@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Order — KizAi</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#08080E;--bg2:#0D0D14;--bg3:#12121A;--card:#161621;--card2:#1C1C28;--lime:#D4FF47;--lime2:#BFEF2A;--hot:#FF3C68;--cyan:#00D9FF;--violet:#7B5EA7;--indigo:#5B5FEE;--amber:#FFB830;--green:#2ECC71;--white:#F4F4FF;--gray:#9898B0;--gray2:#5A5A70;--bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.14);--bdl:rgba(212,255,71,.2);--ffd:'Syne',sans-serif;--ffb:'Plus Jakarta Sans',sans-serif;--ffm:'JetBrains Mono',monospace}
+*,::before,::after{box-sizing:border-box;margin:0;padding:0}html{-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--white);font-family:var(--ffb);min-height:100vh}
+a{color:inherit;text-decoration:none}
+nav{background:rgba(8,8,14,.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd);padding:0 5vw;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.brand{font-family:var(--ffd);font-weight:800;font-size:1.1rem;display:flex;align-items:center;gap:.4rem}
+.bd-d{width:7px;height:7px;background:var(--lime);border-radius:50%}
+.step-bar{display:flex;align-items:center;gap:.4rem}
+.st{display:flex;align-items:center;gap:.3rem;font-family:var(--ffm);font-size:.68rem;color:var(--gray2)}
+.st-n{width:20px;height:20px;border-radius:50%;background:var(--card2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:700}
+.st.on .st-n{background:var(--lime);border-color:var(--lime);color:var(--bg)}.st.on .st-l{color:var(--white)}
+.st.done .st-n{background:var(--green);border-color:var(--green);color:#fff}
+.nbtn{padding:.38rem .9rem;border-radius:7px;font-size:.8rem;font-weight:600;cursor:pointer;border:1px solid var(--bd2);background:transparent;color:var(--gray);font-family:inherit;transition:all .2s}
+.nbtn:hover{color:var(--white)}
+.wrap{max-width:900px;margin:2.5rem auto;padding:0 5vw;display:grid;grid-template-columns:1fr 330px;gap:2rem;align-items:start}
+.fs{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:1.75rem;margin-bottom:1.1rem}
+.fs-t{font-family:var(--ffd);font-weight:700;font-size:.95rem;letter-spacing:-.02em;margin-bottom:1.4rem;color:var(--gray);display:flex;align-items:center;gap:.4rem}
+.fs-t span{color:var(--lime)}
+.fl{font-family:var(--ffm);font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--gray2);display:block;margin-bottom:.4rem}
+.fi{width:100%;padding:.78rem 1rem;background:var(--bg3);border:1.5px solid var(--bd);border-radius:9px;color:var(--white);font-size:.88rem;font-family:inherit;outline:none;transition:border-color .2s}
+.fi:focus{border-color:rgba(212,255,71,.4)}.fi.err{border-color:rgba(255,60,104,.45)}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.9rem}
+.fg{margin-bottom:.9rem}
+.fin{font-size:.72rem;color:var(--gray2);margin-top:.3rem}
+.pc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.55rem;margin-bottom:1.1rem}
+.pc{padding:1rem;border-radius:9px;border:2px solid var(--bd);background:var(--bg3);cursor:pointer;text-align:center;transition:all .22s}
+.pc.on{border-color:var(--lime);background:rgba(212,255,71,.06)}
+.pc.on .pcn{color:var(--lime)}
+.pce{font-size:1.3rem;margin-bottom:.25rem}.pcn{font-weight:700;font-size:.82rem;letter-spacing:-.01em}.pcp{font-family:var(--ffm);font-size:.68rem;color:var(--gray2);margin-top:.15rem}
+.dur-row{display:flex;gap:.4rem;margin-bottom:.75rem}
+.db{padding:.32rem .78rem;border-radius:6px;font-size:.75rem;font-weight:600;cursor:pointer;border:1px solid var(--bd);background:transparent;color:var(--gray);font-family:inherit;transition:all .2s}
+.db.on{background:rgba(212,255,71,.1);border-color:rgba(212,255,71,.3);color:var(--lime)}
+.pay-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.55rem;margin-bottom:.9rem}
+.pm{padding:.8rem .5rem;border-radius:9px;border:1.5px solid var(--bd);background:var(--bg3);cursor:pointer;text-align:center;transition:all .2s}
+.pm.on{border-color:var(--lime);background:rgba(212,255,71,.05)}.pm.on .pm-n{color:var(--lime)}
+.pm-i{font-size:1.2rem;display:block;margin-bottom:.2rem}.pm-n{font-size:.68rem;font-weight:600;color:var(--gray)}
+.pay-info{background:rgba(212,255,71,.04);border:1px solid var(--bdl);border-radius:9px;padding:.8rem;font-size:.78rem;color:var(--gray);line-height:1.6;margin-top:.5rem}
+.cr{display:flex;gap:.5rem;margin-top:.75rem}
+.cr .fi{flex:1}
+.cap{padding:.78rem 1rem;border-radius:9px;background:var(--card2);border:1px solid var(--bd2);color:var(--white);font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;transition:all .2s}
+.cap:hover{border-color:var(--bdl);color:var(--lime)}
+.c-ok{font-size:.72rem;color:var(--green);margin-top:.3rem;display:none}
+/* SUMMARY */
+.scard{background:var(--card);border:1px solid var(--bd2);border-radius:16px;padding:1.75rem;position:sticky;top:80px}
+.sph{display:flex;gap:.9rem;align-items:center;margin-bottom:1.4rem;padding-bottom:1.4rem;border-bottom:1px solid var(--bd)}
+.spi{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.spn{font-family:var(--ffd);font-weight:700;font-size:1rem;letter-spacing:-.02em}
+.spd{font-family:var(--ffm);font-size:.68rem;color:var(--gray2)}
+.srows{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1.4rem}
+.sr{display:flex;justify-content:space-between;font-size:.8rem}
+.sr .k{color:var(--gray)}.sr .v{font-weight:600}
+.stot{display:flex;justify-content:space-between;align-items:center;padding:1rem 0;border-top:1px solid var(--bd);margin-bottom:1.4rem}
+.stot .k{font-weight:700}.stot .v{font-family:var(--ffm);font-weight:700;font-size:1.4rem}
+.bord{width:100%;padding:1rem;border-radius:10px;background:var(--lime);color:var(--bg);font-family:var(--ffd);font-size:.95rem;font-weight:700;border:none;cursor:pointer;transition:all .28s}
+.bord:hover{background:var(--lime2);transform:translateY(-2px);box-shadow:0 10px 28px rgba(212,255,71,.2)}
+.bord:disabled{opacity:.5;transform:none;cursor:not-allowed}
+.tr{display:flex;justify-content:center;gap:1.25rem;margin-top:.85rem;flex-wrap:wrap}
+.tri{font-family:var(--ffm);font-size:.62rem;color:var(--gray2);display:flex;align-items:center;gap:.25rem}
+.mtnote{text-align:center;margin-top:.75rem;font-family:var(--ffm);font-size:.62rem;color:var(--gray2)}
+.mtnote a{color:var(--gray);text-decoration:underline}
+/* TOAST */
+.toasts{position:fixed;top:1rem;right:1rem;z-index:999;display:flex;flex-direction:column;gap:.35rem}
+.toast{padding:.65rem 1rem;border-radius:8px;font-size:.8rem;font-weight:600;animation:tin .3s;display:flex;align-items:center;gap:.35rem;box-shadow:0 8px 20px rgba(0,0,0,.5)}
+.toast.ok{background:rgba(46,204,113,.12);border:1px solid rgba(46,204,113,.25);color:#2ECC71}
+.toast.err{background:rgba(255,60,104,.1);border:1px solid rgba(255,60,104,.25);color:var(--hot)}
+.toast.info{background:rgba(212,255,71,.07);border:1px solid var(--bdl);color:var(--lime)}
+@keyframes tin{from{transform:translateX(16px);opacity:0}to{transform:translateX(0);opacity:1}}
+/* SUCCESS */
+.suc{display:none;text-align:center;padding:5rem 5vw;max-width:500px;margin:0 auto}
+.suc-i{font-size:5rem;margin-bottom:1.75rem;animation:bounce .5s ease}
+.suc-h{font-family:var(--ffd);font-weight:800;font-size:2.5rem;letter-spacing:-.05em;margin-bottom:.7rem}
+.suc-s{color:var(--gray);line-height:1.8;margin-bottom:1.4rem;font-size:.92rem}
+.suc-id{font-family:var(--ffm);font-size:.75rem;background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:.45rem 1.1rem;display:inline-block;margin-bottom:1.75rem;color:var(--lime)}
+.suc-btns{display:flex;gap:.65rem;justify-content:center;flex-wrap:wrap}
+.sb{padding:.78rem 1.6rem;border-radius:9px;font-size:.88rem;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all .22s}
+.sb.m{background:var(--lime);color:var(--bg)}.sb.m:hover{background:var(--lime2)}
+.sb.g{background:var(--card);color:var(--white);border:1px solid var(--bd2)}
+@keyframes bounce{0%,100%{transform:scale(1)}40%{transform:scale(1.15)}}
+@media(max-width:768px){.wrap{grid-template-columns:1fr}.scard{position:static}.pc-grid{grid-template-columns:1fr 1fr 1fr}.frow{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="toasts" id="toasts"></div>
+<nav>
+  <a href="/" class="brand"><span class="bd-d"></span>KizAi</a>
+  <div class="step-bar">
+    <div class="st on" id="s1"><div class="st-n">1</div><span class="st-l">Paket</span></div>
+    <span style="color:var(--gray2);font-size:.8rem">›</span>
+    <div class="st" id="s2"><div class="st-n">2</div><span class="st-l">Data</span></div>
+    <span style="color:var(--gray2);font-size:.8rem">›</span>
+    <div class="st" id="s3"><div class="st-n">3</div><span class="st-l">Bayar</span></div>
+  </div>
+  <a href="/" class="nbtn">← Kembali</a>
+</nav>
+<div id="main-co">
+  <div class="wrap">
+    <div>
+      <div class="fs">
+        <div class="fs-t"><span>01</span> Pilih Paket</div>
+        <div class="pc-grid" id="pc-grid"></div>
+        <label class="fl">Durasi</label>
+        <div class="dur-row" id="dur-row"></div>
+      </div>
+      <div class="fs">
+        <div class="fs-t"><span>02</span> Data Pemesanan</div>
+        <div class="frow">
+          <div><label class="fl">Nama / Nickname *</label><input class="fi" id="fn" placeholder="Nama kamu"></div>
+          <div><label class="fl">Email (opsional)</label><input class="fi" type="email" id="fe" placeholder="email@kamu.com"></div>
+        </div>
+        <div class="fg"><label class="fl">ID / Username Telegram *</label><input class="fi" id="ft" placeholder="@username atau ID numerik"><p class="fin">💡 Kirim /id ke @userinfobot untuk tahu ID Telegram kamu</p></div>
+        <div class="fg"><label class="fl">Catatan (opsional)</label><input class="fi" id="fno" placeholder="Pesan tambahan..."></div>
+      </div>
+      <div class="fs">
+        <div class="fs-t"><span>03</span> Pembayaran</div>
+        <p style="font-size:.8rem;color:var(--gray);margin-bottom:1.1rem">Semua transaksi diproses aman via <b style="color:var(--white)">Midtrans</b>.</p>
+        <div class="pay-grid" id="pay-grid"></div>
+        <div class="pay-info" id="pay-info">Pilih metode pembayaran.</div>
+        <label class="fl" style="margin-top:1.1rem">Kode Kupon (opsional)</label>
+        <div class="cr"><input class="fi" id="fc" placeholder="NEXBOT10, HEMAT20, PREMIUM50..."><button class="cap" onclick="applyCoupon()">Pakai</button></div>
+        <div class="c-ok" id="cok">✅ Kupon aktif!</div>
+      </div>
+    </div>
+    <div>
+      <div class="scard">
+        <div class="sph"><div class="spi" id="spi">💎</div><div><div class="spn" id="spn">VIP</div><div class="spd" id="spd">30 hari</div></div></div>
+        <div class="srows"><div class="sr"><span class="k">Harga paket</span><span class="v" id="sb">Rp 0</span></div><div class="sr" id="sd-row" style="display:none"><span class="k" style="color:var(--green)">Diskon</span><span class="v" style="color:var(--green)" id="sdc">-Rp 0</span></div><div class="sr"><span class="k">Biaya layanan</span><span class="v" style="color:var(--lime)">Gratis</span></div></div>
+        <div class="stot"><span class="k">Total Bayar</span><span class="v" id="st">Rp 0</span></div>
+        <button class="bord" id="bord" onclick="processOrder()">🔒 Bayar Sekarang</button>
+        <div class="tr"><span class="tri">🔒 SSL</span><span class="tri">⚡ Auto Aktif</span><span class="tri">✅ Terverifikasi</span></div>
+        <div class="mtnote">via <a href="https://midtrans.com" target="_blank">Midtrans</a></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="suc" id="suc-page">
+  <div class="suc-i">🎉</div>
+  <div class="suc-h">Berhasil!</div>
+  <p class="suc-s">Paket <b id="suc-pl">Premium</b> selama <b id="suc-dur">30 hari</b> sudah aktif di akun kamu!</p>
+  <div class="suc-id" id="suc-oid">ORD-XXXXXXXXXX</div>
+  <div class="suc-btns">
+    <button class="sb m" onclick="window.open('https://t.me/kizai_bot','_blank')">💬 Buka Bot</button>
+    <button class="sb g" onclick="location.href='/dashboard.html'">Dashboard →</button>
+  </div>
+</div>
+<script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="Mid-client-EBQmSw6d57c4QPuR"></script>
+<script>
+const PR={premium:{30:15000,90:35000},vip:{30:25000,90:60000}};
+const CPN={'NEXBOT10':.1,'HEMAT20':.2,'PREMIUM50':.5,'FREE100':1};
+const PMS=[{id:'qris',i:'📱',n:'QRIS',info:'Scan QR dari e-wallet/m-banking apapun.'},{id:'gopay',i:'💚',n:'GoPay',info:'Bayar via GoPay dari aplikasi Gojek.'},{id:'ovo',i:'💜',n:'OVO',info:'Bayar via OVO, pastikan saldo cukup.'},{id:'dana',i:'💙',n:'Dana',info:'Bayar via DANA dari aplikasi.'},{id:'bca',i:'🏦',n:'BCA VA',info:'Transfer ke Virtual Account BCA (24 jam).'},{id:'bni',i:'🏦',n:'BNI VA',info:'Transfer ke Virtual Account BNI (24 jam).'}];
+const PLM={free:{icon:'🆓',bg:'rgba(107,114,128,.12)'},premium:{icon:'⭐',bg:'rgba(212,255,71,.12)'},vip:{icon:'💎',bg:'rgba(123,94,167,.15)'}};
+const params=new URLSearchParams(location.search);
+let sp=params.get('plan')||'premium',sd=+params.get('dur')||30,spm='qris',coupon=0;
+function renderPC(){document.getElementById('pc-grid').innerHTML=['free','premium','vip'].map(p=>{const m=PLM[p];const pr=p==='free'?'Gratis':'Rp '+(PR[p]?.[30]||0).toLocaleString('id')+'+';return`<div class="pc${p===sp?' on':''}" onclick="sp='${p}';renderAll()"><div class="pce">${m.icon}</div><div class="pcn">${p.charAt(0).toUpperCase()+p.slice(1)}</div><div class="pcp">${pr}</div></div>`}).join('')}
+function renderDur(){document.getElementById('dur-row').innerHTML=[30,90].map(d=>`<button class="db${d===sd?' on':''}" onclick="sd=${d};renderAll()">${d} Hari</button>`).join('')}
+function renderPay(){document.getElementById('pay-grid').innerHTML=PMS.map(pm=>`<div class="pm${pm.id===spm?' on':''}" onclick="spm='${pm.id}';renderAll()"><span class="pm-i">${pm.i}</span><span class="pm-n">${pm.n}</span></div>`).join('');document.getElementById('pay-info').textContent=PMS.find(p=>p.id===spm)?.info||''}
+function renderSum(){const base=sp==='free'?0:PR[sp]?.[sd]||0;const disc=Math.round(base*coupon);const total=base-disc;const m=PLM[sp];const pi=document.getElementById('spi');pi.textContent=m.icon;pi.style.background=m.bg;document.getElementById('spn').textContent=sp.charAt(0).toUpperCase()+sp.slice(1);document.getElementById('spd').textContent=sp==='free'?'Selamanya · Gratis':`${sd} hari · Auto aktif`;document.getElementById('sb').textContent=base>0?'Rp '+base.toLocaleString('id'):'Gratis';document.getElementById('st').textContent=total>0?'Rp '+total.toLocaleString('id'):'Gratis';const dr=document.getElementById('sd-row');dr.style.display=disc>0?'':'none';if(disc>0)document.getElementById('sdc').textContent='-Rp '+disc.toLocaleString('id');document.getElementById('bord').textContent=sp==='free'?'Mulai Gratis →':'🔒 Bayar Sekarang'}
+function renderAll(){renderPC();renderDur();renderPay();renderSum()}
+renderAll();
+function applyCoupon(){const c=document.getElementById('fc').value.trim().toUpperCase();if(CPN[c]){coupon=CPN[c];const ok=document.getElementById('cok');ok.style.display='';ok.textContent=`✅ ${c} — diskon ${Math.round(coupon*100)}% aktif!`;renderSum();toast('Kupon berhasil!','ok')}else{coupon=0;toast('Kode kupon tidak valid','err');renderSum()}}
+async function processOrder(){
+  if(sp==='free'){location.href='/auth.html#register';return}
+  const name=document.getElementById('fn').value.trim();const tg=document.getElementById('ft').value.trim();
+  if(!name){document.getElementById('fn').classList.add('err');toast('Isi nama dulu!','err');return}
+  if(!tg){document.getElementById('ft').classList.add('err');toast('Isi Telegram ID dulu!','err');return}
+  document.getElementById('fn').classList.remove('err');document.getElementById('ft').classList.remove('err');
+  const btn=document.getElementById('bord');btn.disabled=true;btn.textContent='⏳ Memproses...';
+  document.getElementById('s1').classList.add('done');document.getElementById('s2').classList.add('done');document.getElementById('s3').classList.add('on');
+  const base=PR[sp][sd],disc=Math.round(base*coupon),total=base-disc,oid='KZ-'+Date.now();
+  const email=document.getElementById('fe').value.trim()||'user@kizai.id';
+  const token=localStorage.getItem('kizai_token');
+  try{
+    const r=await fetch('/api/payment',{method:'POST',headers:{'Content-Type':'application/json','Authorization':token?'Bearer '+token:''},body:JSON.stringify({plan:sp,duration:sd,amount:total,name,email,telegram_id:tg,payment_method:spm,coupon:coupon>0?document.getElementById('fc').value.trim():null})});
+    const d=await r.json();
+    if(d.snap_token){window.snap.pay(d.snap_token,{onSuccess:()=>onOK(d.order_id||oid),onPending:()=>{toast('Menunggu konfirmasi...','info');btn.disabled=false;btn.textContent='🔒 Bayar Sekarang'},onError:()=>{toast('Gagal. Coba lagi.','err');btn.disabled=false;btn.textContent='🔒 Bayar Sekarang'},onClose:()=>{btn.disabled=false;btn.textContent='🔒 Bayar Sekarang'}})}
+    else if(d.redirect_url)location.href=d.redirect_url;
+    else if(d.demo){toast('Mode demo — disimulasikan','info');setTimeout(()=>onOK(d.order_id||oid),1800)}
+    else{toast(d.error||'Gagal','err');btn.disabled=false;btn.textContent='🔒 Bayar Sekarang'}
+  }catch{toast('Mode demo aktif','info');setTimeout(()=>onOK(oid),2000);btn.disabled=false;btn.textContent='🔒 Bayar Sekarang'}
+}
+function onOK(oid){document.getElementById('main-co').style.display='none';const p=document.getElementById('suc-page');p.style.display='block';document.getElementById('suc-pl').textContent=sp.charAt(0).toUpperCase()+sp.slice(1);document.getElementById('suc-dur').textContent=sd+' hari';document.getElementById('suc-oid').textContent=oid;document.querySelectorAll('.st').forEach(s=>s.classList.add('done'))}
+function toast(msg,type='ok'){const w=document.getElementById('toasts');const el=document.createElement('div');el.className='toast '+type;el.textContent=msg;w.appendChild(el);setTimeout(()=>el.remove(),3200)}
+</script>
+</body>
+</html>
