@@ -1,0 +1,11 @@
+{
+  "name": "kizai-v2",
+  "version": "2.0.0",
+  "description": "KizAi — Telegram AI Bot Website v2 (Supabase + Midtrans)",
+  "scripts": { "dev": "vercel dev", "start": "node server.js" },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "axios": "^1.6.7",
+    "node-fetch": "^2.7.0"
+  }
+}
