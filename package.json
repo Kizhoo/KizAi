@@ -1,0 +1,16 @@
+{
+  "name": "bot-web-dashboard",
+  "version": "1.0.0",
+  "description": "Telegram Bot Web Dashboard & Store",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'Static build'"
+  },
+  "dependencies": {
+    "better-sqlite3": "^9.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "bcryptjs": "^2.4.3",
+    "axios": "^1.6.7",
+    "node-telegram-bot-api": "^0.61.0"
+  }
+}
