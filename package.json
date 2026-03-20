@@ -3,8 +3,7 @@
   "version": "2.1.0",
   "description": "KizAi — AI Platform Website (Supabase + Midtrans + Cloudflare AI)",
   "scripts": {
-    "dev": "vercel dev",
-    "start": "node server.js"
+    "dev": "vercel dev"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0",
