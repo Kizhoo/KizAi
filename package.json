@@ -1,0 +1,13 @@
+{
+  "name": "kizai-v2",
+  "version": "2.1.0",
+  "description": "KizAi — AI Platform Website (Supabase + Midtrans + Cloudflare AI)",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "axios": "^1.6.7",
+    "node-fetch": "^2.7.0"
+  }
+}
