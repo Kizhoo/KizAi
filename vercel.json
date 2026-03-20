@@ -1,8 +1,5 @@
 {
   "version": 2,
-  "functions": {
-    "api/**/*.js": { "runtime": "@vercel/node" }
-  },
   "rewrites": [
     { "source": "/api/auth/(.*)",    "destination": "/api/auth.js" },
     { "source": "/api/chat/(.*)",    "destination": "/api/chat.js" },
