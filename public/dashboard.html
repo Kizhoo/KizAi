@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<script>(function(){var p=JSON.parse(localStorage.getItem("kizai_prefs")||"{}");document.documentElement.setAttribute("data-theme",p.theme||"dark");document.documentElement.setAttribute("data-accent",p.accent||"lime");document.documentElement.setAttribute("data-fs",p.fontSize||"md");if(p.reducedMotion)document.documentElement.setAttribute("data-reduced","1");}());</script>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dashboard — KizAi</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+[data-theme="light"]{--bg:#F8F9FC;--bg2:#EFF1F7;--bg3:#E5E8F0;--card:#FFFFFF;--card2:#F3F4F9;--card3:#ECEEF5;--white:#1A1A2E;--gray:#6B7280;--gray2:#9CA3AF;--bd:rgba(0,0,0,.08);--bd2:rgba(0,0,0,.14);--shadow:0 4px 24px rgba(0,0,0,.1);}
+[data-accent="blue"]{--accent:#3B82F6;--accent2:#2563EB;--accent-rgb:59,130,246;--accent-fg:#fff;}
+[data-accent="purple"]{--accent:#A855F7;--accent2:#9333EA;--accent-rgb:168,85,247;--accent-fg:#fff;}
+[data-accent="pink"]{--accent:#EC4899;--accent2:#DB2777;--accent-rgb:236,72,153;--accent-fg:#fff;}
+[data-accent="orange"]{--accent:#F97316;--accent2:#EA580C;--accent-rgb:249,115,22;--accent-fg:#fff;}
+[data-accent="cyan"]{--accent:#06B6D4;--accent2:#0891B2;--accent-rgb:6,182,212;--accent-fg:#fff;}
+[data-accent="lime"]{--accent:#D4FF47;--accent2:#BFEF2A;--accent-rgb:212,255,71;--accent-fg:#08080E;}
+:root{--bg:#08080E;--bg2:#0D0D14;--bg3:#12121A;--card:#161621;--card2:#1C1C28;--card3:#222235;--white:#F4F4FF;--gray:#9898B0;--gray2:#5A5A70;--bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.13);--shadow:0 8px 32px rgba(0,0,0,.5);--accent:#D4FF47;--accent2:#BFEF2A;--accent-rgb:212,255,71;--accent-fg:#08080E;--hot:#FF3C68;--cyan:#00D9FF;--violet:#7B5EA7;--indigo:#5B5FEE;--amber:#FFB830;--green:#2ECC71;--ff-d:'Syne',sans-serif;--ff-b:'Plus Jakarta Sans',sans-serif;--ff-m:'JetBrains Mono',monospace;--r:8px;--r2:12px;--r3:16px;--r4:20px;--anim:.25s cubic-bezier(.4,0,.2,1);--spring:.45s cubic-bezier(.34,1.56,.64,1);}
+*,::before,::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--white);font-family:var(--ff-b);min-height:100vh;display:flex;transition:background var(--anim),color var(--anim)}
+a{text-decoration:none;color:inherit}
+[data-reduced="1"] *{animation-duration:.01ms!important;transition-duration:.01ms!important}
+[data-fs="sm"]{font-size:14px}[data-fs="md"]{font-size:16px}[data-fs="lg"]{font-size:18px}
+
+/* SIDEBAR */
+.sb{width:248px;background:var(--bg2);border-right:1px solid var(--bd);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:50;transition:transform .3s;overflow-y:auto}
+.sb-brand{padding:1.1rem 1.2rem;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:.5rem;flex-shrink:0}
+.sb-logo{font-family:var(--ff-d);font-weight:800;font-size:1.1rem}
+.sb-dot{width:7px;height:7px;background:var(--accent);border-radius:50%;box-shadow:0 0 6px var(--accent);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.sb-theme-btn{margin-left:auto;background:none;border:none;cursor:pointer;font-size:1rem;color:var(--gray);transition:color .2s}
+.sb-theme-btn:hover{color:var(--white)}
+
+.sb-user{padding:1rem 1.1rem;border-bottom:1px solid var(--bd);flex-shrink:0}
+.sb-av{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;flex-shrink:0;border:2px solid rgba(var(--accent-rgb),.3)}
+.su-name{font-weight:700;font-size:.87rem;margin-bottom:.1rem}
+.su-plan{font-family:var(--ff-m);font-size:.6rem;padding:.12rem .4rem;border-radius:4px;display:inline-block}
+.pf{background:rgba(107,114,128,.12);color:#9CA3AF;border:1px solid rgba(107,114,128,.2)}
+.pp{background:rgba(var(--accent-rgb),.1);color:var(--accent);border:1px solid rgba(var(--accent-rgb),.2)}
+.pv{background:rgba(123,94,167,.15);color:#C084FC;border:1px solid rgba(123,94,167,.25)}
+.xp-bar-wrap{height:4px;background:var(--bd2);border-radius:2px;overflow:hidden;margin-top:.55rem}
+.xp-bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--cyan));border-radius:2px;transition:width 1s var(--spring)}
+.xp-meta{display:flex;justify-content:space-between;font-family:var(--ff-m);font-size:.58rem;color:var(--gray2);margin-top:.25rem}
+.sb-stats{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-top:.6rem}
+.sb-stat{display:flex;align-items:center;gap:.35rem;padding:.4rem .5rem;background:rgba(var(--accent-rgb),.05);border:1px solid rgba(var(--accent-rgb),.12);border-radius:var(--r);font-family:var(--ff-m);font-size:.68rem;font-weight:600}
+.sb-stat.fire{background:rgba(255,60,104,.05);border-color:rgba(255,60,104,.12);color:var(--hot)}
+.sb-stat.coins{color:var(--amber)}
+
+.sb-nav{padding:.6rem 0;flex:1}
+.nav-sec{padding:.2rem .85rem;font-family:var(--ff-m);font-size:.57rem;text-transform:uppercase;letter-spacing:.12em;color:var(--gray2);margin-top:.35rem}
+.ni{display:flex;align-items:center;gap:.6rem;padding:.52rem 1.1rem;font-size:.83rem;font-weight:500;color:var(--gray);cursor:pointer;transition:all .2s;position:relative}
+.ni:hover{color:var(--white);background:rgba(255,255,255,.04)}
+.ni.on{color:var(--accent);background:rgba(var(--accent-rgb),.06)}
+.ni.on::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--accent)}
+.ni-ico{font-size:.9rem;width:19px;text-align:center}
+.ni-badge{margin-left:auto;font-family:var(--ff-m);font-size:.55rem;padding:.08rem .35rem;border-radius:100px;background:var(--hot);color:#fff;font-weight:700}
+
+.sb-bot{padding:.85rem;border-top:1px solid var(--bd);display:flex;flex-direction:column;gap:.4rem;flex-shrink:0}
+.bot-btn{width:100%;padding:.52rem .85rem;border-radius:var(--r2);font-size:.78rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;gap:.45rem;justify-content:center;background:transparent;border:1px solid var(--bd2);color:var(--gray)}
+.bot-btn:hover{color:var(--white);border-color:var(--bd2)}
+.bot-btn.adm{background:rgba(var(--accent-rgb),.08);border-color:rgba(var(--accent-rgb),.2);color:var(--accent);display:none}
+.bot-btn.out:hover{border-color:rgba(255,60,104,.3);color:var(--hot)}
+
+/* MAIN */
+.main{flex:1;margin-left:248px;min-height:100vh;display:flex;flex-direction:column}
+.topbar{padding:.9rem 1.6rem;border-bottom:1px solid var(--bd);background:var(--bg2);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:30;flex-shrink:0}
+.page-ttl{font-family:var(--ff-d);font-weight:700;font-size:1.05rem;letter-spacing:-.02em}
+.topbar-r{display:flex;align-items:center;gap:.45rem}
+.tbb{padding:.38rem .72rem;border-radius:var(--r);font-size:.77rem;font-weight:600;cursor:pointer;border:1px solid var(--bd2);background:transparent;color:var(--gray);font-family:inherit;transition:all .2s}
+.tbb:hover{color:var(--white)}
+.tbb.prime{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.tbb.prime:hover{background:var(--accent2)}
+.menu-btn{display:none;background:none;border:none;color:var(--white);font-size:1.3rem;cursor:pointer}
+
+.content{padding:1.6rem;flex:1}
+.sec{display:none}.sec.on{display:block}
+
+/* LAYOUT HELPERS */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:.9rem}
+.mb{margin-bottom:1.25rem}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--bd);border-radius:var(--r4);padding:1.4rem;transition:border-color var(--anim)}
+.card:hover{border-color:var(--bd2)}
+.ct{font-family:var(--ff-d);font-weight:700;font-size:.96rem;letter-spacing:-.02em;margin-bottom:1.1rem;display:flex;align-items:center;justify-content:space-between}
+
+/* STAT CARDS */
+.sc{background:var(--card);border:1px solid var(--bd);border-radius:var(--r3);padding:1.1rem;overflow:hidden;position:relative;transition:all .25s}
+.sc:hover{border-color:var(--bd2);transform:translateY(-2px);box-shadow:var(--shadow)}
+.sc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.sc.a::before{background:var(--accent)}.sc.b::before{background:var(--cyan)}.sc.c::before{background:var(--violet)}.sc.d::before{background:var(--amber)}.sc.e::before{background:var(--hot)}.sc.f::before{background:var(--green)}
+.sc-glow{position:absolute;top:-30px;right:-30px;width:90px;height:90px;border-radius:50%;filter:blur(30px);opacity:.07}
+.sc.a .sc-glow{background:var(--accent)}.sc.b .sc-glow{background:var(--cyan)}.sc.c .sc-glow{background:var(--violet)}.sc.d .sc-glow{background:var(--amber)}.sc.e .sc-glow{background:var(--hot)}.sc.f .sc-glow{background:var(--green)}
+.sc-i{font-size:1.3rem;display:block;margin-bottom:.5rem}
+.sc-v{font-family:var(--ff-d);font-weight:800;font-size:1.8rem;letter-spacing:-.06em;line-height:1}
+.sc-l{font-size:.68rem;color:var(--gray);margin-top:.2rem;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+
+/* SUB BANNER */
+.sub-ban{background:linear-gradient(135deg,var(--card),rgba(var(--accent-rgb),.05));border:1px solid rgba(var(--accent-rgb),.2);border-radius:var(--r4);padding:1.4rem 1.6rem;position:relative;overflow:hidden;margin-bottom:1.25rem}
+.sub-ban::before{content:'';position:absolute;top:-80px;right:-80px;width:220px;height:220px;background:radial-gradient(circle,rgba(var(--accent-rgb),.1),transparent 70%)}
+.sub-chip{display:inline-flex;align-items:center;gap:.35rem;padding:.22rem .65rem;border-radius:5px;font-family:var(--ff-m);font-size:.62rem;font-weight:700;margin-bottom:.5rem}
+
+/* QUICK ACTION */
+.qa{display:flex;align-items:center;gap:.85rem;padding:.9rem 1.1rem;background:var(--card);border:1px solid var(--bd);border-radius:var(--r3);transition:all .25s;text-decoration:none;color:inherit;cursor:pointer}
+.qa:hover{border-color:rgba(var(--accent-rgb),.3);background:var(--card2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.qa-ico{font-size:1.5rem;flex-shrink:0}
+.qa-n{font-weight:700;font-size:.84rem}
+.qa-d{font-size:.7rem;color:var(--gray);margin-top:.1rem}
+
+/* STREAK CALENDAR */
+.st-cal{display:grid;grid-template-columns:repeat(14,1fr);gap:3px;margin-top:.65rem}
+.st-day{aspect-ratio:1;border-radius:3px;background:var(--bd2);transition:all .3s}
+.st-day.on{background:var(--accent);opacity:.85}
+.st-day.today{background:var(--accent);box-shadow:0 0 8px rgba(var(--accent-rgb),.5)}
+.streak-nums{display:flex;gap:1.25rem;margin-top:.65rem}
+.sn{font-family:var(--ff-m);font-size:.68rem;color:var(--gray2)}
+.sn span{font-family:var(--ff-d);font-weight:700;font-size:1rem;color:var(--white);display:block}
+
+/* ACHIEVEMENTS */
+.ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(125px,1fr));gap:.75rem}
+.ach{background:var(--card2);border:1px solid var(--bd);border-radius:var(--r3);padding:.9rem;text-align:center;transition:all .25s;position:relative;overflow:hidden}
+.ach.u{background:rgba(var(--accent-rgb),.05);border-color:rgba(var(--accent-rgb),.2)}
+.ach.u:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(var(--accent-rgb),.12)}
+.ach.l{opacity:.4;filter:grayscale(.5)}
+.ach-ico{font-size:1.85rem;display:block;margin-bottom:.4rem}
+.ach-n{font-family:var(--ff-d);font-weight:700;font-size:.75rem;margin-bottom:.15rem}
+.ach-d{font-size:.65rem;color:var(--gray);line-height:1.4}
+.ach-tag{position:absolute;top:.35rem;right:.35rem;font-family:var(--ff-m);font-size:.52rem;padding:.08rem .3rem;border-radius:3px;font-weight:700}
+.tag-r{background:rgba(59,130,246,.15);color:#60A5FA;border:1px solid rgba(59,130,246,.3)}
+.tag-e{background:rgba(168,85,247,.15);color:#C084FC;border:1px solid rgba(168,85,247,.3)}
+.tag-l{background:rgba(251,191,36,.15);color:#FBBF24;border:1px solid rgba(251,191,36,.3)}
+
+/* LEADERBOARD */
+.lb-row{display:flex;align-items:center;gap:.75rem;padding:.75rem .8rem;border-radius:var(--r2);transition:background .2s}
+.lb-row:hover{background:rgba(var(--accent-rgb),.04)}
+.lb-row.me{background:rgba(var(--accent-rgb),.06);border:1px solid rgba(var(--accent-rgb),.15)}
+.lb-rank{font-family:var(--ff-d);font-weight:800;font-size:.88rem;width:22px;text-align:center;flex-shrink:0}
+.lb-rank.g{color:#FBBF24}.lb-rank.s{color:#94A3B8}.lb-rank.b{color:#CD7C37}
+.lb-av{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
+.lb-n{font-weight:600;font-size:.83rem}
+.lb-l{font-family:var(--ff-m);font-size:.6rem;color:var(--gray2);margin-top:.08rem}
+.lb-xp{margin-left:auto;font-family:var(--ff-d);font-weight:700;font-size:.88rem;color:var(--accent)}
+
+/* PROFILE FORM */
+.ig{margin-bottom:.9rem}
+.ig label{font-family:var(--ff-m);font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--gray2);display:block;margin-bottom:.38rem}
+.ig input,.ig textarea{width:100%;padding:.75rem 1rem;background:var(--bg3);border:1.5px solid var(--bd);border-radius:var(--r2);color:var(--white);font-size:.86rem;font-family:inherit;outline:none;transition:border-color .2s}
+.ig input:focus,.ig textarea:focus{border-color:rgba(var(--accent-rgb),.4)}
+.ig input:disabled{color:var(--gray2);cursor:default}
+.ig textarea{resize:vertical;min-height:72px}
+.av-pick{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.9rem}
+.av-o{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.05rem;cursor:pointer;border:2px solid transparent;transition:all .2s}
+.av-o.on{border-color:var(--accent);box-shadow:0 0 0 2px rgba(var(--accent-rgb),.2)}
+.cp{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.9rem}
+.cp-d{width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .2s}
+.cp-d.on{border-color:var(--white);transform:scale(1.15)}
+
+/* SETTINGS */
+.sg{margin-bottom:1.25rem}
+.sg-l{font-family:var(--ff-m);font-size:.63rem;text-transform:uppercase;letter-spacing:.1em;color:var(--gray2);margin-bottom:.55rem;display:block}
+.th-row{display:flex;gap:.45rem}
+.th-btn{flex:1;padding:.6rem;border-radius:var(--r2);border:1.5px solid var(--bd);background:var(--bg3);color:var(--gray);font-size:.8rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;text-align:center}
+.th-btn.on{border-color:var(--accent);color:var(--accent);background:rgba(var(--accent-rgb),.08)}
+.ac-row{display:flex;gap:.45rem;flex-wrap:wrap}
+.ac-d{width:30px;height:30px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all .2s}
+.ac-d.on{border-color:var(--white);transform:scale(1.12);box-shadow:0 0 0 2px rgba(255,255,255,.15)}
+.fs-row{display:flex;gap:.45rem}
+.fs-b{flex:1;padding:.48rem;border-radius:var(--r);border:1.5px solid var(--bd);background:var(--bg3);color:var(--gray);font-size:.78rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;text-align:center}
+.fs-b.on{border-color:var(--accent);color:var(--accent);background:rgba(var(--accent-rgb),.08)}
+.tog-row{display:flex;align-items:center;justify-content:space-between;padding:.6rem 0;border-bottom:1px solid var(--bd)}
+.tog-row:last-child{border-bottom:0}
+.tog-n{font-size:.83rem;font-weight:600}
+.tog-d{font-size:.7rem;color:var(--gray);margin-top:.08rem}
+.tog{width:42px;height:22px;border-radius:11px;background:var(--bd2);border:none;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0}
+.tog::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:3px;left:3px;transition:transform .2s}
+.tog.on{background:var(--accent)}
+.tog.on::after{transform:translateX(20px)}
+
+/* REF BOX */
+.ref-bx{background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r2);padding:.8rem 1rem;display:flex;align-items:center;gap:.6rem}
+.ref-cd{font-family:var(--ff-m);font-size:.95rem;font-weight:700;letter-spacing:.1em;color:var(--accent);flex:1}
+.ref-cp{padding:.38rem .8rem;border-radius:var(--r);background:rgba(var(--accent-rgb),.1);border:1px solid rgba(var(--accent-rgb),.2);color:var(--accent);font-family:var(--ff-m);font-size:.7rem;font-weight:600;cursor:pointer;transition:all .2s}
+.ref-cp:hover{background:rgba(var(--accent-rgb),.2)}
+
+/* ORDER ROWS */
+.ord-r{display:flex;align-items:center;padding:.8rem 0;border-bottom:1px solid var(--bd);gap:.85rem}
+.ord-r:last-child{border-bottom:0}
+.ord-p{font-size:.83rem;font-weight:600}
+.ord-id{font-family:var(--ff-m);font-size:.65rem;color:var(--gray2);margin-top:.12rem}
+.ord-pr{font-family:var(--ff-d);font-weight:700;font-size:.85rem;color:var(--accent);margin-left:auto}
+.ord-s{padding:.16rem .55rem;border-radius:4px;font-family:var(--ff-m);font-size:.6rem;font-weight:700;margin-left:.5rem}
+.sp{background:rgba(255,184,48,.1);color:var(--amber);border:1px solid rgba(255,184,48,.2)}
+.sa{background:rgba(46,204,113,.1);color:var(--green);border:1px solid rgba(46,204,113,.2)}
+.sr{background:rgba(255,60,104,.1);color:var(--hot);border:1px solid rgba(255,60,104,.2)}
+
+/* TOAST */
+#toasts{position:fixed;top:1rem;right:1rem;z-index:9999;display:flex;flex-direction:column;gap:.4rem;pointer-events:none;max-width:280px}
+.tt{pointer-events:auto;padding:.65rem 1rem;border-radius:var(--r2);font-size:.8rem;font-weight:600;display:flex;align-items:center;gap:.5rem;box-shadow:var(--shadow);animation:tin .3s var(--spring)}
+@keyframes tin{from{transform:translateX(20px);opacity:0}to{transform:translateX(0);opacity:1}}
+.tt.ok{background:rgba(46,204,113,.12);border:1px solid rgba(46,204,113,.25);color:var(--green)}
+.tt.er{background:rgba(255,60,104,.1);border:1px solid rgba(255,60,104,.25);color:var(--hot)}
+.tt.in{background:rgba(var(--accent-rgb),.08);border:1px solid rgba(var(--accent-rgb),.2);color:var(--accent)}
+
+/* MOBILE */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:40}
+@media(max-width:820px){
+  .sb{transform:translateX(-100%)}.sb.open{transform:translateX(0)}.overlay.open{display:block}
+  .main{margin-left:0}.topbar{padding:.8rem 1rem}.content{padding:1rem}
+  .g4{grid-template-columns:1fr 1fr}.g2,.g3{grid-template-columns:1fr}
+  .menu-btn{display:block}
+}
+@media(max-width:400px){.g4{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div id="toasts"></div>
+<div class="overlay" id="ov" onclick="closeSb()"></div>
+
+<aside class="sb" id="sb">
+  <div class="sb-brand">
+    <span class="sb-dot"></span>
+    <span class="sb-logo">KizAi</span>
+    <button class="sb-theme-btn" onclick="smoothToggle()" id="th-ico">🌙</button>
+  </div>
+  <div class="sb-user">
+    <div style="display:flex;gap:.65rem;align-items:center">
+      <div class="sb-av" id="sb-av" style="background:#5B5FEE">😊</div>
+      <div>
+        <div class="su-name" id="sb-nm">...</div>
+        <span class="su-plan pf" id="sb-pl">FREE</span>
+      </div>
+    </div>
+    <div class="xp-bar-wrap"><div class="xp-bar" id="xp-b" style="width:10%"></div></div>
+    <div class="xp-meta"><span>Lv.<span id="sb-lv">1</span></span><span><span id="sb-xp">0</span> XP</span></div>
+    <div class="sb-stats">
+      <div class="sb-stat coins">💰 <span id="sb-coins">0</span></div>
+      <div class="sb-stat fire">🔥 <span id="sb-str">0</span> hari</div>
+    </div>
+  </div>
+  <nav class="sb-nav">
+    <div class="nav-sec">Utama</div>
+    <div class="ni on" onclick="go('ov')"><span class="ni-ico">🏠</span>Overview</div>
+    <div class="ni" onclick="location.href='/chat.html'"><span class="ni-ico">🤖</span>KizAi Chat</div>
+    <div class="ni" onclick="location.href='/tools.html'"><span class="ni-ico">🔧</span>Tools Hub</div>
+    <div class="ni" onclick="location.href='/games.html'"><span class="ni-ico">🎮</span>Games Hub</div>
+    <div class="ni" onclick="location.href='/leaderboard.html'"><span class="ni-ico">🏆</span>Leaderboard</div>
+    <div class="nav-sec">Akun</div>
+    <div class="ni" onclick="go('pf')"><span class="ni-ico">👤</span>Profil</div>
+    <div class="ni" onclick="go('ac')"><span class="ni-ico">🎖️</span>Achievement <span class="ni-badge" id="ac-b" style="display:none">!</span></div>
+    <div class="ni" onclick="go('sb2')"><span class="ni-ico">💎</span>Langganan</div>
+    <div class="ni" onclick="go('or')"><span class="ni-ico">📦</span>Riwayat Order</div>
+    <div class="nav-sec">Lainnya</div>
+    <div class="ni" onclick="go('st')"><span class="ni-ico">⚙️</span>Pengaturan</div>
+    <div class="ni" onclick="location.href='/checkout.html'"><span class="ni-ico">⭐</span>Upgrade Plan</div>
+  </nav>
+  <div class="sb-bot">
+    <button class="bot-btn adm" id="adm-btn" onclick="location.href='/admin.html'">⚙️ Admin Dashboard</button>
+    <button class="bot-btn out" onclick="logout()">🚪 Keluar</button>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:.65rem">
+      <button class="menu-btn" onclick="toggleSb()">☰</button>
+      <span class="page-ttl" id="pg-ttl">Dashboard</span>
+    </div>
+    <div class="topbar-r">
+      <span style="font-family:var(--ff-m);font-size:.73rem;color:var(--amber)">💰 <span id="tb-coins">0</span></span>
+      <button class="tbb" onclick="smoothToggle()">🌙 <span id="tb-th">Gelap</span></button>
+      <button class="tbb prime" onclick="location.href='/checkout.html'">⭐ Upgrade</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- OVERVIEW -->
+    <div id="s-ov" class="sec on">
+      <div class="g4 mb">
+        <div class="sc a"><div class="sc-glow"></div><span class="sc-i">💰</span><div class="sc-v" id="ov-c">0</div><div class="sc-l">Koin</div></div>
+        <div class="sc b"><div class="sc-glow"></div><span class="sc-i">⭐</span><div class="sc-v" id="ov-x">0</div><div class="sc-l">Total XP</div></div>
+        <div class="sc e"><div class="sc-glow"></div><span class="sc-i">🔥</span><div class="sc-v" id="ov-st">0</div><div class="sc-l">Streak Hari</div></div>
+        <div class="sc c"><div class="sc-glow"></div><span class="sc-i">🎮</span><div class="sc-v" id="ov-gp">0</div><div class="sc-l">Games</div></div>
+        <div class="sc d"><div class="sc-glow"></div><span class="sc-i">💬</span><div class="sc-v" id="ov-ch">0</div><div class="sc-l">Chat AI</div></div>
+        <div class="sc f"><div class="sc-glow"></div><span class="sc-i">🔧</span><div class="sc-v" id="ov-tu">0</div><div class="sc-l">Tools</div></div>
+        <div class="sc a"><div class="sc-glow"></div><span class="sc-i">🏅</span><div class="sc-v" id="ov-lv">1</div><div class="sc-l">Level</div></div>
+        <div class="sc b"><div class="sc-glow"></div><span class="sc-i">🎖️</span><div class="sc-v" id="ov-ac">0</div><div class="sc-l">Achievement</div></div>
+      </div>
+
+      <div class="sub-ban mb" id="sub-ban">
+        <div class="sub-chip pf" id="sub-chip">🆓 FREE</div>
+        <div style="font-family:var(--ff-d);font-weight:800;font-size:1.35rem;letter-spacing:-.04em;margin-bottom:.25rem" id="sub-h">Paket Free</div>
+        <div style="font-size:.8rem;color:var(--gray)" id="sub-sub">Upgrade untuk akses model AI premium</div>
+        <div style="display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.8rem" id="sub-mods"></div>
+        <button id="sub-upbtn" onclick="location.href='/checkout.html'" style="margin-top:.9rem;padding:.52rem 1.15rem;border-radius:var(--r2);background:var(--accent);color:var(--accent-fg);font-weight:700;font-size:.83rem;border:none;cursor:pointer;font-family:inherit;transition:all .2s">⭐ Upgrade Sekarang</button>
+      </div>
+
+      <div class="g2 mb">
+        <div>
+          <div class="card">
+            <div class="ct">🚀 Aksi Cepat</div>
+            <div style="display:flex;flex-direction:column;gap:.5rem">
+              <a href="/chat.html" class="qa"><span class="qa-ico">🤖</span><div><div class="qa-n">KizAi Chat</div><div class="qa-d">Chat dengan 9 model AI</div></div></a>
+              <a href="/tools.html" class="qa"><span class="qa-ico">🔧</span><div><div class="qa-n">105+ Tools</div><div class="qa-d">Explore tools interaktif</div></div></a>
+              <a href="/games.html" class="qa"><span class="qa-ico">🎮</span><div><div class="qa-n">52+ Games</div><div class="qa-d">Main game browser</div></div></a>
+              <a href="/leaderboard.html" class="qa"><span class="qa-ico">🏆</span><div><div class="qa-n">Leaderboard</div><div class="qa-d">Cek ranking kamu</div></div></a>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:1rem">
+          <div class="card">
+            <div class="ct">🔥 Streak Aktivitas</div>
+            <div class="st-cal" id="st-cal"></div>
+            <div class="streak-nums">
+              <div class="sn"><span id="sn-c">0</span>Streak Ini</div>
+              <div class="sn"><span id="sn-m">0</span>Terpanjang</div>
+              <div class="sn"><span id="sn-t">0</span>Total Hari</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="ct">📦 Order Terbaru <a href="/checkout.html" style="font-family:var(--ff-m);font-size:.62rem;color:var(--accent);font-weight:600">+ Order</a></div>
+            <div id="rec-orders"><p style="color:var(--gray);font-size:.8rem">Belum ada order.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROFILE -->
+    <div id="s-pf" class="sec">
+      <div class="g2">
+        <div>
+          <div class="card mb">
+            <div class="ct">👤 Profil Saya</div>
+            <div style="display:flex;align-items:center;gap:.85rem;margin-bottom:1.25rem">
+              <div id="pf-av" style="width:58px;height:58px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.7rem;background:#5B5FEE;flex-shrink:0"></div>
+              <div>
+                <div style="font-family:var(--ff-d);font-weight:800;font-size:1.05rem" id="pf-nm">-</div>
+                <div style="font-size:.76rem;color:var(--gray)" id="pf-em">-</div>
+              </div>
+            </div>
+            <div style="font-family:var(--ff-m);font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--gray2);margin-bottom:.4rem">Emoji Avatar</div>
+            <div class="av-pick" id="av-pick"></div>
+            <div style="font-family:var(--ff-m);font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--gray2);margin-bottom:.4rem">Warna Avatar</div>
+            <div class="cp" id="cp"></div>
+            <div class="ig"><label>Username</label><input id="p-user" disabled></div>
+            <div class="ig"><label>Telegram ID</label><input id="p-tg" placeholder="@username atau ID numerik"></div>
+            <div class="ig"><label>Bio</label><textarea id="p-bio" placeholder="Ceritakan tentang kamu..."></textarea></div>
+            <button onclick="saveProfile()" style="padding:.65rem 1.35rem;border-radius:var(--r2);background:var(--accent);color:var(--accent-fg);font-weight:700;font-size:.83rem;border:none;cursor:pointer;font-family:inherit;transition:all .2s">💾 Simpan Profil</button>
+          </div>
+        </div>
+        <div>
+          <div class="card mb">
+            <div class="ct">🔑 Ubah Password</div>
+            <div class="ig"><label>Password Baru</label><input type="password" id="pw-n" placeholder="min 6 karakter"></div>
+            <div class="ig"><label>Konfirmasi</label><input type="password" id="pw-c" placeholder="ulangi password baru"></div>
+            <button onclick="changePW()" style="padding:.65rem 1.35rem;border-radius:var(--r2);background:var(--accent);color:var(--accent-fg);font-weight:700;font-size:.83rem;border:none;cursor:pointer;font-family:inherit">🔑 Ubah Password</button>
+          </div>
+          <div class="card">
+            <div class="ct">🤝 Referral Kamu</div>
+            <p style="font-size:.8rem;color:var(--gray);margin-bottom:.8rem">Bagikan kode ini dan dapatkan bonus!</p>
+            <div class="ref-bx"><div class="ref-cd" id="ref-cd">-</div><button class="ref-cp" onclick="copyRef()">📋 Salin</button></div>
+            <div style="margin-top:.75rem;font-family:var(--ff-m);font-size:.65rem;color:var(--gray2)">Bergabung: <span id="pf-jn" style="color:var(--white);font-weight:600">-</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACHIEVEMENT -->
+    <div id="s-ac" class="sec">
+      <div class="card">
+        <div class="ct">🎖️ Achievement <span style="font-family:var(--ff-m);font-size:.7rem;color:var(--gray2)"><span id="ac-cnt">0</span>/20 Unlocked</span></div>
+        <div class="ach-grid" id="ach-grid"></div>
+      </div>
+    </div>
+
+    <!-- SUBSCRIPTION -->
+    <div id="s-sb2" class="sec">
+      <div class="card mb" style="max-width:680px"><div class="ct">💎 Status Langganan</div><div id="sub-det"></div></div>
+      <div class="g3" style="max-width:680px" id="plan-cmp"></div>
+    </div>
+
+    <!-- ORDERS -->
+    <div id="s-or" class="sec">
+      <div class="card"><div class="ct">📦 Riwayat Pembelian</div><div id="orders-list"><p style="color:var(--gray);font-size:.83rem">Loading...</p></div></div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="s-st" class="sec">
+      <div class="g2">
+        <div>
+          <div class="card mb">
+            <div class="ct">🎨 Tampilan</div>
+            <div class="sg"><span class="sg-l">Tema</span><div class="th-row"><button class="th-btn" onclick="setTheme('dark')" id="th-dk">🌙 Gelap</button><button class="th-btn" onclick="setTheme('light')" id="th-lt">☀️ Terang</button></div></div>
+            <div class="sg"><span class="sg-l">Warna Aksen</span><div class="ac-row" id="ac-row"></div></div>
+            <div class="sg"><span class="sg-l">Ukuran Font</span><div class="fs-row"><button class="fs-b" onclick="setFs('sm')" id="fs-sm">Kecil</button><button class="fs-b" onclick="setFs('md')" id="fs-md">Sedang</button><button class="fs-b" onclick="setFs('lg')" id="fs-lg">Besar</button></div></div>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <div class="ct">⚙️ Preferensi</div>
+            <div class="tog-row"><div><div class="tog-n">🖱️ Custom Cursor</div><div class="tog-d">Kursor kustom animasi</div></div><button class="tog" id="tog-cc" onclick="togPref('customCursor','tog-cc')"></button></div>
+            <div class="tog-row"><div><div class="tog-n">♿ Reduced Motion</div><div class="tog-d">Matikan semua animasi</div></div><button class="tog" id="tog-rm" onclick="togPref('reducedMotion','tog-rm')"></button></div>
+            <div class="tog-row"><div><div class="tog-n">🔊 Sound Effects</div><div class="tog-d">Efek suara UI</div></div><button class="tog" id="tog-se" onclick="togPref('soundEffects','tog-se')"></button></div>
+            <div class="tog-row"><div><div class="tog-n">📐 Compact View</div><div class="tog-d">Tampilan lebih rapat</div></div><button class="tog" id="tog-cv" onclick="togPref('compactView','tog-cv')"></button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const API='/api/auth';
+let U=null,TOKEN=localStorage.getItem('kizai_token');
+let PREFS=JSON.parse(localStorage.getItem('kizai_prefs')||'{"theme":"dark","accent":"lime","fontSize":"md","customCursor":false,"reducedMotion":false,"soundEffects":false,"compactView":false}');
+
+const MODELS={'llama-8b':{l:'Llama 8B',t:'free'},'deepseek-coder':{l:'DeepSeek Coder',t:'free'},'phi-3-mini':{l:'Phi-3 Mini',t:'free'},'llama-70b':{l:'Llama 70B',t:'premium'},'mixtral':{l:'Mixtral 8x7B',t:'premium'},'mistral-7b':{l:'Mistral 7B',t:'premium'},'qwen-72b':{l:'Qwen 72B',t:'vip'},'deepseek-r1':{l:'DeepSeek R1',t:'vip'},'gemma-27b':{l:'Gemma 27B',t:'vip'}};
+const EMOJIS=['😊','😎','🤩','🦊','🐯','🦁','🐉','🤖','👾','🎭','🦋','🔥','⚡','🌟','💎'];
+const COLORS=['#5B5FEE','#7B5EA7','#2ECC71','#FFB830','#FF3C68','#00D9FF','#D4FF47','#EC4899','#F97316'];
+const ACCENTS=[{n:'lime',c:'#D4FF47'},{n:'blue',c:'#3B82F6'},{n:'purple',c:'#A855F7'},{n:'pink',c:'#EC4899'},{n:'orange',c:'#F97316'},{n:'cyan',c:'#06B6D4'}];
+const ACHS=[
+  {id:'first',i:'🌟',n:'Selamat Datang!',d:'Login pertama kali',t:'',r:u=>true},
+  {id:'chat1',i:'🤖',n:'Chat Pertama',d:'Kirim pesan AI pertama',t:'',r:u=>u.chat_messages>=1},
+  {id:'chat10',i:'💬',n:'Aktif Ngobrol',d:'10 pesan chat AI',t:'',r:u=>u.chat_messages>=10},
+  {id:'chat50',i:'🗣️',n:'Cerewet!',d:'50 pesan chat AI',t:'r',r:u=>u.chat_messages>=50},
+  {id:'chat200',i:'📢',n:'Pro Talker',d:'200 pesan chat AI',t:'e',r:u=>u.chat_messages>=200},
+  {id:'game1',i:'🎮',n:'Gamer Baru',d:'Main game pertama',t:'',r:u=>u.games_played>=1},
+  {id:'game10',i:'🕹️',n:'Pecinta Game',d:'10 kali main game',t:'r',r:u=>u.games_played>=10},
+  {id:'game50',i:'🏆',n:'Game Master',d:'50 kali main game',t:'e',r:u=>u.games_played>=50},
+  {id:'str3',i:'🔥',n:'On Fire!',d:'Streak 3 hari',t:'',r:u=>u.streak>=3},
+  {id:'str7',i:'⚡',n:'Minggu Penuh',d:'Streak 7 hari',t:'r',r:u=>u.streak>=7},
+  {id:'str30',i:'💫',n:'Dedikasi Tinggi',d:'Streak 30 hari',t:'l',r:u=>u.streak>=30},
+  {id:'xp100',i:'⭐',n:'Pemula XP',d:'100 XP',t:'',r:u=>u.xp>=100},
+  {id:'xp500',i:'🌠',n:'XP Sejati',d:'500 XP',t:'r',r:u=>u.xp>=500},
+  {id:'xp2k',i:'✨',n:'XP Legend',d:'2000 XP',t:'l',r:u=>u.xp>=2000},
+  {id:'lv5',i:'📈',n:'Naik Level',d:'Capai Level 5',t:'r',r:u=>(u.level||1)>=5},
+  {id:'lv10',i:'🚀',n:'Double Digit',d:'Capai Level 10',t:'e',r:u=>(u.level||1)>=10},
+  {id:'coin100',i:'💰',n:'Kantong Tebal',d:'Punya 100 koin',t:'',r:u=>u.coins>=100},
+  {id:'coin500',i:'💎',n:'Kaya Koin',d:'Punya 500 koin',t:'r',r:u=>u.coins>=500},
+  {id:'prem',i:'👑',n:'Premium Member',d:'Upgrade ke Premium/VIP',t:'e',r:u=>u.plan!=='free'},
+  {id:'tool1',i:'🔧',n:'Tool User',d:'Pakai tools pertama kali',t:'',r:u=>u.tools_used>=1},
+];
+
+// BOOT
+(async()=>{
+  if(!TOKEN)return location.href='/auth.html';
+  try{
+    const r=await fetch(`${API}?action=me`,{headers:{Authorization:'Bearer '+TOKEN}});
+    const d=await r.json();
+    if(!r.ok){localStorage.removeItem('kizai_token');return location.href='/auth.html';}
+    U=d.user;render();loadOrders();
+  }catch{location.href='/auth.html';}
+})();
+
+function render(){
+  if(!U)return;
+  const plan=U.effective_plan||'free';
+  const ac=COLORS[U.username.charCodeAt(0)%COLORS.length];
+  const av=U.avatar_color||ac;
+
+  // sidebar
+  document.getElementById('sb-av').style.background=av;
+  document.getElementById('sb-av').textContent=U.avatar_emoji||'😊';
+  document.getElementById('sb-nm').textContent=U.username;
+  const pel=document.getElementById('sb-pl');
+  pel.textContent={free:'FREE',premium:'⭐ PREMIUM',vip:'💎 VIP'}[plan];
+  pel.className='su-plan '+{free:'pf',premium:'pp',vip:'pv'}[plan];
+  document.getElementById('sb-lv').textContent=U.level||1;
+  document.getElementById('sb-xp').textContent=U.xp||0;
+  const lv=U.level||1,xneed=lv*lv*80,xpct=Math.min(100,((U.xp||0)%xneed)/xneed*100);
+  document.getElementById('xp-b').style.width=xpct+'%';
+  document.getElementById('sb-coins').textContent=U.coins||0;
+  document.getElementById('sb-str').textContent=U.streak||0;
+  if(U.role==='admin')document.getElementById('adm-btn').style.display='flex';
+
+  // topbar
+  document.getElementById('tb-coins').textContent=U.coins||0;
+
+  // stats
+  $('ov-c',U.coins||0);$('ov-x',U.xp||0);$('ov-st',U.streak||0);
+  $('ov-gp',U.games_played||0);$('ov-ch',U.chat_messages||0);
+  $('ov-tu',U.tools_used||0);$('ov-lv',U.level||1);
+
+  // sub banner
+  const chip=document.getElementById('sub-chip');
+  chip.textContent={free:'🆓 FREE',premium:'⭐ PREMIUM',vip:'💎 VIP'}[plan];
+  chip.className='sub-chip '+{free:'pf',premium:'pp',vip:'pv'}[plan];
+  document.getElementById('sub-h').textContent={free:'Paket Free',premium:'Paket Premium',vip:'Paket VIP'}[plan];
+  document.getElementById('sub-sub').textContent=plan==='free'?'Upgrade untuk akses model AI premium':(U.plan_expires?`Aktif hingga ${new Date(U.plan_expires).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}`:' Aktif selamanya');
+  if(plan!=='free')document.getElementById('sub-upbtn').style.display='none';
+  const mds=U.accessible_models||['llama-8b'];
+  document.getElementById('sub-mods').innerHTML=mds.map(m=>{const i=MODELS[m]||{l:m,t:'free'};return `<span style="padding:.2rem .55rem;border-radius:4px;font-family:var(--ff-m);font-size:.62rem;font-weight:600;background:rgba(var(--accent-rgb),.08);border:1px solid rgba(var(--accent-rgb),.2);color:var(--accent)">${i.l}</span>`;}).join('');
+
+  // streak
+  renderStreak();
+
+  // profile
+  document.getElementById('pf-av').style.background=av;
+  document.getElementById('pf-av').textContent=U.avatar_emoji||'😊';
+  document.getElementById('pf-nm').textContent=U.username;
+  document.getElementById('pf-em').textContent=U.email||'';
+  document.getElementById('p-user').value=U.username;
+  document.getElementById('p-tg').value=U.telegram_id||'';
+  document.getElementById('p-bio').value=U.bio||'';
+  document.getElementById('ref-cd').textContent=U.referral_code||('KZ'+Math.random().toString(36).slice(2,8).toUpperCase());
+  document.getElementById('pf-jn').textContent=new Date(U.created_at).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
+
+  // pickers
+  document.getElementById('av-pick').innerHTML=EMOJIS.map(e=>`<div class="av-o${(U.avatar_emoji||'😊')===e?' on':''}" onclick="selEmoji('${e}')">${e}</div>`).join('');
+  document.getElementById('cp').innerHTML=COLORS.map(c=>`<div class="cp-d${(U.avatar_color||ac)===c?' on':''}" style="background:${c}" onclick="selColor('${c}')"></div>`).join('');
+
+  // achievements
+  renderAch();
+  renderSubDet(plan);
+  renderSettings();
+}
+
+function $(id,v){const el=document.getElementById(id);if(el)el.textContent=v;}
+
+function renderStreak(){
+  const str=U.streak||0;
+  const days=Array.from({length:14},(_,i)=>{const d=new Date(Date.now()-(13-i)*86400000);return d.toISOString().split('T')[0];});
+  const today=new Date().toISOString().split('T')[0];
+  document.getElementById('st-cal').innerHTML=days.map((d,i)=>{
+    let cls='st-day';
+    if(d===today)cls+=' today';
+    else if(i>=(14-Math.min(str,14)))cls+=' on';
+    return `<div class="${cls}"></div>`;
+  }).join('');
+  $('sn-c',str);$('sn-m',Math.max(str,3));$('sn-t',Math.max(str,1));
+}
+
+function renderAch(){
+  const u=ACHS.filter(a=>a.r(U)),l=ACHS.filter(a=>!a.r(U));
+  $('ov-ac',u.length);$('ac-cnt',u.length);
+  if(u.length>0)document.getElementById('ac-b').style.display='';
+  document.getElementById('ach-grid').innerHTML=[...u,...l].map(a=>{
+    const ok=a.r(U);
+    const tl={'r':'RARE','e':'EPIC','l':'★ LEGEND'}[a.t]||'';
+    const tc={'r':'tag-r','e':'tag-e','l':'tag-l'}[a.t]||'';
+    return `<div class="ach ${ok?'u':'l'}">${tl?`<span class="ach-tag ${tc}">${tl}</span>`:''}<span class="ach-ico">${a.i}</span><div class="ach-n">${a.n}</div><div class="ach-d">${a.d}</div></div>`;
+  }).join('');
+}
+
+function renderSubDet(plan){
+  const P={free:{n:'Free',i:'🆓',m:['Llama 8B','DeepSeek Coder','Phi-3 Mini'],pr:'Gratis'},premium:{n:'Premium',i:'⭐',m:['Semua Free','Llama 70B','Mixtral','Mistral 7B','Qwen 72B','DeepSeek R1','Gemma 27B'],pr:'Rp 15rb/30hr'},vip:{n:'VIP',i:'💎',m:['Semua Free','Qwen 72B','DeepSeek R1','Gemma 27B'],pr:'Rp 25rb/30hr'}};
+  const info=P[plan];
+  document.getElementById('sub-det').innerHTML=`<div style="display:flex;align-items:center;gap:.85rem;margin-bottom:1.25rem"><div style="width:52px;height:52px;border-radius:13px;background:rgba(var(--accent-rgb),.1);border:1px solid rgba(var(--accent-rgb),.2);display:flex;align-items:center;justify-content:center;font-size:1.4rem">${info.i}</div><div><div style="font-family:var(--ff-d);font-weight:800;font-size:1.25rem">${info.n}</div><div style="font-size:.78rem;color:var(--gray)">${info.m.length} model · ${info.pr}</div></div></div><div style="display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:1rem">${info.m.map(m=>`<span style="padding:.2rem .55rem;border-radius:4px;background:var(--bg3);border:1px solid var(--bd2);font-size:.73rem;font-family:var(--ff-m)">${m}</span>`).join('')}</div>${plan==='free'?`<div style="padding:.9rem 1rem;border-radius:var(--r2);background:rgba(var(--accent-rgb),.04);border:1px solid rgba(var(--accent-rgb),.15)"><p style="font-size:.8rem;color:var(--gray);margin-bottom:.65rem">Upgrade <strong style="color:var(--accent)">Premium</strong> untuk semua 9 model AI!</p><button onclick="location.href='/checkout.html'" style="padding:.5rem 1.1rem;border-radius:var(--r);background:var(--accent);color:var(--accent-fg);font-weight:700;font-size:.8rem;border:none;cursor:pointer;font-family:inherit">⭐ Upgrade</button></div>`:''}`;
+  document.getElementById('plan-cmp').innerHTML=Object.entries(P).map(([k,v])=>`<div style="background:var(--card);border:1.5px solid ${plan===k?'rgba(var(--accent-rgb),.3)':'var(--bd)'};border-radius:var(--r3);padding:1.1rem;${plan===k?'background:rgba(var(--accent-rgb),.03)':''}"><div style="font-size:1.4rem;margin-bottom:.35rem">${v.i}</div><div style="font-family:var(--ff-d);font-weight:700;font-size:.92rem">${v.n}</div><div style="font-size:.7rem;color:var(--gray2);margin:.2rem 0 .65rem">${v.m.length} model · ${v.pr}</div>${plan===k?`<div style="font-family:var(--ff-m);font-size:.62rem;color:var(--accent);font-weight:700">✓ AKTIF</div>`:k!=='free'?`<button onclick="location.href='/checkout.html?plan=${k}'" style="width:100%;padding:.45rem;border-radius:var(--r);background:var(--bg3);border:1px solid var(--bd2);color:var(--gray);font-size:.72rem;cursor:pointer;font-family:inherit">Pilih →</button>`:''}</div>`).join('');
+}
+
+function renderSettings(){
+  const p=PREFS;
+  document.getElementById('th-dk').classList.toggle('on',p.theme!=='light');
+  document.getElementById('th-lt').classList.toggle('on',p.theme==='light');
+  ['sm','md','lg'].forEach(f=>document.getElementById('fs-'+f).classList.toggle('on',(p.fontSize||'md')===f));
+  document.getElementById('ac-row').innerHTML=ACCENTS.map(a=>`<div class="ac-d${(p.accent||'lime')===a.n?' on':''}" style="background:${a.c}" onclick="setAc('${a.n}')" title="${a.n}"></div>`).join('');
+  const tm={cc:'customCursor',rm:'reducedMotion',se:'soundEffects',cv:'compactView'};
+  Object.entries(tm).forEach(([k,v])=>{const el=document.getElementById('tog-'+k);if(el)el.classList.toggle('on',!!p[v]);});
+  const isDark=p.theme!=='light';
+  document.getElementById('th-ico').textContent=isDark?'🌙':'☀️';
+  document.getElementById('tb-th').textContent=isDark?'Gelap':'Terang';
+}
+
+// SETTINGS ACTIONS
+function setTheme(t){PREFS.theme=t;savePr();document.documentElement.setAttribute('data-theme',t);renderSettings();}
+function setAc(a){PREFS.accent=a;savePr();document.documentElement.setAttribute('data-accent',a);renderSettings();}
+function setFs(f){PREFS.fontSize=f;savePr();document.documentElement.setAttribute('data-fs',f);renderSettings();}
+function togPref(k,id){PREFS[k]=!PREFS[k];savePr();renderSettings();if(k==='reducedMotion')document.documentElement.setAttribute('data-reduced',PREFS[k]?'1':'0');toast(PREFS[k]?'Diaktifkan':'Dimatikan','in');}
+function savePr(){localStorage.setItem('kizai_prefs',JSON.stringify(PREFS));}
+function smoothToggle(){document.documentElement.style.transition='background .3s,color .3s';setTimeout(()=>document.documentElement.style.transition='',400);setTheme(PREFS.theme==='light'?'dark':'light');}
+
+// PROFILE
+function selEmoji(e){U.avatar_emoji=e;document.getElementById('pf-av').textContent=e;document.getElementById('sb-av').textContent=e;document.querySelectorAll('.av-o').forEach(el=>el.classList.toggle('on',el.textContent===e));}
+function selColor(c){U.avatar_color=c;document.getElementById('pf-av').style.background=c;document.getElementById('sb-av').style.background=c;document.querySelectorAll('.cp-d').forEach(el=>el.classList.toggle('on',el.style.background===c||el.style.backgroundColor===c));}
+function copyRef(){navigator.clipboard.writeText(document.getElementById('ref-cd').textContent).then(()=>toast('Kode disalin! 📋','in'));}
+
+async function saveProfile(){
+  try{
+    const r=await fetch(`${API}?action=profile`,{method:'PUT',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify({telegram_id:document.getElementById('p-tg').value.trim(),bio:document.getElementById('p-bio').value.trim(),avatar_emoji:U.avatar_emoji,avatar_color:U.avatar_color})});
+    const d=await r.json();
+    if(!r.ok)return toast(d.error||'Gagal','er');
+    U={...U,...d.user};toast('Profil tersimpan! ✅','ok');
+  }catch{toast('Koneksi error','er');}
+}
+async function changePW(){
+  const n=document.getElementById('pw-n').value,c=document.getElementById('pw-c').value;
+  if(!n||n.length<6)return toast('Password min 6 karakter','er');
+  if(n!==c)return toast('Konfirmasi tidak cocok','er');
+  try{
+    const r=await fetch(`${API}?action=change-password`,{method:'PUT',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify({newpass:n})});
+    const d=await r.json();
+    if(!r.ok)return toast(d.error,'er');
+    document.getElementById('pw-n').value='';document.getElementById('pw-c').value='';
+    toast('Password berhasil diubah! 🔑','ok');
+  }catch{toast('Koneksi error','er');}
+}
+
+async function loadOrders(){
+  const render=(ords,elId)=>{
+    const el=document.getElementById(elId);if(!el)return;
+    if(!ords||!ords.length){el.innerHTML='<p style="color:var(--gray);font-size:.8rem">Belum ada order. <a href="/checkout.html" style="color:var(--accent)">Upgrade →</a></p>';return;}
+    el.innerHTML=ords.slice(0,10).map(o=>`<div class="ord-r"><div><div class="ord-p">${(o.plan||'-').toUpperCase()} · ${o.duration||0} Hari</div><div class="ord-id">${o.order_id||'-'}</div></div><div class="ord-pr">Rp ${(o.price||0).toLocaleString('id-ID')}</div><span class="ord-s s${(o.status||'p')[0]}">${o.status||'pending'}</span></div>`).join('');
+  };
+  try{
+    const r=await fetch(`${API}?action=my-orders`,{headers:{Authorization:'Bearer '+TOKEN}});
+    if(r.ok){const d=await r.json();const ords=d.orders||[];localStorage.setItem('kizai_orders',JSON.stringify(ords));render(ords,'rec-orders');render(ords,'orders-list');return;}
+  }catch{}
+  const lc=JSON.parse(localStorage.getItem('kizai_orders')||'[]');
+  render(lc,'rec-orders');render(lc,'orders-list');
+}
+
+// NAV
+function go(name){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+  document.getElementById('s-'+name).classList.add('on');
+  document.querySelectorAll('.ni').forEach(el=>el.classList.remove('on'));
+  const ttl={ov:'Dashboard',pf:'Profil',ac:'Achievement',sb2:'Langganan',or:'Riwayat Order',st:'Pengaturan'};
+  document.getElementById('pg-ttl').textContent=ttl[name]||'Dashboard';
+  if(name==='or')loadOrders();
+  closeSb();
+}
+
+function toggleSb(){document.getElementById('sb').classList.toggle('open');document.getElementById('ov').classList.toggle('open');}
+function closeSb(){document.getElementById('sb').classList.remove('open');document.getElementById('ov').classList.remove('open');}
+function logout(){localStorage.removeItem('kizai_token');localStorage.removeItem('kizai_user');location.href='/auth.html';}
+
+function toast(msg,type='ok'){
+  const el=document.createElement('div');
+  el.className='tt '+type;el.textContent=msg;
+  document.getElementById('toasts').appendChild(el);
+  setTimeout(()=>el.remove(),3000);
+}
+</script>
+</body>
+</html>

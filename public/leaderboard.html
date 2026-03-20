@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<script>(function(){var p=JSON.parse(localStorage.getItem("kizai_prefs")||"{}");document.documentElement.setAttribute("data-theme",p.theme||"dark");document.documentElement.setAttribute("data-accent",p.accent||"lime");document.documentElement.setAttribute("data-fs",p.fontSize||"md");}());</script>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Leaderboard — KizAi</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+[data-theme="light"]{--bg:#F8F9FC;--bg2:#EFF1F7;--bg3:#E5E8F0;--card:#FFFFFF;--card2:#F3F4F9;--white:#1A1A2E;--gray:#6B7280;--gray2:#9CA3AF;--bd:rgba(0,0,0,.08);--bd2:rgba(0,0,0,.14);}
+[data-accent="blue"]{--accent:#3B82F6;--accent2:#2563EB;--accent-rgb:59,130,246;--accent-fg:#fff;}
+[data-accent="purple"]{--accent:#A855F7;--accent2:#9333EA;--accent-rgb:168,85,247;--accent-fg:#fff;}
+[data-accent="pink"]{--accent:#EC4899;--accent2:#DB2777;--accent-rgb:236,72,153;--accent-fg:#fff;}
+[data-accent="orange"]{--accent:#F97316;--accent2:#EA580C;--accent-rgb:249,115,22;--accent-fg:#fff;}
+[data-accent="cyan"]{--accent:#06B6D4;--accent2:#0891B2;--accent-rgb:6,182,212;--accent-fg:#fff;}
+[data-accent="lime"]{--accent:#D4FF47;--accent2:#BFEF2A;--accent-rgb:212,255,71;--accent-fg:#08080E;}
+:root{--bg:#08080E;--bg2:#0D0D14;--bg3:#12121A;--card:#161621;--card2:#1C1C28;--white:#F4F4FF;--gray:#9898B0;--gray2:#5A5A70;--bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.13);--shadow:0 8px 32px rgba(0,0,0,.5);--accent:#D4FF47;--accent2:#BFEF2A;--accent-rgb:212,255,71;--accent-fg:#08080E;--hot:#FF3C68;--cyan:#00D9FF;--violet:#7B5EA7;--amber:#FFB830;--green:#2ECC71;--ff-d:'Syne',sans-serif;--ff-b:'Plus Jakarta Sans',sans-serif;--ff-m:'JetBrains Mono',monospace;--r:8px;--r2:12px;--r3:16px;--r4:20px;--anim:.25s cubic-bezier(.4,0,.2,1);}
+*,::before,::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+body{background:var(--bg);color:var(--white);font-family:var(--ff-b);min-height:100vh;transition:background var(--anim),color var(--anim)}
+a{text-decoration:none;color:inherit}
+
+nav{position:sticky;top:0;z-index:100;background:rgba(8,8,14,.9);backdrop-filter:blur(24px);border-bottom:1px solid var(--bd);padding:.8rem 5vw;display:flex;align-items:center;gap:.75rem}
+[data-theme="light"] nav{background:rgba(248,249,252,.92)}
+.brand{font-family:var(--ff-d);font-weight:800;font-size:1.1rem;display:flex;align-items:center;gap:.4rem}
+.dot{width:7px;height:7px;background:var(--accent);border-radius:50%;box-shadow:0 0 6px var(--accent);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.nav-r{display:flex;gap:.4rem;align-items:center;margin-left:auto}
+.nb{padding:.35rem .7rem;border-radius:var(--r);font-size:.76rem;font-weight:600;cursor:pointer;border:1px solid var(--bd2);background:transparent;color:var(--gray);font-family:inherit;transition:all .2s}
+.nb:hover{color:var(--white);border-color:rgba(255,255,255,.2)}
+.nb.acc{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.nb.acc:hover{background:var(--accent2)}
+
+.wrap{max-width:820px;margin:0 auto;padding:3rem 5vw 5rem}
+
+/* HERO */
+.hero{text-align:center;margin-bottom:2.5rem;position:relative}
+.hero::before{content:'';position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:500px;height:350px;background:radial-gradient(ellipse,rgba(var(--accent-rgb),.07),transparent 70%);pointer-events:none;z-index:0}
+.htag{position:relative;display:inline-flex;align-items:center;gap:.4rem;padding:.28rem .8rem;border-radius:100px;border:1px solid rgba(var(--accent-rgb),.25);background:rgba(var(--accent-rgb),.06);font-family:var(--ff-m);font-size:.64rem;color:var(--accent);margin-bottom:1rem}
+.htitle{position:relative;font-family:var(--ff-d);font-weight:800;font-size:clamp(2.2rem,5vw,3.5rem);letter-spacing:-.05em;line-height:1.05;margin-bottom:.6rem}
+.hsub{position:relative;color:var(--gray);font-size:.88rem;max-width:480px;margin:0 auto}
+
+/* PODIUM */
+.podium{display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:.65rem;align-items:end;margin-bottom:2rem}
+.pod{border-radius:var(--r3);padding:1.4rem .9rem 1.2rem;text-align:center;position:relative;overflow:hidden;transition:transform .3s,box-shadow .3s}
+.pod:hover{transform:translateY(-4px)}
+.pod::after{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.pod.p1{background:linear-gradient(160deg,rgba(251,191,36,.1),var(--card));border:1px solid rgba(251,191,36,.25)}
+.pod.p1::after{background:linear-gradient(90deg,#FBBF24,#F59E0B)}
+.pod.p1:hover{box-shadow:0 16px 48px rgba(251,191,36,.15)}
+.pod.p2{background:linear-gradient(160deg,rgba(148,163,184,.07),var(--card2));border:1px solid rgba(148,163,184,.18)}
+.pod.p2::after{background:linear-gradient(90deg,#94A3B8,#64748B)}
+.pod.p3{background:linear-gradient(160deg,rgba(205,124,55,.07),var(--card2));border:1px solid rgba(205,124,55,.18)}
+.pod.p3::after{background:linear-gradient(90deg,#CD7C37,#A0522D)}
+.pod-medal{font-size:1.8rem;display:block;margin-bottom:.4rem}
+.pod-av{width:50px;height:50px;border-radius:13px;margin:0 auto .55rem;display:flex;align-items:center;justify-content:center;font-size:1.25rem;border:2px solid rgba(255,255,255,.15)}
+.pod-name{font-family:var(--ff-d);font-weight:700;font-size:.88rem;margin-bottom:.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pod-plan{font-family:var(--ff-m);font-size:.58rem;padding:.1rem .38rem;border-radius:3px;display:inline-block;margin-bottom:.35rem}
+.pip-f{background:rgba(107,114,128,.12);color:#9CA3AF}.pip-p{background:rgba(var(--accent-rgb),.1);color:var(--accent)}.pip-v{background:rgba(123,94,167,.15);color:#C084FC}
+.pod-xp{font-family:var(--ff-d);font-weight:700;font-size:1.05rem;color:var(--accent)}
+.pod-lv{font-family:var(--ff-m);font-size:.62rem;color:var(--gray2);margin-top:.1rem}
+
+/* MY RANK BAR */
+.my-bar{background:rgba(var(--accent-rgb),.05);border:1px solid rgba(var(--accent-rgb),.2);border-radius:var(--r3);padding:.9rem 1.2rem;margin-bottom:1.2rem;display:flex;align-items:center;gap:.85rem}
+.my-rk{font-family:var(--ff-d);font-weight:800;font-size:1.4rem;color:var(--accent);min-width:42px}
+.my-av{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
+.my-nm{font-weight:600;font-size:.85rem}
+.my-xp{font-family:var(--ff-m);font-size:.65rem;color:var(--gray2);margin-top:.08rem}
+.my-chips{margin-left:auto;display:flex;gap:.4rem;align-items:center}
+.chip{font-family:var(--ff-m);font-size:.65rem;padding:.18rem .5rem;border-radius:4px;font-weight:600}
+.chip-xp{background:rgba(var(--accent-rgb),.1);color:var(--accent);border:1px solid rgba(var(--accent-rgb),.2)}
+.chip-lv{background:rgba(107,114,128,.12);color:var(--gray2);border:1px solid rgba(107,114,128,.2)}
+
+/* FILTER */
+.tabs{display:flex;gap:.35rem;margin-bottom:1rem;background:var(--bg2);padding:.3rem;border-radius:var(--r2);border:1px solid var(--bd)}
+.tab{flex:1;padding:.48rem;border-radius:var(--r);text-align:center;font-size:.77rem;font-weight:600;cursor:pointer;color:var(--gray);border:none;background:transparent;font-family:inherit;transition:all .2s}
+.tab.on{background:var(--card);color:var(--accent);box-shadow:0 2px 8px rgba(0,0,0,.3)}
+
+/* LIST */
+.lb-card{background:var(--card);border:1px solid var(--bd);border-radius:var(--r4);overflow:hidden}
+.lb-hdr{display:grid;grid-template-columns:44px 1fr 64px 72px 50px;gap:.5rem;align-items:center;padding:.6rem 1.1rem;border-bottom:1px solid var(--bd);font-family:var(--ff-m);font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--gray2)}
+.lb-row{display:grid;grid-template-columns:44px 1fr 64px 72px 50px;gap:.5rem;align-items:center;padding:.75rem 1.1rem;border-bottom:1px solid var(--bd);transition:background .2s}
+.lb-row:last-child{border-bottom:0}
+.lb-row:hover{background:rgba(var(--accent-rgb),.03)}
+.lb-row.me{background:rgba(var(--accent-rgb),.05);border-left:2px solid var(--accent)}
+.rk{font-family:var(--ff-d);font-weight:800;font-size:.9rem;text-align:center}
+.rk.g{color:#FBBF24}.rk.s{color:#94A3B8}.rk.b{color:#CD7C37}
+.row-av{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
+.row-nm{font-weight:600;font-size:.83rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-plan{font-family:var(--ff-m);font-size:.58rem;margin-top:.08rem;display:inline-block;padding:.07rem .32rem;border-radius:3px}
+.row-val{font-family:var(--ff-d);font-weight:700;font-size:.88rem;color:var(--accent);text-align:right}
+.row-lv{font-family:var(--ff-m);font-size:.7rem;color:var(--gray2);text-align:right}
+.row-str{font-family:var(--ff-m);font-size:.7rem;color:var(--hot);text-align:right}
+
+/* SKEL */
+.sk{background:linear-gradient(90deg,var(--card) 25%,var(--card2) 50%,var(--card) 75%);background-size:200% 100%;animation:sk 1.4s ease infinite;border-radius:var(--r);display:block}
+@keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:100px}
+@media(max-width:600px){
+  .podium{gap:.4rem}.pod-av{width:40px;height:40px}
+  .lb-hdr{display:none}
+  .lb-row{grid-template-columns:40px 1fr auto}
+  .lb-row .row-plan,.lb-row .row-lv,.lb-row .row-str,.lb-hdr span:nth-child(3),.lb-hdr span:nth-child(5){display:none}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="brand"><span class="dot"></span>KizAi</a>
+  <div class="nav-r">
+    <button class="nb" onclick="smoothToggle()" id="th-btn">🌙</button>
+    <a href="/dashboard.html" class="nb">Dashboard</a>
+    <a href="/chat.html" class="nb acc">🤖 Chat AI</a>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="htag">🏆 Papan Peringkat Global</div>
+    <h1 class="htitle">Top <span style="color:var(--accent)">KizAi</span><br>Users</h1>
+    <p class="hsub">Ranking berdasarkan XP — kumpulkan XP dari chat AI, games, dan tools!</p>
+  </div>
+
+  <div id="my-bar" style="display:none" class="my-bar">
+    <div class="my-rk">#<span id="my-rk-n">-</span></div>
+    <div class="my-av" id="my-av" style="background:#5B5FEE">😊</div>
+    <div>
+      <div class="my-nm" id="my-nm">-</div>
+      <div class="my-xp" id="my-xp">-</div>
+    </div>
+    <div class="my-chips">
+      <span class="chip chip-xp" id="my-xp-chip">0 XP</span>
+      <span class="chip chip-lv" id="my-lv-chip">Lv.1</span>
+    </div>
+  </div>
+
+  <div class="podium" id="podium">
+    <div class="sk" style="height:175px;border-radius:var(--r3)"></div>
+    <div class="sk" style="height:205px;border-radius:var(--r3)"></div>
+    <div class="sk" style="height:175px;border-radius:var(--r3)"></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab on" onclick="setFilter('xp',this)">⭐ XP</button>
+    <button class="tab" onclick="setFilter('games_played',this)">🎮 Games</button>
+    <button class="tab" onclick="setFilter('chat_messages',this)">💬 Chat</button>
+    <button class="tab" onclick="setFilter('streak',this)">🔥 Streak</button>
+    <button class="tab" onclick="setFilter('coins',this)">💰 Koin</button>
+  </div>
+
+  <div class="lb-card" id="lb-list">
+    <div style="padding:1.5rem;display:flex;flex-direction:column;gap:.4rem">
+      <div class="sk" style="height:52px;border-radius:8px"></div>
+      <div class="sk" style="height:52px;border-radius:8px"></div>
+      <div class="sk" style="height:52px;border-radius:8px"></div>
+      <div class="sk" style="height:52px;border-radius:8px"></div>
+      <div class="sk" style="height:52px;border-radius:8px"></div>
+      <div class="sk" style="height:52px;border-radius:8px"></div>
+      <div class="sk" style="height:52px;border-radius:8px"></div>
+      <div class="sk" style="height:52px;border-radius:8px"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+let TOKEN=localStorage.getItem('kizai_token');
+let ME=null,DATA=[],FILTER='xp';
+let PREFS=JSON.parse(localStorage.getItem('kizai_prefs')||'{"theme":"dark","accent":"lime"}');
+
+const AV_COLORS=['#5B5FEE','#7B5EA7','#2ECC71','#FFB830','#FF3C68','#00D9FF','#D4FF47','#EC4899','#F97316'];
+
+(async()=>{
+  if(TOKEN){
+    try{const r=await fetch('/api/auth?action=me',{headers:{Authorization:'Bearer '+TOKEN}});if(r.ok){const d=await r.json();ME=d.user;}}catch{}
+  }
+  try{
+    const headers = TOKEN ? {Authorization:'Bearer '+TOKEN} : {};
+    const r=await fetch('/api/auth?action=leaderboard', {headers});
+    if(r.ok){const d=await r.json();DATA=d.leaderboard||d||[];if(!DATA.length)throw 0;}
+    else throw 0;
+  }catch{DATA=demoData();}
+  renderPodium();renderList();showMyRank();
+})();
+
+function demoData(){
+  const names=['Ahmad_R','Siti_M','Budi_K','Dewi_A','Rian_F','Maya_L','Farhan','Nisa','Dito','Citra','Rizky','Amel','Bagas','Fira','Hendra','Indra','Joko','Kiki','Lina','Maman'];
+  const plans=['premium','vip','premium','free','vip','free','free','premium','free','free','free','free','free','free','free','free','free','free','free','free'];
+  const emojis=['😎','🦁','🤩','🦊','🐯','🦋','🤖','👾','🎭','🔥','⚡','🌟','💎','🎯','🚀','💫','🌈','🦄','🐉','😊'];
+  return names.map((n,i)=>{
+    const xp=Math.round(8000*Math.pow(0.68,i));
+    return {username:n,avatar_emoji:emojis[i],avatar_color:AV_COLORS[i%AV_COLORS.length],plan:plans[i],xp,level:Math.max(1,Math.floor(Math.sqrt(xp/80))+1),streak:Math.round(25*Math.pow(0.72,i)),games_played:Math.round(120*Math.pow(0.74,i)),chat_messages:Math.round(90*Math.pow(0.71,i)),coins:Math.round(500*Math.pow(0.75,i))};
+  });
+}
+
+function renderPodium(){
+  if(DATA.length<3){document.getElementById('podium').innerHTML='';return;}
+  const order=[{d:DATA[1],cls:'p2',medal:'🥈'},{d:DATA[0],cls:'p1',medal:'🥇'},{d:DATA[2],cls:'p3',medal:'🥉'}];
+  const heights=['175px','205px','175px'];
+  document.getElementById('podium').innerHTML=order.map((o,i)=>{
+    const u=o.d;
+    const pip=`<span class="pod-plan pip-${u.plan?.[0]||'f'}">${{free:'FREE',premium:'⭐PRE',vip:'💎VIP'}[u.plan]||'FREE'}</span>`;
+    return `<div class="pod ${o.cls}" style="min-height:${heights[i]}">
+      <span class="pod-medal">${o.medal}</span>
+      <div class="pod-av" style="background:${u.avatar_color||'#5B5FEE'}">${u.avatar_emoji||'😊'}</div>
+      <div class="pod-name">${u.username}</div>${pip}
+      <div class="pod-xp">${(u.xp||0).toLocaleString('id')} XP</div>
+      <div class="pod-lv">Level ${u.level||1}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderList(){
+  const sorted=[...DATA].sort((a,b)=>(b[FILTER]||0)-(a[FILTER]||0));
+  const colLabel={xp:'XP',games_played:'Games',chat_messages:'Chat',streak:'Streak 🔥',coins:'Koin 💰'};
+  const meNm=ME?.username;
+  document.getElementById('lb-list').innerHTML=`
+    <div class="lb-hdr">
+      <span style="text-align:center">#</span>
+      <span>User</span>
+      <span style="text-align:right">Plan</span>
+      <span style="text-align:right">${colLabel[FILTER]}</span>
+      <span style="text-align:right">Lv</span>
+    </div>
+    ${sorted.map((u,i)=>{
+      const rank=i+1;
+      const isMe=meNm&&u.username===meNm;
+      const rkCls=rank===1?'rk g':rank===2?'rk s':rank===3?'rk b':'rk';
+      const rkIcon=rank<=3?['🥇','🥈','🥉'][rank-1]:rank;
+      const planPip=`<span class="row-plan pip-${u.plan?.[0]||'f'}">${{free:'FREE',premium:'PRE',vip:'VIP'}[u.plan]||'FREE'}</span>`;
+      const val=(u[FILTER]||0).toLocaleString('id');
+      return `<div class="lb-row${isMe?' me':''}">
+        <div class="${rkCls}">${rkIcon}</div>
+        <div style="display:flex;align-items:center;gap:.6rem;min-width:0">
+          <div class="row-av" style="background:${u.avatar_color||'#5B5FEE'};flex-shrink:0">${u.avatar_emoji||'😊'}</div>
+          <div style="min-width:0">
+            <div class="row-nm" style="${isMe?'color:var(--accent);font-weight:700':''}">
+              ${u.username}${isMe?' 👈':''}
+            </div>
+            ${planPip}
+          </div>
+        </div>
+        <div style="text-align:right;font-size:.72rem;color:var(--gray2)">${{free:'FREE',premium:'PRE',vip:'VIP'}[u.plan]||'FREE'}</div>
+        <div class="row-val">${val}</div>
+        <div class="row-lv">${u.level||1}</div>
+      </div>`;
+    }).join('')}
+  `;
+}
+
+function showMyRank(){
+  if(!ME)return;
+  const sorted=[...DATA].sort((a,b)=>(b.xp||0)-(a.xp||0));
+  const idx=sorted.findIndex(u=>u.username===ME.username);
+  if(idx>=0){
+    const bar=document.getElementById('my-bar');
+    bar.style.display='flex';
+    document.getElementById('my-rk-n').textContent=idx+1;
+    document.getElementById('my-av').style.background=ME.avatar_color||'#5B5FEE';
+    document.getElementById('my-av').textContent=ME.avatar_emoji||'😊';
+    document.getElementById('my-nm').textContent=ME.username;
+    document.getElementById('my-xp').textContent=`XP: ${ME.xp||0} · Level ${ME.level||1} · Streak ${ME.streak||0} hari`;
+    document.getElementById('my-xp-chip').textContent=`${(ME.xp||0).toLocaleString('id')} XP`;
+    document.getElementById('my-lv-chip').textContent=`Lv.${ME.level||1}`;
+  }
+}
+
+function setFilter(f,el){
+  FILTER=f;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  renderList();
+}
+
+function smoothToggle(){
+  document.documentElement.style.transition='background .3s,color .3s';
+  setTimeout(()=>document.documentElement.style.transition='',400);
+  const t=PREFS.theme==='light'?'dark':'light';
+  PREFS.theme=t;localStorage.setItem('kizai_prefs',JSON.stringify(PREFS));
+  document.documentElement.setAttribute('data-theme',t);
+  document.getElementById('th-btn').textContent=t==='light'?'☀️':'🌙';
+}
+</script>
+</body>
+</html>

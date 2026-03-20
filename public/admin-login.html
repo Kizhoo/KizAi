@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<script>(function(){var p=JSON.parse(localStorage.getItem("kizai_prefs")||"{}");var t=p.theme||"dark",a=p.accent||"lime",fs=p.fontSize||"md";document.documentElement.setAttribute("data-theme",t);document.documentElement.setAttribute("data-accent",a);document.documentElement.setAttribute("data-fs",fs);if(p.reducedMotion)document.documentElement.setAttribute("data-reduced","1");}());</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Login — KizAi</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+/* ── LIGHT MODE ── */
+[data-theme="light"]{--bg:#F8F9FC;--bg2:#EFF1F7;--bg3:#E5E8F0;--card:#FFFFFF;--card2:#F3F4F9;--white:#1A1A2E;--gray:#6B7280;--gray2:#9CA3AF;--border:rgba(0,0,0,.08);--border2:rgba(0,0,0,.14);--bd:rgba(0,0,0,.08);--bd2:rgba(0,0,0,.14);--shadow:0 4px 24px rgba(0,0,0,.1);}
+/* ── ACCENT PRESETS ── */
+[data-accent="blue"]{--accent:#3B82F6;--accent2:#2563EB;--accent-rgb:59,130,246;--accent-fg:#fff;}
+[data-accent="purple"]{--accent:#A855F7;--accent2:#9333EA;--accent-rgb:168,85,247;--accent-fg:#fff;}
+[data-accent="pink"]{--accent:#EC4899;--accent2:#DB2777;--accent-rgb:236,72,153;--accent-fg:#fff;}
+[data-accent="orange"]{--accent:#F97316;--accent2:#EA580C;--accent-rgb:249,115,22;--accent-fg:#fff;}
+[data-accent="cyan"]{--accent:#06B6D4;--accent2:#0891B2;--accent-rgb:6,182,212;--accent-fg:#fff;}
+[data-accent="lime"]{--accent:#D4FF47;--accent2:#BFEF2A;--accent-rgb:212,255,71;--accent-fg:#08080E;}
+
+:root{--bg:#08080E;--bg2:#0D0D14;--bg3:#12121A;--card:#161621;--card2:#1C1C28;--lime:#D4FF47;--lime2:#BFEF2A;--hot:#FF3C68;--white:#F4F4FF;--gray:#9898B0;--gray2:#5A5A70;--border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.14);--bd-lime:rgba(212,255,71,.2);--ff-d:'Syne',sans-serif;--ff-b:'Plus Jakarta Sans',sans-serif;--ff-m:'JetBrains Mono',monospace}
+*,::before,::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--white);font-family:var(--ff-b);min-height:100vh;display:flex;align-items:center;justify-content:center}
+
+.bg{position:fixed;inset:0;overflow:hidden;z-index:0}
+.orb{position:absolute;border-radius:50%;filter:blur(100px)}
+.o1{width:400px;height:400px;background:rgba(255,60,104,.06);top:-100px;right:-100px;animation:fl 6s ease-in-out infinite}
+.o2{width:350px;height:350px;background:rgba(91,95,238,.06);bottom:-80px;left:-80px;animation:fl 8s ease-in-out infinite reverse}
+.grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:48px 48px}
+@keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-15px)}}
+
+.wrap{position:relative;z-index:1;width:100%;max-width:400px;padding:1rem}
+.card{background:var(--card);border:1px solid var(--border2);border-radius:20px;padding:2.5rem;box-shadow:0 40px 80px rgba(0,0,0,.6);animation:ci .4s cubic-bezier(.34,1.56,.64,1)}
+@keyframes ci{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+.logo{text-align:center;margin-bottom:2rem}
+.logo-icon{width:56px;height:56px;border-radius:14px;background:rgba(255,60,104,.1);border:1px solid rgba(255,60,104,.2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin:0 auto .75rem}
+.logo h1{font-family:var(--ff-d);font-weight:800;font-size:1.5rem;letter-spacing:-.04em}
+.logo p{font-size:.8rem;color:var(--gray);margin-top:.25rem}
+.admin-badge{display:inline-flex;align-items:center;gap:.4rem;padding:.25rem .7rem;border-radius:5px;background:rgba(255,60,104,.08);border:1px solid rgba(255,60,104,.2);font-family:var(--ff-m);font-size:.65rem;color:var(--hot);margin-bottom:.6rem}
+
+.fg{margin-bottom:1rem}
+.fl{font-family:var(--ff-m);font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--gray2);display:block;margin-bottom:.4rem}
+.fw{position:relative}
+.fi{width:100%;padding:.8rem 1rem .8rem 2.6rem;background:var(--bg3);border:1.5px solid var(--border);border-radius:9px;color:var(--white);font-size:.88rem;font-family:inherit;outline:none;transition:border-color .2s,box-shadow .2s}
+.fi:focus{border-color:rgba(255,60,104,.4);box-shadow:0 0 0 3px rgba(255,60,104,.07)}
+.fi-ic{position:absolute;left:.8rem;top:50%;transform:translateY(-50%);font-size:.95rem;color:var(--gray2)}
+.fi-eye{position:absolute;right:.8rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--gray2);cursor:pointer;font-size:.85rem;padding:0;transition:color .2s}
+.fi-eye:hover{color:var(--gray)}
+
+.btn{width:100%;padding:.88rem;border-radius:9px;background:var(--hot);color:#fff;font-family:var(--ff-d);font-weight:700;font-size:.95rem;border:none;cursor:pointer;transition:all .3s;margin-top:.5rem;display:flex;align-items:center;justify-content:center;gap:.5rem}
+.btn:hover:not(:disabled){background:#e03460;transform:translateY(-2px);box-shadow:0 12px 32px rgba(255,60,104,.25)}
+.btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.err-box{background:rgba(255,60,104,.08);border:1px solid rgba(255,60,104,.2);border-radius:8px;padding:.7rem .9rem;font-size:.8rem;color:var(--hot);margin-bottom:1rem;display:none;align-items:center;gap:.5rem}
+
+.back{display:block;text-align:center;margin-top:1.25rem;font-size:.78rem;color:var(--gray2);transition:color .2s}
+.back:hover{color:var(--white)}
+
+.toasts{position:fixed;top:1rem;right:1rem;z-index:999;display:flex;flex-direction:column;gap:.4rem}
+.toast{padding:.65rem 1rem;border-radius:8px;font-size:.8rem;font-weight:600;animation:ti .3s;box-shadow:0 8px 24px rgba(0,0,0,.5);display:flex;align-items:center;gap:.4rem}
+.toast.err{background:rgba(255,60,104,.1);border:1px solid rgba(255,60,104,.25);color:var(--hot)}
+.toast.ok{background:rgba(46,204,113,.1);border:1px solid rgba(46,204,113,.25);color:#2ECC71}
+@keyframes ti{from{transform:translateX(16px);opacity:0}to{transform:translateX(0);opacity:1}}
+</style>
+</head>
+<body>
+<div class="bg"><div class="grid"></div><div class="orb o1"></div><div class="orb o2"></div></div>
+<div class="toasts" id="toasts"></div>
+
+<div class="wrap">
+  <div class="card">
+    <div class="logo">
+      <div class="logo-icon">⚙️</div>
+      <div class="admin-badge">🔴 Admin Area</div>
+      <h1>Admin Login</h1>
+      <p>Akses terbatas untuk administrator</p>
+    </div>
+
+    <div class="err-box" id="err-box">
+      <span>❌</span><span id="err-msg">Error</span>
+    </div>
+
+    <div class="fg">
+      <label class="fl">Email Admin</label>
+      <div class="fw">
+        <span class="fi-ic">📧</span>
+        <input class="fi" id="email" type="email" placeholder="admin@kizai.id" autocomplete="email" autofocus>
+      </div>
+    </div>
+    <div class="fg">
+      <label class="fl">Password</label>
+      <div class="fw">
+        <span class="fi-ic">🔒</span>
+        <input class="fi" id="password" type="password" placeholder="password admin" autocomplete="current-password">
+        <button class="fi-eye" onclick="togglePW()" type="button">👁</button>
+      </div>
+    </div>
+
+    <button class="btn" id="btn" onclick="doLogin()">
+      <span class="spinner" id="spinner"></span>
+      <span id="btn-text">Masuk sebagai Admin</span>
+    </button>
+
+    <a href="/auth.html" class="back">← Kembali ke login user biasa</a>
+  </div>
+</div>
+
+<script>
+function togglePW() {
+  const inp = document.getElementById('password');
+  const btn = document.querySelector('.fi-eye');
+  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+  else { inp.type = 'password'; btn.textContent = '👁'; }
+}
+
+function showErr(msg) {
+  const box = document.getElementById('err-box');
+  document.getElementById('err-msg').textContent = msg;
+  box.style.display = 'flex';
+}
+function hideErr() { document.getElementById('err-box').style.display = 'none'; }
+
+async function doLogin() {
+  hideErr();
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  if (!email || !password) { showErr('Lengkapi semua field'); return; }
+
+  const btn = document.getElementById('btn');
+  const spinner = document.getElementById('spinner');
+  const btnText = document.getElementById('btn-text');
+  btn.disabled = true;
+  spinner.style.display = 'block';
+  btnText.textContent = 'Verifikasi...';
+
+  try {
+    const r = await fetch('/api/auth?action=admin-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const d = await r.json();
+    if (!r.ok) {
+      showErr(d.error || 'Login gagal');
+      btn.disabled = false;
+      spinner.style.display = 'none';
+      btnText.textContent = 'Masuk sebagai Admin';
+      return;
+    }
+    localStorage.setItem('kizai_token', d.access_token);
+    localStorage.setItem('kizai_user', JSON.stringify(d.user));
+    toast('Login admin berhasil!', 'ok');
+    setTimeout(() => window.location.href = '/admin.html', 700);
+  } catch {
+    showErr('Koneksi error. Coba lagi.');
+    btn.disabled = false;
+    spinner.style.display = 'none';
+    btnText.textContent = 'Masuk sebagai Admin';
+  }
+}
+
+function toast(msg, type = 'ok') {
+  const w = document.getElementById('toasts');
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.textContent = msg;
+  w.appendChild(el);
+  setTimeout(() => el.remove(), 3000);
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+// Check if already admin logged in
+const token = localStorage.getItem('kizai_token');
+if (token) {
+  fetch('/api/auth?action=me', { headers: { Authorization: 'Bearer ' + token } })
+    .then(r => r.json())
+    .then(d => { if (d.user?.role === 'admin') window.location.href = '/admin.html'; })
+    .catch(() => {});
+}
+</script>
+</body>
+</html>
