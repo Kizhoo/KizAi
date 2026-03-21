@@ -1,0 +1,17 @@
+{
+  "name": "kizai-v4",
+  "version": "4.0.0",
+  "description": "KizAi v4 — Platform AI Terlengkap Indonesia",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'Static build — no build step needed'",
+    "start": "vercel dev"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "node-fetch": "^2.7.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
