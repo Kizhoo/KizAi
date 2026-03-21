@@ -1,0 +1,43 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "api/**/*.js", "use": "@vercel/node" },
+    { "src": "public/**", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/api/auth(.*)", "dest": "/api/auth.js" },
+    { "src": "/api/chat(.*)", "dest": "/api/chat.js" },
+    { "src": "/api/payment(.*)", "dest": "/api/payment.js" },
+    { "src": "/api/admin(.*)", "dest": "/api/admin.js" },
+    { "src": "/", "dest": "/public/index.html" },
+    { "src": "/chat", "dest": "/public/chat.html" },
+    { "src": "/auth", "dest": "/public/auth.html" },
+    { "src": "/dashboard", "dest": "/public/dashboard.html" },
+    { "src": "/checkout", "dest": "/public/checkout.html" },
+    { "src": "/tools", "dest": "/public/tools.html" },
+    { "src": "/games", "dest": "/public/games.html" },
+    { "src": "/leaderboard", "dest": "/public/leaderboard.html" },
+    { "src": "/admin", "dest": "/public/admin.html" },
+    { "src": "/admin-login", "dest": "/public/admin-login.html" },
+    { "src": "/(.*)\\.html", "dest": "/public/$1.html" },
+    { "src": "/shared\\.css", "dest": "/public/shared.css" },
+    { "src": "/shared\\.js", "dest": "/public/shared.js" },
+    { "src": "/manifest\\.json", "dest": "/public/manifest.json" },
+    { "src": "/(.*)", "dest": "/public/$1" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-XSS-Protection", "value": "1; mode=block" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+      ]
+    },
+    {
+      "source": "/shared.(css|js)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=3600" }]
+    }
+  ]
+}
