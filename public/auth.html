@@ -341,18 +341,7 @@ async function doLogin() {
   if (!pw) { setErr('login-pw-err','Password wajib diisi'); return; }
 
   setLoading('login-btn','login-btn-text',true);
-  let loginResult;
-  try {
-    const lPromise = API.post('/api/auth?action=login', { identifier: id, password: pw });
-    const lTimeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 12000));
-    loginResult = await Promise.race([lPromise, lTimeout]);
-  } catch(e) {
-    setLoading('login-btn','login-btn-text',false,'Masuk ke Akun →');
-    if (e.message === 'timeout') setErr('login-id-err', 'Request timeout. Coba lagi.');
-    else setErr('login-id-err', 'Koneksi bermasalah. Coba lagi.');
-    return;
-  }
-  const { data, ok, error } = loginResult;
+  const { data, ok, error } = await API.post('/api/auth?action=login', { identifier: id, password: pw });
   setLoading('login-btn','login-btn-text',false,'Masuk ke Akun →');
 
   if (!ok) {
@@ -400,19 +389,7 @@ async function doRegister() {
   if (!valid) return;
 
   setLoading('reg-btn','reg-btn-text',true);
-  let regData, regOk, regError;
-  try {
-    const regPromise = API.post('/api/auth?action=register', { username, email, password: pw, telegram_id: tg });
-    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 15000));
-    const result = await Promise.race([regPromise, timeoutPromise]);
-    regData = result.data; regOk = result.ok; regError = result.error;
-  } catch(e) {
-    setLoading('reg-btn','reg-btn-text',false,'🚀 Buat Akun Gratis →');
-    if (e.message === 'timeout') Toast.err('Request timeout. Coba lagi.');
-    else Toast.err('Koneksi bermasalah. Coba lagi.');
-    return;
-  }
-  const data = regData, ok = regOk, error = regError;
+  const { data, ok, error } = await API.post('/api/auth?action=register', { username, email, password: pw, telegram_id: tg });
   setLoading('reg-btn','reg-btn-text',false,'🚀 Buat Akun Gratis →');
 
   if (!ok) {
