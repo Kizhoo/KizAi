@@ -4,14 +4,6 @@ const { sb, verifyToken, effectivePlan, accessibleModels, rateLimit } = require(
 
 const router = Router();
 
-/* Timeout wrapper - prevents hanging requests */
-function withTimeout(promise, ms = 8000) {
-  return Promise.race([
-    promise,
-    new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms))
-  ]);
-}
-
 router.all('*', async (req, res) => {
   let client;
   try { client = sb(); }
@@ -39,43 +31,27 @@ router.all('*', async (req, res) => {
     const emailClean = email.toLowerCase().trim();
     const uname      = username.toLowerCase().trim();
 
-    // Cek username duplikat
+    // Cek username duplikat dulu (cepat)
     const { data: existingU } = await client.from('profiles').select('id').eq('username', uname).maybeSingle();
     if (existingU) return res.status(409).json({ error: 'Username sudah dipakai, pilih yang lain' });
 
-    // Buat user - coba admin.createUser dulu, fallback ke signUp
-    let authUser = null;
+    // LANGSUNG pakai signUp (lebih cepat dari admin.createUser)
+    // Email confirm sudah di-disable di Supabase dashboard
+    const { data: sd, error: se } = await client.auth.signUp({
+      email: emailClean,
+      password,
+      options: { data: { username: uname } },
+    });
 
-    try {
-      const { data: adminData, error: adminErr } = await withTimeout(
-        client.auth.admin.createUser({
-          email: emailClean, password, email_confirm: true,
-          user_metadata: { username: uname },
-        }), 6000
-      );
-      if (!adminErr && adminData?.user) authUser = adminData.user;
-    } catch (e) {
-      console.warn('admin.createUser failed:', e.message, '— trying signUp');
+    if (se) {
+      if (se.message.toLowerCase().includes('already registered') ||
+          se.message.toLowerCase().includes('already exists') ||
+          se.message.toLowerCase().includes('user already'))
+        return res.status(409).json({ error: 'Email sudah terdaftar. Silakan login.' });
+      return res.status(400).json({ error: se.message });
     }
 
-    // Fallback: signUp biasa
-    if (!authUser) {
-      try {
-        const { data: sd, error: se } = await withTimeout(
-          client.auth.signUp({ email: emailClean, password, options: { data: { username: uname } } }),
-          6000
-        );
-        if (se) {
-          if (se.message.toLowerCase().includes('already'))
-            return res.status(409).json({ error: 'Email sudah terdaftar. Silakan login.' });
-          return res.status(400).json({ error: se.message });
-        }
-        authUser = sd?.user;
-      } catch (e) {
-        return res.status(400).json({ error: 'Gagal membuat akun: ' + e.message });
-      }
-    }
-
+    const authUser = sd?.user;
     if (!authUser?.id) return res.status(400).json({ error: 'Gagal membuat akun. Coba lagi.' });
 
     // Buat profile
@@ -85,7 +61,7 @@ router.all('*', async (req, res) => {
       telegram_id: (telegram_id || '').trim(),
       referral_code: refCode, coins: 50, xp: 0, level: 1, streak: 0,
       preferences: { email: emailClean, theme: 'dark', accent: 'blue', language: 'id', fontSize: 'md' },
-    }, { onConflict: 'id' }).catch(() => {});
+    }, { onConflict: 'id' }).catch(e => console.warn('profile upsert:', e.message));
 
     // Notifikasi selamat datang
     await client.from('notifications').insert({
@@ -95,32 +71,23 @@ router.all('*', async (req, res) => {
       icon: '🎉',
     }).catch(() => {});
 
-    await client.from('activity_log').insert({
-      user_id: authUser.id, type: 'register',
-      description: 'Bergabung dengan KizAi', icon: '🎉', xp_earned: 0,
-    }).catch(() => {});
-
     // Auto-login
-    try {
-      const { data: session, error: le } = await withTimeout(
-        client.auth.signInWithPassword({ email: emailClean, password }), 5000
-      );
-      if (!le && session?.session) {
-        const { data: profile } = await client.from('profiles').select('*').eq('id', authUser.id).single();
-        if (profile) {
-          const plan = effectivePlan(profile);
-          return res.status(201).json({
-            access_token:  session.session.access_token,
-            refresh_token: session.session.refresh_token,
-            user: { ...profile, email: emailClean, effective_plan: plan, accessible_models: accessibleModels(plan) },
-          });
-        }
-      }
-    } catch (e) {
-      console.warn('Auto-login failed:', e.message);
+    const { data: session, error: le } = await client.auth.signInWithPassword({ email: emailClean, password });
+
+    if (le || !session?.session) {
+      console.warn('Auto-login gagal:', le?.message);
+      return res.status(201).json({ needs_login: true, message: 'Akun dibuat! Silakan login.' });
     }
 
-    return res.status(201).json({ needs_login: true, message: 'Akun dibuat! Silakan login.' });
+    const { data: profile } = await client.from('profiles').select('*').eq('id', authUser.id).single();
+    if (!profile) return res.status(201).json({ needs_login: true, message: 'Akun dibuat! Silakan login.' });
+
+    const plan = effectivePlan(profile);
+    return res.status(201).json({
+      access_token:  session.session.access_token,
+      refresh_token: session.session.refresh_token,
+      user: { ...profile, email: emailClean, effective_plan: plan, accessible_models: accessibleModels(plan) },
+    });
   }
 
   /* ═══ LOGIN ══════════════════════════════════════════════ */
@@ -134,22 +101,28 @@ router.all('*', async (req, res) => {
 
     let email = identifier.trim().toLowerCase();
 
+    // Username → cari email
     if (!email.includes('@')) {
-      const { data: p } = await client.from('profiles').select('id,preferences').eq('username', email).maybeSingle();
+      const { data: p } = await client.from('profiles')
+        .select('id,preferences').eq('username', email).maybeSingle();
       if (!p) return res.status(401).json({ error: 'Username tidak ditemukan' });
+
       if (p.preferences?.email) {
         email = p.preferences.email;
       } else {
+        // Fallback: ambil dari auth.users via admin API
         try {
           const { data: au } = await client.auth.admin.getUserById(p.id);
           if (au?.user?.email) {
             email = au.user.email;
-            await client.from('profiles').update({ preferences: { ...(p.preferences||{}), email: au.user.email } }).eq('id', p.id).catch(() => {});
+            await client.from('profiles').update({
+              preferences: { ...(p.preferences || {}), email: au.user.email }
+            }).eq('id', p.id).catch(() => {});
           } else {
-            return res.status(401).json({ error: 'Login gagal. Coba gunakan email langsung.' });
+            return res.status(401).json({ error: 'Coba login dengan email langsung.' });
           }
         } catch {
-          return res.status(401).json({ error: 'Login gagal. Coba gunakan email langsung.' });
+          return res.status(401).json({ error: 'Coba login dengan email langsung.' });
         }
       }
     }
@@ -163,17 +136,17 @@ router.all('*', async (req, res) => {
     if (!session?.session) return res.status(401).json({ error: 'Gagal membuat sesi. Coba lagi.' });
 
     const { data: profile } = await client.from('profiles').select('*').eq('id', session.user.id).single();
-    if (!profile) return res.status(404).json({ error: 'Profil tidak ditemukan. Hubungi admin.' });
+    if (!profile) return res.status(404).json({ error: 'Profil tidak ditemukan.' });
     if (profile.is_banned) return res.status(403).json({ error: 'Akun dinonaktifkan.' });
 
-    // Streak & daily bonus
+    // Streak
     const today     = new Date().toISOString().split('T')[0];
     const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
     let newStreak   = profile.streak || 0;
     let coinBonus   = 0;
     if (profile.streak_last !== today) {
-      coinBonus = 10;
-      newStreak = profile.streak_last === yesterday ? newStreak + 1 : 1;
+      coinBonus  = 10;
+      newStreak  = profile.streak_last === yesterday ? newStreak + 1 : 1;
       if (newStreak === 7)  coinBonus += 50;
       if (newStreak === 30) coinBonus += 200;
     }
@@ -183,15 +156,6 @@ router.all('*', async (req, res) => {
       if (coinBonus > 0) upd.coins = (profile.coins || 0) + coinBonus;
     }
     await client.from('profiles').update(upd).eq('id', profile.id).catch(() => {});
-
-    if (newStreak === 7 || newStreak === 30) {
-      await client.from('notifications').insert({
-        user_id: profile.id, type: 'achievement',
-        title: `🔥 Streak ${newStreak} hari!`,
-        message: `Kamu login ${newStreak} hari berturut-turut! Bonus +${coinBonus} koin!`,
-        icon: '🔥',
-      }).catch(() => {});
-    }
 
     const plan = effectivePlan(profile);
     return res.json({
@@ -209,7 +173,6 @@ router.all('*', async (req, res) => {
     return res.json({ user: { ...user, rank: (count || 0) + 1 } });
   }
 
-  /* ═══ UPDATE PROFILE ══════════════════════════════════════ */
   if (req.method === 'PUT' && action === 'update_profile') {
     const user = await verifyToken(client, req.headers.authorization);
     if (!user) return res.status(401).json({ error: 'Tidak terautentikasi' });
@@ -239,7 +202,7 @@ router.all('*', async (req, res) => {
     const user = await verifyToken(client, req.headers.authorization);
     if (!user) return res.status(401).json({ error: 'Tidak terautentikasi' });
     const { current_password, new_password } = req.body;
-    if (!current_password || !new_password) return res.status(400).json({ error: 'Semua field wajib diisi' });
+    if (!current_password || !new_password) return res.status(400).json({ error: 'Semua field wajib' });
     if (new_password.length < 6) return res.status(400).json({ error: 'Password baru minimal 6 karakter' });
     const { error: se } = await client.auth.signInWithPassword({ email: user.email, password: current_password });
     if (se) return res.status(400).json({ error: 'Password saat ini salah' });
@@ -247,7 +210,6 @@ router.all('*', async (req, res) => {
     return res.json({ ok: true });
   }
 
-  /* ═══ NOTIFICATIONS ══════════════════════════════════════ */
   if (req.method === 'GET' && action === 'notifications') {
     const user = await verifyToken(client, req.headers.authorization);
     if (!user) return res.json({ notifications: [] });
@@ -270,7 +232,6 @@ router.all('*', async (req, res) => {
     return res.json({ ok: true });
   }
 
-  /* ═══ LEADERBOARD ════════════════════════════════════════ */
   if (req.method === 'GET' && action === 'leaderboard') {
     const sortMap = { xp:'xp', messages:'chat_messages', games:'games_played', streak:'streak', coins:'coins' };
     const sortCol = sortMap[req.query.sort] || 'xp';
@@ -288,7 +249,6 @@ router.all('*', async (req, res) => {
     return res.json({ rank: (count || 0) + 1, xp: user.xp || 0 });
   }
 
-  /* ═══ ACTIVITY ═══════════════════════════════════════════ */
   if (req.method === 'GET' && action === 'activity') {
     const user = await verifyToken(client, req.headers.authorization);
     if (!user) return res.status(401).json({ error: 'Tidak terautentikasi' });
@@ -300,7 +260,10 @@ router.all('*', async (req, res) => {
   if (req.method === 'PUT' && action === 'update_prefs') {
     const user = await verifyToken(client, req.headers.authorization);
     if (!user) return res.status(401).json({ error: 'Tidak terautentikasi' });
-    await client.from('profiles').update({ preferences: { ...(user.preferences || {}), ...req.body }, updated_at: new Date().toISOString() }).eq('id', user.id);
+    await client.from('profiles').update({
+      preferences: { ...(user.preferences || {}), ...req.body },
+      updated_at: new Date().toISOString(),
+    }).eq('id', user.id);
     return res.json({ ok: true });
   }
 
