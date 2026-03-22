@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark" data-accent="blue" data-fs="md">
+<head>
+<script>(function(){var p=JSON.parse(localStorage.getItem('kizai_prefs')||'{}');document.documentElement.setAttribute('data-theme',p.theme||'dark');document.documentElement.setAttribute('data-accent',p.accent||'blue');document.documentElement.setAttribute('data-fs',p.fontSize||'md')}())</script>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Leaderboard — KizAi</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/shared.css">
+<style>
+#main-nav{position:sticky;top:0;z-index:500;height:60px;display:flex;align-items:center;padding:0 4vw;gap:2rem;background:rgba(5,5,16,.92);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--bd)}
+.nav-links{display:flex;gap:.15rem}.nav-right{display:flex;align-items:center;gap:.4rem;margin-left:auto}
+.nav-link{padding:.4rem .85rem;border-radius:var(--r2);font-size:.85rem;font-weight:500;color:var(--gray);transition:all .2s;text-decoration:none}
+.nav-link:hover,.nav-link.active{color:var(--white);background:rgba(255,255,255,.07)}
+.lb-hero{padding:2rem 4vw 2rem;text-align:center;position:relative;overflow:hidden}
+.lb-hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 0%,rgba(var(--accent-rgb),.08),transparent)}
+.lb-title{font-family:var(--ff-display);font-weight:900;font-size:clamp(1.8rem,6vw,4rem);letter-spacing:-.06em;line-height:1;margin-bottom:.75rem}
+.lb-sub{color:var(--gray);font-size:.95rem;max-width:460px;margin:0 auto 2rem;line-height:1.7}
+.lb-tabs{display:flex;gap:.35rem;justify-content:center;flex-wrap:wrap;margin-bottom:3rem}
+.lb-tab{padding:.45rem 1.1rem;border-radius:100px;font-size:.82rem;font-weight:600;cursor:pointer;border:1.5px solid var(--bd2);background:none;color:var(--gray);font-family:inherit;transition:all .2s}
+.lb-tab.active{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.lb-wrap{max-width:760px;margin:0 auto;padding:0 4vw 3rem}
+/* TOP 3 PODIUM */
+.podium{display:flex;align-items:flex-end;justify-content:center;gap:1rem;margin-bottom:2.5rem;flex-wrap:wrap}
+.podium-item{display:flex;flex-direction:column;align-items:center;gap:.6rem;flex:1;max-width:200px;min-width:120px}
+.podium-rank{font-family:var(--ff-display);font-weight:900;font-size:2rem;line-height:1}
+.podium-ava{width:70px;height:70px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;border:3px solid;transition:transform .3s}
+.podium-item:hover .podium-ava{transform:scale(1.08)}
+.podium-item.p1 .podium-ava{border-color:var(--amber);box-shadow:0 0 24px rgba(var(--amber-rgb),.4)}
+.podium-item.p2 .podium-ava{border-color:var(--gray);box-shadow:0 0 16px rgba(107,114,128,.3)}
+.podium-item.p3 .podium-ava{border-color:var(--orange);box-shadow:0 0 16px rgba(var(--orange-rgb),.3)}
+.podium-crown{font-size:1.5rem;margin-bottom:-.3rem}
+.podium-name{font-weight:700;font-size:.95rem;text-align:center}
+.podium-xp{font-family:var(--ff-mono);font-size:.72rem;color:var(--gray);text-align:center}
+.podium-base{width:100%;border-radius:var(--r3) var(--r3) 0 0;display:flex;align-items:center;justify-content:center;padding:.5rem;font-family:var(--ff-display);font-weight:800;font-size:1.2rem;color:#fff}
+.p1 .podium-base{background:linear-gradient(135deg,var(--amber),#e6962d);height:70px}
+.p2 .podium-base{background:linear-gradient(135deg,#9ca3af,#6b7280);height:50px}
+.p3 .podium-base{background:linear-gradient(135deg,var(--orange),#c2410c);height:40px}
+/* ROWS */
+.lb-list{display:flex;flex-direction:column;gap:.5rem}
+.lb-row{display:flex;align-items:center;gap:.9rem;padding:.85rem 1.1rem;background:var(--card);border:1px solid var(--bd);border-radius:var(--r3);transition:all .2s;position:relative;overflow:hidden}
+.lb-row:hover{border-color:rgba(var(--accent-rgb),.25);transform:translateX(3px)}
+.lb-row.me{border-color:rgba(var(--accent-rgb),.4);background:var(--accent-dim)}
+.lb-row.me::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent)}
+.lb-rank{font-family:var(--ff-display);font-weight:800;font-size:1.1rem;width:32px;text-align:center;flex-shrink:0;color:var(--gray2)}
+.lb-row:nth-child(1) .lb-rank{color:var(--amber)}
+.lb-row:nth-child(2) .lb-rank{color:var(--gray)}
+.lb-row:nth-child(3) .lb-rank{color:var(--orange)}
+.lb-ava{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.lb-info{flex:1;min-width:0}
+.lb-name{font-weight:700;font-size:.9rem;margin-bottom:.15rem;display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
+.lb-meta{font-size:.74rem;color:var(--gray);font-family:var(--ff-mono)}
+.lb-stats{display:flex;flex-direction:column;align-items:flex-end;gap:.15rem;flex-shrink:0}
+.lb-xp{font-family:var(--ff-display);font-weight:700;font-size:1.05rem;letter-spacing:-.03em;color:var(--accent)}
+.lb-level{font-family:var(--ff-mono);font-size:.65rem;color:var(--gray2)}
+/* MY RANK BANNER */
+.my-rank-banner{background:var(--accent-dim);border:1px solid rgba(var(--accent-rgb),.3);border-radius:var(--r3);padding:1rem 1.25rem;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.mrb-left{display:flex;align-items:center;gap:.75rem}
+.mrb-rank{font-family:var(--ff-display);font-weight:900;font-size:1.8rem;color:var(--accent);letter-spacing:-.05em}
+/* FILTER */
+.lb-filter{display:flex;gap:.5rem;margin-bottom:1.5rem;flex-wrap:wrap;align-items:center}
+.lb-filter-label{font-family:var(--ff-mono);font-size:.65rem;color:var(--gray2);text-transform:uppercase;letter-spacing:.1em}
+@media(max-width:600px){.podium{gap:.5rem}.podium-item{min-width:90px}.lb-row{padding:.65rem .8rem;gap:.6rem}}
+</style>
+</head>
+<body>
+<div id="toast-stack"></div>
+<div id="scroll-bar"></div>
+<header id="main-nav">
+  <a href="/" style="font-family:var(--ff-display);font-weight:800;font-size:1.2rem;letter-spacing:-.04em;text-decoration:none"><span style="color:var(--accent)">Kiz</span>Ai</a>
+  <nav class="nav-links">
+    <a href="/" class="nav-link">Beranda</a>
+    <a href="/chat" class="nav-link">💬 Chat</a>
+    <a href="/tools" class="nav-link">🔧 Tools</a>
+    <a href="/games" class="nav-link">🎮 Games</a>
+    <a href="/leaderboard" class="nav-link active">🏆 Leaderboard</a>
+  </nav>
+  <div class="nav-right">
+    <a href="/dashboard" class="btn btn-sm btn-outline" id="dash-btn" style="display:none">Dashboard</a>
+    <a href="/auth" class="btn btn-sm btn-primary" id="login-btn">Masuk</a>
+  </div>
+</header>
+
+<div class="lb-hero">
+  <div class="lb-hero-bg"></div>
+  <div style="position:relative;z-index:1">
+    <div class="lb-title rv">🏆 <span style="background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Leaderboard</span></div>
+    <p class="lb-sub rv d1">Bersaing dengan 12.000+ pengguna KizAi. Kumpulkan XP dari setiap aktivitas dan capai puncak peringkat!</p>
+    <div class="lb-tabs rv d2" id="lb-tabs">
+      <button class="lb-tab active" onclick="setTab('xp',this)">⭐ XP Global</button>
+      <button class="lb-tab" onclick="setTab('messages',this)">💬 Chat</button>
+      <button class="lb-tab" onclick="setTab('tools',this)">🔧 Tools</button>
+      <button class="lb-tab" onclick="setTab('games',this)">🎮 Games</button>
+      <button class="lb-tab" onclick="setTab('streak',this)">🔥 Streak</button>
+      <button class="lb-tab" onclick="setTab('coins',this)">🪙 Koin</button>
+    </div>
+  </div>
+</div>
+
+<div class="lb-wrap">
+  <!-- MY RANK (if logged in) -->
+  <div class="my-rank-banner" id="my-rank-banner" style="display:none">
+    <div class="mrb-left">
+      <div id="mrb-ava" style="width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;border:2px solid rgba(var(--accent-rgb),.4)"></div>
+      <div>
+        <div style="font-weight:700;font-size:.9rem" id="mrb-name">Kamu</div>
+        <div style="font-family:var(--ff-mono);font-size:.68rem;color:var(--gray)">Peringkat kamu saat ini</div>
+      </div>
+    </div>
+    <div style="text-align:right">
+      <div class="mrb-rank" id="mrb-rank">#—</div>
+      <div style="font-family:var(--ff-mono);font-size:.65rem;color:var(--gray)" id="mrb-xp">0 XP</div>
+    </div>
+  </div>
+
+  <!-- FILTER -->
+  <div class="lb-filter">
+    <span class="lb-filter-label">Periode:</span>
+    <button class="lb-tab active" style="padding:.3rem .75rem;font-size:.75rem" onclick="setPeriod('all',this)">Semua Waktu</button>
+    <button class="lb-tab" style="padding:.3rem .75rem;font-size:.75rem" onclick="setPeriod('month',this)">Bulan Ini</button>
+    <button class="lb-tab" style="padding:.3rem .75rem;font-size:.75rem" onclick="setPeriod('week',this)">Pekan Ini</button>
+  </div>
+
+  <!-- TOP 3 PODIUM -->
+  <div class="podium" id="podium"></div>
+
+  <!-- FULL LIST (rank 4+) -->
+  <div class="lb-list" id="lb-list"></div>
+
+  <!-- LOAD MORE -->
+  <div style="text-align:center;margin-top:1.5rem" id="load-more-wrap">
+    <button class="btn btn-outline btn-md" id="load-more-btn" onclick="loadMore()">Muat Lebih Banyak</button>
+  </div>
+</div>
+
+<button id="btt">↑</button>
+<script src="/shared.js"></script>
+<script>
+let currentTab = 'xp', currentPeriod = 'all', page = 1;
+const TOTAL_SHOW = 20;
+
+// Nav
+const user = Auth.getUser();
+if (user) {
+  document.getElementById('dash-btn').style.display = '';
+  document.getElementById('login-btn').style.display = 'none';
+  document.getElementById('dash-btn').textContent = user.username;
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadLeaderboard();
+  if (user) loadMyRank();
+  Scroll.init();
+});
+
+async function loadLeaderboard() {
+  document.getElementById('lb-list').innerHTML = Array(5).fill(`<div class="lb-row"><div class="skel" style="width:32px;height:24px"></div><div class="skel" style="width:40px;height:40px;border-radius:50%"></div><div style="flex:1"><div class="skel" style="width:120px;height:16px;margin-bottom:.4rem"></div><div class="skel" style="width:80px;height:12px"></div></div></div>`).join('');
+
+  const { data, ok } = await API.get(`/api/auth?action=leaderboard&sort=${currentTab}&period=${currentPeriod}&limit=${TOTAL_SHOW}`);
+  const lb = ok ? (data?.leaderboard || []) : generateMockLB();
+  renderLeaderboard(lb);
+}
+
+function generateMockLB() {
+  const names = ['rizky_dev','sari_design','budi_coder','maya_ai','fajar_pro','rina_tech','dian_create','arif_hack','lisa_ml','hendra_ds','tito_py','nurul_web','asep_game','yuni_ux','bagas_net','irma_cloud','tomy_sec','wulan_nlp','dedi_ios','elly_and'];
+  const emojis = ['😎','🤩','👨‍💻','👩‍🎨','🧑‍💻','🦸','🤖','🦊','🐱','🌟'];
+  const colors = ['#4f7fff','#8b5cf6','#06b6d4','#22c55e','#f59e0b','#ec4899','#f97316','#ef4444'];
+  const plans = ['vip','vip','premium','vip','premium','free','vip','premium','free','premium','free','vip','free','premium','free','vip','premium','free','free','free'];
+  return names.map((n,i) => ({
+    rank: i+1, username: n,
+    avatar_emoji: emojis[i%emojis.length],
+    avatar_color: colors[i%colors.length],
+    plan: plans[i], level: Math.max(1, 25-i),
+    xp: Math.max(50, 15000 - i*700 + Math.random()*300 | 0),
+    chat_messages: Math.max(5, 800 - i*40 | 0),
+    tools_used: Math.max(2, 400 - i*20 | 0),
+    games_played: Math.max(1, 200 - i*10 | 0),
+    streak: Math.max(0, 30 - i),
+    coins: Math.max(10, 5000 - i*250 | 0),
+    is_me: user && n === user.username
+  }));
+}
+
+function renderLeaderboard(lb) {
+  if (!lb.length) {
+    document.getElementById('podium').innerHTML = '';
+    document.getElementById('lb-list').innerHTML = '<div class="empty-state"><div class="empty-state-icon">🏆</div><div class="empty-state-title">Belum ada data</div></div>';
+    return;
+  }
+
+  const top3 = lb.slice(0,3);
+  const rest = lb.slice(3);
+  const statKey = { xp:'xp', messages:'chat_messages', tools:'tools_used', games:'games_played', streak:'streak', coins:'coins' }[currentTab] || 'xp';
+  const statLabel = { xp:'XP', messages:'Pesan', tools:'Tools', games:'Games', streak:'Hari', coins:'Koin' }[currentTab] || 'XP';
+
+  // Podium
+  const podiumOrder = top3.length >= 3 ? [top3[1], top3[0], top3[2]] : top3;
+  const podiumClasses = top3.length >= 3 ? ['p2','p1','p3'] : ['p1','p2','p3'];
+  const crowns = top3.length >= 3 ? ['🥈','👑','🥉'] : ['👑','🥈','🥉'];
+  document.getElementById('podium').innerHTML = podiumOrder.map((u, i) => u ? `
+    <div class="podium-item ${podiumClasses[i]}">
+      <span class="podium-crown">${crowns[i]}</span>
+      <div class="podium-ava" style="background:${u.avatar_color||'rgba(79,127,255,.2)'}">${u.avatar_emoji||'😊'}</div>
+      <div class="podium-name">${u.username}${u.is_me?' (Kamu)':''}</div>
+      <div class="podium-xp">${Format.number(u[statKey]||0)} ${statLabel}</div>
+      <div class="podium-base">#${u.rank}</div>
+    </div>` : '').join('');
+
+  // List 4+
+  document.getElementById('lb-list').innerHTML = rest.map(u => `
+    <div class="lb-row${u.is_me?' me':''}">
+      <div class="lb-rank">${u.rank}</div>
+      <div class="lb-ava" style="background:${u.avatar_color||'rgba(79,127,255,.2)'}">${u.avatar_emoji||'😊'}</div>
+      <div class="lb-info">
+        <div class="lb-name">
+          <span>${u.username}${u.is_me?' <span style="font-size:.65rem;color:var(--accent)">(Kamu)</span>':''}</span>
+          <span class="badge ${KZ.plans[u.plan||'free']?.badge||'badge-free'}" style="font-size:.55rem">${KZ.plans[u.plan||'free']?.icon||'🆓'} ${u.plan||'free'}</span>
+        </div>
+        <div class="lb-meta">Lv.${u.level||1} · ${Format.number(u.chat_messages||0)} pesan · ${u.streak||0}🔥 streak</div>
+      </div>
+      <div class="lb-stats">
+        <div class="lb-xp">${Format.number(u[statKey]||0)}</div>
+        <div class="lb-level">${statLabel}</div>
+      </div>
+    </div>`).join('');
+}
+
+function loadMyRank() {
+  if (!user) return;
+  const banner = document.getElementById('my-rank-banner');
+  const ava = document.getElementById('mrb-ava');
+  ava.textContent = user.avatar_emoji || '😊';
+  ava.style.background = user.avatar_color || 'rgba(79,127,255,.2)';
+  document.getElementById('mrb-name').textContent = user.username;
+  document.getElementById('mrb-xp').textContent = `${Format.number(user.xp||0)} XP`;
+  banner.style.display = '';
+
+  API.get('/api/auth?action=my_rank').then(({ data, ok }) => {
+    if (ok && data?.rank) document.getElementById('mrb-rank').textContent = '#' + data.rank;
+  });
+}
+
+function setTab(tab, btn) {
+  currentTab = tab;
+  document.querySelectorAll('.lb-tabs .lb-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  loadLeaderboard();
+}
+
+function setPeriod(period, btn) {
+  currentPeriod = period;
+  btn.closest('.lb-filter').querySelectorAll('.lb-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  loadLeaderboard();
+}
+
+function loadMore() {
+  Toast.info('Memuat lebih banyak peringkat...');
+  // In production: page++; loadLeaderboard(append=true);
+}
+</script>
+</body>
+</html>

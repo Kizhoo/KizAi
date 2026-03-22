@@ -1,0 +1,21 @@
+{
+  "name": "KizAi",
+  "short_name": "KizAi",
+  "description": "Platform AI terlengkap Indonesia — Chat AI, 105+ Tools, 52+ Games",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#050510",
+  "theme_color": "#4f7fff",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "categories": ["productivity", "utilities"],
+  "screenshots": [],
+  "shortcuts": [
+    { "name": "Chat AI", "url": "/chat", "description": "Mulai chat dengan AI" },
+    { "name": "Tools", "url": "/tools", "description": "105+ tools gratis" },
+    { "name": "Games", "url": "/games", "description": "52+ mini games" }
+  ]
+}

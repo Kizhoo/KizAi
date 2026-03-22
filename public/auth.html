@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark" data-accent="blue" data-fs="md">
+<head>
+<script>(function(){var p=JSON.parse(localStorage.getItem('kizai_prefs')||'{}');document.documentElement.setAttribute('data-theme',p.theme||'dark');document.documentElement.setAttribute('data-accent',p.accent||'blue');document.documentElement.setAttribute('data-fs',p.fontSize||'md')}())</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#050510">
+<title>Masuk / Daftar — KizAi</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/shared.css">
+<style>
+body{display:flex;min-height:100vh;flex-direction:column}
+.auth-wrap{flex:1;display:grid;grid-template-columns:1fr 1fr;min-height:100vh}
+.auth-left{position:relative;background:var(--bg2);border-right:1px solid var(--bd);display:flex;flex-direction:column;padding:3rem;overflow:hidden}
+.auth-left-bg{position:absolute;inset:0}
+.al-orb1{position:absolute;width:500px;height:500px;border-radius:50%;background:rgba(var(--accent-rgb),.06);filter:blur(80px);top:-100px;right:-100px;animation:float-orb 9s ease-in-out infinite}
+.al-orb2{position:absolute;width:400px;height:400px;border-radius:50%;background:rgba(139,92,246,.05);filter:blur(80px);bottom:-100px;left:-100px;animation:float-orb 11s ease-in-out infinite reverse}
+@keyframes float-orb{0%,100%{transform:translate(0,0)}50%{transform:translate(20px,-30px)}}
+.auth-left-content{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;justify-content:center;gap:2.5rem}
+.al-logo{font-family:var(--ff-display);font-weight:900;font-size:2rem;letter-spacing:-.05em}
+.al-logo a{display:flex;align-items:center;gap:.5rem;text-decoration:none}
+.al-headline{font-family:var(--ff-display);font-weight:800;font-size:2.8rem;letter-spacing:-.05em;line-height:1.05}
+.al-headline .hl{background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.al-desc{color:var(--gray);font-size:.95rem;line-height:1.85;max-width:380px}
+.al-features{display:flex;flex-direction:column;gap:.85rem}
+.al-feat{display:flex;align-items:center;gap:.75rem;font-size:.88rem}
+.al-feat-ico{width:34px;height:34px;border-radius:var(--r2);background:var(--accent-dim);display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0}
+.al-feat-text{color:var(--gray)}
+.al-feat-text strong{color:var(--white)}
+.al-bottom{font-family:var(--ff-mono);font-size:.65rem;color:var(--gray2)}
+
+/* RIGHT PANEL */
+.auth-right{display:flex;align-items:center;justify-content:center;padding:2.5rem;background:var(--bg)}
+.auth-box{width:100%;max-width:420px}
+.auth-header{margin-bottom:2rem}
+.auth-title{font-family:var(--ff-display);font-weight:800;font-size:1.85rem;letter-spacing:-.04em;margin-bottom:.35rem}
+.auth-subtitle{color:var(--gray);font-size:.88rem}
+.tab-row{display:flex;gap:.25rem;background:var(--bg3);padding:.25rem;border-radius:var(--r3);border:1px solid var(--bd);margin-bottom:2rem}
+.auth-tab{flex:1;padding:.5rem;border-radius:var(--r2);font-size:.85rem;font-weight:600;color:var(--gray);background:none;border:none;cursor:pointer;transition:all var(--t);font-family:inherit;text-align:center}
+.auth-tab.active{background:var(--card2);color:var(--white);box-shadow:var(--shadow)}
+.form-section{display:none}
+.form-section.active{display:flex;flex-direction:column;gap:1rem}
+.input-group{display:flex;flex-direction:column;gap:.4rem}
+.input-label{font-family:var(--ff-mono);font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--gray2);font-weight:500}
+.input-wrap{position:relative}
+.input-icon{position:absolute;left:.85rem;top:50%;transform:translateY(-50%);font-size:.95rem;pointer-events:none}
+.input-with-icon{padding-left:2.5rem}
+.pw-toggle{position:absolute;right:.85rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--gray);cursor:pointer;font-size:.85rem;padding:.2rem;transition:color var(--t)}
+.pw-toggle:hover{color:var(--white)}
+.pw-strength{margin-top:.4rem;display:flex;gap:.25rem}
+.pw-bar{flex:1;height:3px;border-radius:100px;background:var(--bd2);transition:background .3s}
+.pw-bar.weak{background:var(--hot)}
+.pw-bar.fair{background:var(--amber)}
+.pw-bar.good{background:var(--green)}
+.pw-bar.strong{background:var(--cyan)}
+.pw-label{font-family:var(--ff-mono);font-size:.62rem;color:var(--gray2);margin-top:.25rem}
+.field-error{font-size:.74rem;color:var(--hot);margin-top:.25rem;display:none}
+.field-error.show{display:block}
+.agree-row{display:flex;align-items:flex-start;gap:.6rem;font-size:.8rem;color:var(--gray)}
+.agree-row a{color:var(--accent)}
+.auth-submit{width:100%;padding:.85rem;border-radius:var(--r3);font-family:var(--ff-display);font-size:.95rem;font-weight:700;border:none;cursor:pointer;transition:all .25s;letter-spacing:-.01em;position:relative;overflow:hidden}
+.auth-submit.primary{background:var(--accent);color:var(--accent-fg)}
+.auth-submit.primary:hover{background:var(--accent2);box-shadow:0 8px 32px rgba(var(--accent-rgb),.35);transform:translateY(-1px)}
+.auth-submit:disabled{opacity:.5;transform:none;cursor:not-allowed}
+.auth-divider{display:flex;align-items:center;gap:.75rem;color:var(--gray2);font-size:.78rem;margin:.5rem 0}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--bd)}
+.oauth-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+.oauth-btn{display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.65rem;border-radius:var(--r3);font-size:.82rem;font-weight:600;cursor:pointer;border:1.5px solid var(--bd2);background:transparent;color:var(--gray);font-family:inherit;transition:all .2s}
+.oauth-btn:hover{border-color:var(--bd3);color:var(--white);background:rgba(255,255,255,.04)}
+.switch-text{text-align:center;font-size:.83rem;color:var(--gray);margin-top:.75rem}
+.switch-text a{color:var(--accent);font-weight:600}
+
+/* FORGOT PASSWORD */
+.forgot-panel{display:none;text-align:center;padding:2rem 0}
+.forgot-panel.active{display:block}
+.back-btn{display:inline-flex;align-items:center;gap:.4rem;font-size:.82rem;color:var(--gray);cursor:pointer;margin-bottom:1.5rem;background:none;border:none;font-family:inherit;transition:color var(--t)}
+.back-btn:hover{color:var(--white)}
+
+/* SUCCESS OVERLAY */
+.success-overlay{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;opacity:0;pointer-events:none;transition:opacity .5s;text-align:center;padding:2rem}
+.success-overlay.show{opacity:1;pointer-events:auto}
+.success-emoji{font-size:5rem;margin-bottom:1.5rem;animation:bounce .6s ease}
+.success-title{font-family:var(--ff-display);font-weight:800;font-size:2.5rem;letter-spacing:-.04em;margin-bottom:.5rem}
+.success-sub{color:var(--gray);font-size:.95rem;margin-bottom:2rem;line-height:1.7}
+
+/* RESPONSIVE */
+@media(max-width:900px){.auth-wrap{grid-template-columns:1fr}.auth-left{display:none}}
+@media(max-width:480px){.auth-right{padding:1.5rem;align-items:flex-start;padding-top:2rem}}
+</style>
+</head>
+<body>
+<div id="toast-stack"></div>
+
+<div class="auth-wrap">
+  <!-- LEFT PANEL -->
+  <div class="auth-left">
+    <div class="auth-left-bg"><div class="al-orb1"></div><div class="al-orb2"></div></div>
+    <div class="auth-left-content">
+      <div class="al-logo">
+        <a href="/">
+          <span style="background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Kiz</span><span>Ai</span>
+          <span style="background:rgba(var(--accent-rgb),.12);color:var(--accent);font-family:var(--ff-mono);font-size:.6rem;padding:.15rem .5rem;border-radius:4px;font-weight:700;letter-spacing:.08em">v4</span>
+        </a>
+      </div>
+      <div>
+        <h1 class="al-headline">Platform AI<br><span class="hl">Terlengkap</span><br>Indonesia</h1>
+        <p class="al-desc">Bergabung dengan 12.000+ pengguna yang sudah merasakan manfaatnya. Gratis selamanya, tanpa kartu kredit.</p>
+      </div>
+      <div class="al-features">
+        <div class="al-feat"><div class="al-feat-ico">💬</div><div class="al-feat-text"><strong>10+ Model AI</strong> — Llama, DeepSeek, Qwen, dan lainnya</div></div>
+        <div class="al-feat"><div class="al-feat-ico">🔧</div><div class="al-feat-text"><strong>105+ Tools</strong> — Text, image, code, SEO, dan banyak lagi</div></div>
+        <div class="al-feat"><div class="al-feat-ico">🎮</div><div class="al-feat-text"><strong>52+ Games</strong> — Kumpulkan XP sambil bersenang-senang</div></div>
+        <div class="al-feat"><div class="al-feat-ico">⭐</div><div class="al-feat-text"><strong>Sistem XP & Level</strong> — Naik level dan bersaing di leaderboard</div></div>
+        <div class="al-feat"><div class="al-feat-ico">🔒</div><div class="al-feat-text"><strong>Aman & Privat</strong> — Data terenkripsi, tanpa iklan</div></div>
+      </div>
+      <div class="al-bottom">© 2025 KizAi · Platform AI #1 Indonesia</div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="auth-right">
+    <div class="auth-box">
+      <div class="auth-header" id="auth-header">
+        <div class="auth-title" id="auth-title">Selamat datang 👋</div>
+        <div class="auth-subtitle" id="auth-subtitle">Masuk ke akunmu atau daftar gratis sekarang</div>
+      </div>
+
+      <!-- TABS -->
+      <div class="tab-row" id="tab-row">
+        <button class="auth-tab active" onclick="switchTab('login')">Masuk</button>
+        <button class="auth-tab" onclick="switchTab('register')">Daftar</button>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <div class="form-section active" id="form-login">
+        <div class="input-group">
+          <label class="input-label">Email atau Username</label>
+          <div class="input-wrap">
+            <span class="input-icon">📧</span>
+            <input class="input input-with-icon" type="text" id="login-id" placeholder="email@contoh.com atau username" autocomplete="username">
+          </div>
+          <div class="field-error" id="login-id-err"></div>
+        </div>
+        <div class="input-group">
+          <div class="flex" style="justify-content:space-between;align-items:center">
+            <label class="input-label">Password</label>
+            <button class="back-btn" style="font-size:.75rem;margin:0" onclick="showForgot()">Lupa password?</button>
+          </div>
+          <div class="input-wrap">
+            <span class="input-icon">🔒</span>
+            <input class="input input-with-icon" type="password" id="login-pw" placeholder="Password kamu" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+            <button class="pw-toggle" onclick="togglePw('login-pw')">👁️</button>
+          </div>
+          <div class="field-error" id="login-pw-err"></div>
+        </div>
+        <div class="flex" style="align-items:center;gap:.5rem;font-size:.82rem;color:var(--gray)">
+          <input type="checkbox" id="remember-me" style="width:16px;height:16px;accent-color:var(--accent);cursor:pointer">
+          <label for="remember-me" style="cursor:pointer">Ingat saya</label>
+        </div>
+        <button class="auth-submit primary" id="login-btn" onclick="doLogin()">
+          <span id="login-btn-text">Masuk ke Akun →</span>
+        </button>
+        <div class="switch-text">Belum punya akun? <a onclick="switchTab('register')" style="cursor:pointer">Daftar gratis sekarang →</a></div>
+      </div>
+
+      <!-- REGISTER FORM -->
+      <div class="form-section" id="form-register">
+        <div class="input-group">
+          <label class="input-label">Username</label>
+          <div class="input-wrap">
+            <span class="input-icon">👤</span>
+            <input class="input input-with-icon" type="text" id="reg-username" placeholder="username_kamu (3-20 karakter)" autocomplete="username" maxlength="20" oninput="validateUsername(this)">
+          </div>
+          <div class="field-error" id="reg-username-err"></div>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Email</label>
+          <div class="input-wrap">
+            <span class="input-icon">📧</span>
+            <input class="input input-with-icon" type="email" id="reg-email" placeholder="email@contoh.com" autocomplete="email">
+          </div>
+          <div class="field-error" id="reg-email-err"></div>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Password</label>
+          <div class="input-wrap">
+            <span class="input-icon">🔒</span>
+            <input class="input input-with-icon" type="password" id="reg-pw" placeholder="Minimal 8 karakter" autocomplete="new-password" oninput="checkPwStrength(this.value)">
+            <button class="pw-toggle" onclick="togglePw('reg-pw')">👁️</button>
+          </div>
+          <div class="pw-strength" id="pw-strength">
+            <div class="pw-bar" id="pw-b1"></div>
+            <div class="pw-bar" id="pw-b2"></div>
+            <div class="pw-bar" id="pw-b3"></div>
+            <div class="pw-bar" id="pw-b4"></div>
+          </div>
+          <div class="pw-label" id="pw-label">Masukkan password</div>
+          <div class="field-error" id="reg-pw-err"></div>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Konfirmasi Password</label>
+          <div class="input-wrap">
+            <span class="input-icon">🔒</span>
+            <input class="input input-with-icon" type="password" id="reg-pw2" placeholder="Ulangi password" autocomplete="new-password">
+          </div>
+          <div class="field-error" id="reg-pw2-err"></div>
+        </div>
+        <div class="input-group">
+          <label class="input-label">ID Telegram (opsional)</label>
+          <div class="input-wrap">
+            <span class="input-icon">✈️</span>
+            <input class="input input-with-icon" type="text" id="reg-tg" placeholder="@username atau ID numerik">
+          </div>
+          <div class="form-hint" style="color:var(--gray2);font-size:.74rem">💡 Untuk notifikasi pembayaran & update akun</div>
+        </div>
+        <div class="agree-row">
+          <input type="checkbox" id="agree" style="width:16px;height:16px;accent-color:var(--accent);cursor:pointer;flex-shrink:0;margin-top:2px">
+          <label for="agree" style="cursor:pointer;line-height:1.5">Saya setuju dengan <a href="#" onclick="return false">Syarat & Ketentuan</a> dan <a href="#" onclick="return false">Kebijakan Privasi</a> KizAi.</label>
+        </div>
+        <button class="auth-submit primary" id="reg-btn" onclick="doRegister()">
+          <span id="reg-btn-text">🚀 Buat Akun Gratis →</span>
+        </button>
+        <div class="switch-text">Sudah punya akun? <a onclick="switchTab('login')" style="cursor:pointer">Masuk →</a></div>
+      </div>
+
+      <!-- FORGOT PASSWORD -->
+      <div class="forgot-panel" id="forgot-panel">
+        <button class="back-btn" onclick="hideForgot()">← Kembali ke login</button>
+        <div style="font-size:2.5rem;margin-bottom:1rem">🔑</div>
+        <div class="auth-title" style="font-size:1.5rem;margin-bottom:.4rem">Reset Password</div>
+        <div class="auth-subtitle" style="margin-bottom:1.5rem">Masukkan email dan kami kirimkan link reset password.</div>
+        <div class="input-group" style="margin-bottom:1rem;text-align:left">
+          <label class="input-label">Email</label>
+          <div class="input-wrap">
+            <span class="input-icon">📧</span>
+            <input class="input input-with-icon" type="email" id="forgot-email" placeholder="email@contoh.com">
+          </div>
+        </div>
+        <button class="auth-submit primary" onclick="doForgot()">Kirim Link Reset →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS OVERLAY -->
+<div class="success-overlay" id="success-overlay">
+  <div class="success-emoji" id="success-emoji">🎉</div>
+  <div class="success-title" id="success-title">Berhasil!</div>
+  <div class="success-sub" id="success-sub">Akun berhasil dibuat. Mengarahkan ke dashboard...</div>
+  <div class="spinner spinner-lg" style="border-top-color:var(--accent)"></div>
+</div>
+
+<script src="/shared.js"></script>
+<script>
+// Check if already logged in
+if (Auth.isLoggedIn()) window.location.href = '/dashboard';
+
+// Hash routing
+const hash = location.hash;
+if (hash === '#register') switchTab('register');
+
+function switchTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='register')));
+  document.getElementById('form-login').classList.toggle('active', tab==='login');
+  document.getElementById('form-register').classList.toggle('active', tab==='register');
+  document.getElementById('forgot-panel').classList.remove('active');
+  document.getElementById('tab-row').style.display = '';
+  document.getElementById('auth-title').textContent = tab==='login' ? 'Selamat datang 👋' : 'Buat akun baru ✨';
+  document.getElementById('auth-subtitle').textContent = tab==='login' ? 'Masuk ke akunmu untuk melanjutkan' : 'Bergabung dengan 12.000+ pengguna aktif';
+  history.replaceState(null,'',tab==='register'?'#register':'#');
+}
+
+function showForgot() {
+  document.getElementById('form-login').classList.remove('active');
+  document.getElementById('tab-row').style.display = 'none';
+  document.getElementById('forgot-panel').classList.add('active');
+  document.getElementById('auth-title').textContent = 'Lupa Password?';
+  document.getElementById('auth-subtitle').textContent = '';
+}
+function hideForgot() {
+  document.getElementById('forgot-panel').classList.remove('active');
+  document.getElementById('tab-row').style.display = '';
+  document.getElementById('form-login').classList.add('active');
+  document.getElementById('auth-title').textContent = 'Selamat datang 👋';
+  document.getElementById('auth-subtitle').textContent = 'Masuk ke akunmu untuk melanjutkan';
+}
+
+function togglePw(id) {
+  const el = document.getElementById(id);
+  el.type = el.type === 'password' ? 'text' : 'password';
+}
+
+function validateUsername(el) {
+  const v = el.value;
+  const err = document.getElementById('reg-username-err');
+  if (!v) { err.textContent=''; err.classList.remove('show'); return; }
+  if (!/^[a-zA-Z0-9_]+$/.test(v)) { err.textContent='Hanya huruf, angka, dan underscore'; err.classList.add('show'); }
+  else if (v.length < 3) { err.textContent='Minimal 3 karakter'; err.classList.add('show'); }
+  else if (v.length > 20) { err.textContent='Maksimal 20 karakter'; err.classList.add('show'); }
+  else { err.textContent=''; err.classList.remove('show'); }
+}
+
+function checkPwStrength(pw) {
+  const bars = [document.getElementById('pw-b1'),document.getElementById('pw-b2'),document.getElementById('pw-b3'),document.getElementById('pw-b4')];
+  const label = document.getElementById('pw-label');
+  bars.forEach(b => { b.className = 'pw-bar'; });
+  if (!pw) { label.textContent = 'Masukkan password'; return; }
+  let score = 0;
+  if (pw.length >= 8) score++;
+  if (/[A-Z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+  const levels = ['weak','fair','good','strong'];
+  const labels = ['Lemah — tambahkan huruf kapital & angka', 'Sedang — tambahkan karakter khusus', 'Bagus!', 'Sangat kuat! 💪'];
+  for (let i = 0; i < score; i++) bars[i].classList.add(levels[score-1]);
+  label.textContent = labels[score-1] || 'Masukkan password';
+  label.style.color = score === 1 ? 'var(--hot)' : score === 2 ? 'var(--amber)' : score === 3 ? 'var(--green)' : 'var(--cyan)';
+}
+
+function setErr(id, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.toggle('show', !!msg);
+}
+
+function setLoading(btnId, textId, loading, text = '') {
+  const btn = document.getElementById(btnId);
+  const tx = document.getElementById(textId);
+  btn.disabled = loading;
+  if (loading) tx.innerHTML = '<span style="display:flex;align-items:center;gap:.4rem;justify-content:center"><span class="spinner spinner-sm"></span>Memproses...</span>';
+  else tx.textContent = text;
+}
+
+async function doLogin() {
+  const id = document.getElementById('login-id').value.trim();
+  const pw = document.getElementById('login-pw').value;
+
+  setErr('login-id-err',''); setErr('login-pw-err','');
+  if (!id) { setErr('login-id-err','Email atau username wajib diisi'); return; }
+  if (!pw) { setErr('login-pw-err','Password wajib diisi'); return; }
+
+  setLoading('login-btn','login-btn-text',true);
+  let loginResult;
+  try {
+    const lPromise = API.post('/api/auth?action=login', { identifier: id, password: pw });
+    const lTimeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 12000));
+    loginResult = await Promise.race([lPromise, lTimeout]);
+  } catch(e) {
+    setLoading('login-btn','login-btn-text',false,'Masuk ke Akun →');
+    if (e.message === 'timeout') setErr('login-id-err', 'Request timeout. Coba lagi.');
+    else setErr('login-id-err', 'Koneksi bermasalah. Coba lagi.');
+    return;
+  }
+  const { data, ok, error } = loginResult;
+  setLoading('login-btn','login-btn-text',false,'Masuk ke Akun →');
+
+  if (!ok) {
+    if (error?.includes('password') || error?.includes('kata sandi')) setErr('login-pw-err', error);
+    else setErr('login-id-err', error || 'Gagal masuk, coba lagi');
+    return;
+  }
+
+  Store.set('token', data.access_token);
+  Store.set('user', data.user);
+  if (document.getElementById('remember-me').checked) {
+    Store.set('remember', true);
+  }
+
+  const success = document.getElementById('success-overlay');
+  document.getElementById('success-emoji').textContent = '👋';
+  document.getElementById('success-title').textContent = `Halo, ${data.user.username}!`;
+  document.getElementById('success-sub').textContent = 'Login berhasil. Mengarahkan ke dashboard...';
+  success.classList.add('show');
+
+  setTimeout(() => {
+    const redirect = sessionStorage.getItem('kizai_redirect') || '/dashboard';
+    sessionStorage.removeItem('kizai_redirect');
+    window.location.href = redirect;
+  }, 1500);
+}
+
+async function doRegister() {
+  const username = document.getElementById('reg-username').value.trim().toLowerCase();
+  const email    = document.getElementById('reg-email').value.trim().toLowerCase();
+  const pw       = document.getElementById('reg-pw').value;
+  const pw2      = document.getElementById('reg-pw2').value;
+  const tg       = document.getElementById('reg-tg').value.trim();
+  const agreed   = document.getElementById('agree').checked;
+
+  // Clear errors
+  ['reg-username-err','reg-email-err','reg-pw-err','reg-pw2-err'].forEach(id => setErr(id,''));
+
+  let valid = true;
+  if (!username || !/^[a-zA-Z0-9_]{3,20}$/.test(username)) { setErr('reg-username-err','Username 3-20 karakter (huruf, angka, underscore)'); valid=false; }
+  if (!email || !Validate.email(email)) { setErr('reg-email-err','Format email tidak valid'); valid=false; }
+  if (!pw || pw.length < 6) { setErr('reg-pw-err','Password minimal 6 karakter'); valid=false; }
+  if (pw !== pw2) { setErr('reg-pw2-err','Password tidak cocok'); valid=false; }
+  if (!agreed) { Toast.warn('Setujui syarat & ketentuan terlebih dahulu'); valid=false; }
+  if (!valid) return;
+
+  setLoading('reg-btn','reg-btn-text',true);
+  let regData, regOk, regError;
+  try {
+    const regPromise = API.post('/api/auth?action=register', { username, email, password: pw, telegram_id: tg });
+    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 15000));
+    const result = await Promise.race([regPromise, timeoutPromise]);
+    regData = result.data; regOk = result.ok; regError = result.error;
+  } catch(e) {
+    setLoading('reg-btn','reg-btn-text',false,'🚀 Buat Akun Gratis →');
+    if (e.message === 'timeout') Toast.err('Request timeout. Coba lagi.');
+    else Toast.err('Koneksi bermasalah. Coba lagi.');
+    return;
+  }
+  const data = regData, ok = regOk, error = regError;
+  setLoading('reg-btn','reg-btn-text',false,'🚀 Buat Akun Gratis →');
+
+  if (!ok) {
+    if (error?.includes('username') || error?.includes('Username')) setErr('reg-username-err', error);
+    else if (error?.includes('email') || error?.includes('Email')) setErr('reg-email-err', error);
+    else if (error?.includes('password') || error?.includes('Password')) setErr('reg-pw-err', error);
+    else Toast.err(error || 'Gagal mendaftar. Coba lagi.');
+    return;
+  }
+
+  // Auto-login berhasil → simpan token & langsung ke dashboard
+  if (data?.access_token && data?.user) {
+    Store.set('token', data.access_token);
+    Store.set('user', data.user);
+    if (data.refresh_token) Store.set('refresh_token', data.refresh_token);
+    document.getElementById('success-emoji').textContent = '🎉';
+    document.getElementById('success-title').textContent = `Selamat, ${data.user.username}!`;
+    document.getElementById('success-sub').textContent = 'Akun berhasil dibuat & kamu dapat 50 koin bonus!';
+    document.getElementById('success-overlay').classList.add('show');
+    setTimeout(() => { window.location.href = '/dashboard'; }, 1800);
+    return;
+  }
+
+  // Auto-login gagal (email perlu dikonfirmasi) → arahkan ke login
+  document.getElementById('success-emoji').textContent = '✅';
+  document.getElementById('success-title').textContent = `Akun dibuat, ${username}!`;
+  document.getElementById('success-sub').textContent = (data?.message) || 'Akun berhasil dibuat! Silakan login.';
+  document.getElementById('success-overlay').classList.add('show');
+  setTimeout(() => {
+    document.getElementById('success-overlay').classList.remove('show');
+    switchTab('login');
+    document.getElementById('login-id').value = email;
+  }, 2500);
+}
+
+async function doForgot() {
+  const email = document.getElementById('forgot-email').value.trim();
+  if (!email || !Validate.email(email)) { Toast.warn('Masukkan email yang valid'); return; }
+  Toast.info('Jika email terdaftar, link reset akan dikirimkan ke ' + email);
+  // In production, call API: await API.post('/api/auth?action=forgot_password', { email });
+}
+
+// Handle Enter key on forms
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    if (document.getElementById('form-register').classList.contains('active')) doRegister();
+  }
+});
+</script>
+</body>
+</html>
