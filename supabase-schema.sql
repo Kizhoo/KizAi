@@ -157,32 +157,70 @@ DECLARE
   v_base     TEXT;
   v_counter  INTEGER := 0;
 BEGIN
+  -- Ambil username dari metadata atau dari email
   v_base := LOWER(COALESCE(
     NULLIF(TRIM(NEW.raw_user_meta_data->>'username'), ''),
     SPLIT_PART(NEW.email, '@', 1)
   ));
+  
+  -- Bersihkan karakter yang tidak diizinkan
   v_base := REGEXP_REPLACE(v_base, '[^a-z0-9_]', '', 'g');
-  IF LENGTH(v_base) < 3 THEN v_base := 'user' || SUBSTR(REPLACE(NEW.id::text,'-',''),1,6); END IF;
+  
+  -- Minimal 3 karakter
+  IF v_base IS NULL OR LENGTH(v_base) < 3 THEN
+    v_base := 'user' || SUBSTR(REPLACE(NEW.id::text, '-', ''), 1, 8);
+  END IF;
+  
+  -- Potong ke 15 karakter
   v_base     := SUBSTR(v_base, 1, 15);
   v_username := v_base;
 
-  WHILE EXISTS(SELECT 1 FROM profiles WHERE username = v_username) AND v_counter < 99 LOOP
+  -- Cari username yang unik
+  LOOP
+    EXIT WHEN NOT EXISTS(SELECT 1 FROM public.profiles WHERE username = v_username);
+    EXIT WHEN v_counter >= 99;
     v_counter  := v_counter + 1;
-    v_username := v_base || v_counter;
+    v_username := SUBSTR(v_base, 1, 12) || '_' || v_counter;
   END LOOP;
 
-  INSERT INTO profiles(id, username, preferences)
+  -- Insert profile baru (abaikan jika sudah ada)
+  INSERT INTO public.profiles(id, username, preferences)
   VALUES(
-    NEW.id, v_username,
-    jsonb_build_object('email', NEW.email, 'theme','dark','accent','blue','language','id','fontSize','md')
+    NEW.id,
+    v_username,
+    jsonb_build_object(
+      'email',    NEW.email,
+      'theme',    'dark',
+      'accent',   'blue',
+      'language', 'id',
+      'fontSize', 'md'
+    )
   )
   ON CONFLICT (id) DO NOTHING;
+  
   RETURN NEW;
-EXCEPTION WHEN OTHERS THEN
-  RAISE WARNING 'handle_new_user error: %', SQLERRM;
-  RETURN NEW;
+
+EXCEPTION
+  WHEN unique_violation THEN
+    -- Username conflict - buat username random dan coba lagi
+    BEGIN
+      INSERT INTO public.profiles(id, username, preferences)
+      VALUES(
+        NEW.id,
+        'user_' || SUBSTR(REPLACE(NEW.id::text, '-', ''), 1, 10),
+        jsonb_build_object('email', NEW.email, 'theme', 'dark', 'accent', 'blue', 'language', 'id', 'fontSize', 'md')
+      )
+      ON CONFLICT (id) DO NOTHING;
+    EXCEPTION WHEN OTHERS THEN
+      NULL; -- Abaikan semua error
+    END;
+    RETURN NEW;
+  WHEN OTHERS THEN
+    -- Log warning tapi JANGAN gagalkan signup
+    RAISE WARNING 'handle_new_user: % (user: %)', SQLERRM, NEW.id;
+    RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, auth;
 
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION handle_new_user();
@@ -205,7 +243,13 @@ DO $$ DECLARE r RECORD; BEGIN
 END $$;
 
 -- New clean policies
-CREATE POLICY "profiles_all"     ON profiles      USING (true) WITH CHECK (auth.uid() = id);
+-- SELECT: allow read for leaderboard  
+CREATE POLICY "profiles_select"  ON profiles FOR SELECT USING (true);
+-- INSERT: allow users to insert their own profile (trigger uses SECURITY DEFINER so bypasses this)
+CREATE POLICY "profiles_insert"  ON profiles FOR INSERT WITH CHECK (auth.uid() = id OR auth.uid() IS NULL);
+-- UPDATE/DELETE: only own
+CREATE POLICY "profiles_update"  ON profiles FOR UPDATE USING (auth.uid() = id) WITH CHECK (auth.uid() = id);
+CREATE POLICY "profiles_delete"  ON profiles FOR DELETE USING (auth.uid() = id);
 CREATE POLICY "orders_own"       ON orders        USING (auth.uid() = user_id);
 CREATE POLICY "sessions_own"     ON chat_sessions USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "messages_own"     ON chat_messages USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
