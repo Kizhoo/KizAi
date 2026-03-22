@@ -1,11 +1,11 @@
 -- ═══════════════════════════════════════════════════════════════
---  KizAi v4 — Database Schema + Admin Account
---  Jalankan di Supabase SQL Editor → Run All
+--  KizAi v4 — Complete Database Schema
+--  Jalankan SELURUH file ini di Supabase SQL Editor
 -- ═══════════════════════════════════════════════════════════════
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- ── PROFILES ──────────────────────────────────────────────────
+-- ── TABLES ────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS profiles (
   id              UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
   username        TEXT UNIQUE NOT NULL,
@@ -13,8 +13,8 @@ CREATE TABLE IF NOT EXISTS profiles (
   avatar_emoji    TEXT    DEFAULT '😊',
   telegram_id     TEXT    DEFAULT '',
   bio             TEXT    DEFAULT '',
-  role            TEXT    DEFAULT 'user' CHECK (role IN ('user','admin')),
-  plan            TEXT    DEFAULT 'free' CHECK (plan IN ('free','premium','vip')),
+  role            TEXT    DEFAULT 'user'  CHECK (role IN ('user','admin')),
+  plan            TEXT    DEFAULT 'free'  CHECK (plan IN ('free','premium','vip')),
   plan_expires    TIMESTAMPTZ DEFAULT NULL,
   xp              INTEGER DEFAULT 0,
   level           INTEGER DEFAULT 1,
@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS chat_sessions (
 CREATE TABLE IF NOT EXISTS chat_messages (
   id          UUID    DEFAULT uuid_generate_v4() PRIMARY KEY,
   session_id  UUID    REFERENCES chat_sessions(id) ON DELETE CASCADE NOT NULL,
-  user_id     UUID    REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
+  user_id     UUID    REFERENCES profiles(id)      ON DELETE CASCADE NOT NULL,
   role        TEXT    NOT NULL CHECK (role IN ('user','assistant','system')),
   content     TEXT    NOT NULL,
   model_id    TEXT    DEFAULT NULL,
@@ -136,181 +136,103 @@ CREATE INDEX IF NOT EXISTS idx_activity_user      ON activity_log(user_id, creat
 
 -- ── AUTO-UPDATE TIMESTAMP ─────────────────────────────────────
 CREATE OR REPLACE FUNCTION update_updated_at()
-RETURNS TRIGGER AS $$
-BEGIN NEW.updated_at = NOW(); RETURN NEW; END;
-$$ LANGUAGE plpgsql;
+RETURNS TRIGGER AS $$ BEGIN NEW.updated_at = NOW(); RETURN NEW; END; $$ LANGUAGE plpgsql;
 
 DROP TRIGGER IF EXISTS profiles_updated_at ON profiles;
-CREATE TRIGGER profiles_updated_at BEFORE UPDATE ON profiles FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 DROP TRIGGER IF EXISTS orders_updated_at ON orders;
-CREATE TRIGGER orders_updated_at BEFORE UPDATE ON orders FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 DROP TRIGGER IF EXISTS sessions_updated_at ON chat_sessions;
-CREATE TRIGGER sessions_updated_at BEFORE UPDATE ON chat_sessions FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+CREATE TRIGGER profiles_updated_at  BEFORE UPDATE ON profiles     FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+CREATE TRIGGER orders_updated_at    BEFORE UPDATE ON orders        FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+CREATE TRIGGER sessions_updated_at  BEFORE UPDATE ON chat_sessions FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
--- ── AUTO-CREATE PROFILE ON SIGNUP ────────────────────────────
--- Trigger ini membuat profile otomatis saat user baru daftar
--- Dengan penanganan konflik username yang robust
+-- ── SIGNUP TRIGGER (minimal, tidak bisa gagal) ────────────────
+-- Trigger ini hanya membuat profile kosong jika belum ada
+-- Profile lengkap dibuat oleh application code
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER AS $$
-DECLARE
-  v_username TEXT;
-  v_base     TEXT;
-  v_counter  INTEGER := 0;
 BEGIN
-  -- Ambil username dari metadata atau dari email
-  v_base := LOWER(COALESCE(
-    NULLIF(TRIM(NEW.raw_user_meta_data->>'username'), ''),
-    SPLIT_PART(NEW.email, '@', 1)
-  ));
-  
-  -- Bersihkan karakter yang tidak diizinkan
-  v_base := REGEXP_REPLACE(v_base, '[^a-z0-9_]', '', 'g');
-  
-  -- Minimal 3 karakter
-  IF v_base IS NULL OR LENGTH(v_base) < 3 THEN
-    v_base := 'user' || SUBSTR(REPLACE(NEW.id::text, '-', ''), 1, 8);
-  END IF;
-  
-  -- Potong ke 15 karakter
-  v_base     := SUBSTR(v_base, 1, 15);
-  v_username := v_base;
-
-  -- Cari username yang unik
-  LOOP
-    EXIT WHEN NOT EXISTS(SELECT 1 FROM public.profiles WHERE username = v_username);
-    EXIT WHEN v_counter >= 99;
-    v_counter  := v_counter + 1;
-    v_username := SUBSTR(v_base, 1, 12) || '_' || v_counter;
-  END LOOP;
-
-  -- Insert profile baru (abaikan jika sudah ada)
-  INSERT INTO public.profiles(id, username, preferences)
+  INSERT INTO public.profiles(id, username, coins, preferences)
   VALUES(
     NEW.id,
-    v_username,
-    jsonb_build_object(
-      'email',    NEW.email,
-      'theme',    'dark',
-      'accent',   'blue',
-      'language', 'id',
-      'fontSize', 'md'
-    )
+    COALESCE(
+      NULLIF(LOWER(REGEXP_REPLACE(COALESCE(NEW.raw_user_meta_data->>'username',''), '[^a-z0-9_]', '', 'g')), ''),
+      'u' || SUBSTR(REPLACE(NEW.id::text,'-',''), 1, 11)
+    ),
+    50,
+    jsonb_build_object('email', COALESCE(NEW.email,''), 'theme','dark','accent','blue','language','id','fontSize','md')
   )
   ON CONFLICT (id) DO NOTHING;
-  
   RETURN NEW;
-
-EXCEPTION
-  WHEN unique_violation THEN
-    -- Username conflict - buat username random dan coba lagi
-    BEGIN
-      INSERT INTO public.profiles(id, username, preferences)
-      VALUES(
-        NEW.id,
-        'user_' || SUBSTR(REPLACE(NEW.id::text, '-', ''), 1, 10),
-        jsonb_build_object('email', NEW.email, 'theme', 'dark', 'accent', 'blue', 'language', 'id', 'fontSize', 'md')
-      )
-      ON CONFLICT (id) DO NOTHING;
-    EXCEPTION WHEN OTHERS THEN
-      NULL; -- Abaikan semua error
-    END;
-    RETURN NEW;
-  WHEN OTHERS THEN
-    -- Log warning tapi JANGAN gagalkan signup
-    RAISE WARNING 'handle_new_user: % (user: %)', SQLERRM, NEW.id;
-    RETURN NEW;
+EXCEPTION WHEN OTHERS THEN
+  RETURN NEW;  -- JANGAN pernah gagalkan signup
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, auth;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-CREATE TRIGGER on_auth_user_created AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION handle_new_user();
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION handle_new_user();
 
 -- ── ROW LEVEL SECURITY ────────────────────────────────────────
 ALTER TABLE profiles      ENABLE ROW LEVEL SECURITY;
 ALTER TABLE orders        ENABLE ROW LEVEL SECURITY;
 ALTER TABLE chat_sessions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE chat_messages ENABLE ROW LEVEL SECURITY;
-ALTER TABLE notifications  ENABLE ROW LEVEL SECURITY;
+ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE activity_log  ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bookmarks     ENABLE ROW LEVEL SECURITY;
 ALTER TABLE referrals     ENABLE ROW LEVEL SECURITY;
 
--- Drop old policies
+-- Drop semua policy lama
 DO $$ DECLARE r RECORD; BEGIN
   FOR r IN SELECT policyname, tablename FROM pg_policies WHERE schemaname='public' LOOP
-    EXECUTE format('DROP POLICY IF EXISTS %I ON %I', r.policyname, r.tablename);
+    EXECUTE format('DROP POLICY IF EXISTS %I ON public.%I', r.policyname, r.tablename);
   END LOOP;
+EXCEPTION WHEN OTHERS THEN NULL;
 END $$;
 
--- New clean policies
--- SELECT: allow read for leaderboard  
-CREATE POLICY "profiles_select"  ON profiles FOR SELECT USING (true);
--- INSERT: allow users to insert their own profile (trigger uses SECURITY DEFINER so bypasses this)
-CREATE POLICY "profiles_insert"  ON profiles FOR INSERT WITH CHECK (auth.uid() = id OR auth.uid() IS NULL);
--- UPDATE/DELETE: only own
-CREATE POLICY "profiles_update"  ON profiles FOR UPDATE USING (auth.uid() = id) WITH CHECK (auth.uid() = id);
-CREATE POLICY "profiles_delete"  ON profiles FOR DELETE USING (auth.uid() = id);
-CREATE POLICY "orders_own"       ON orders        USING (auth.uid() = user_id);
-CREATE POLICY "sessions_own"     ON chat_sessions USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "messages_own"     ON chat_messages USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "notifs_own"       ON notifications  USING (auth.uid() = user_id);
-CREATE POLICY "activity_own"     ON activity_log  USING (auth.uid() = user_id);
-CREATE POLICY "bookmarks_own"    ON bookmarks     USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "referrals_own"    ON referrals     USING (auth.uid() = referrer_id OR auth.uid() = referred_id);
+-- Profiles
+CREATE POLICY "p_sel" ON profiles FOR SELECT USING (true);
+CREATE POLICY "p_ins" ON profiles FOR INSERT WITH CHECK (true);
+CREATE POLICY "p_upd" ON profiles FOR UPDATE USING (auth.uid() = id);
+CREATE POLICY "p_del" ON profiles FOR DELETE USING (auth.uid() = id);
+-- Orders
+CREATE POLICY "o_sel" ON orders FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "o_ins" ON orders FOR INSERT WITH CHECK (true);
+-- Chat sessions
+CREATE POLICY "cs_all" ON chat_sessions USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+-- Chat messages
+CREATE POLICY "cm_sel" ON chat_messages FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "cm_ins" ON chat_messages FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "cm_del" ON chat_messages FOR DELETE USING (auth.uid() = user_id);
+-- Notifications
+CREATE POLICY "n_sel" ON notifications FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "n_upd" ON notifications FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "n_ins" ON notifications FOR INSERT WITH CHECK (true);
+-- Activity
+CREATE POLICY "a_sel" ON activity_log FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "a_ins" ON activity_log FOR INSERT WITH CHECK (true);
+-- Bookmarks
+CREATE POLICY "b_all" ON bookmarks USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+-- Referrals
+CREATE POLICY "r_sel" ON referrals FOR SELECT USING (auth.uid() = referrer_id OR auth.uid() = referred_id);
+CREATE POLICY "r_ins" ON referrals FOR INSERT WITH CHECK (true);
 
--- ═══════════════════════════════════════════════════════════════
---  ADMIN ACCOUNT
---  Username : admin
---  Password : KizAi@Admin2025!
---  Email    : admin@kizai.id
---
---  Cara buat admin account:
---  1. Jalankan SQL di bawah ini SETELAH schema di atas
---  2. Atau daftar manual di /auth lalu jalankan:
---     UPDATE profiles SET role='admin' WHERE username='namauser';
--- ═══════════════════════════════════════════════════════════════
+-- ── ADMIN ACCOUNT ─────────────────────────────────────────────
+-- Langkah 1: Daftar dulu di /auth pakai email admin@kizai.id
+-- Langkah 2: Jalankan SQL ini lagi, bagian DO $$ di bawah akan set admin
 
--- ═══════════════════════════════════════════════════════════════
---  ADMIN ACCOUNT
---  Cara membuat admin:
---  1. Daftar akun biasa di /auth dengan email: admin@kizai.id
---     Password bebas (misal: KizAi@Admin2025!)
---  2. Jalankan SQL berikut untuk set role admin:
--- ═══════════════════════════════════════════════════════════════
-
--- Set role admin untuk user dengan email admin@kizai.id
--- Jalankan ini SETELAH daftar akun manual
 DO $$
-DECLARE
-  admin_uid UUID;
+DECLARE v_uid UUID;
 BEGIN
-  -- Cari user by email
-  SELECT id INTO admin_uid FROM auth.users WHERE email = 'admin@kizai.id' LIMIT 1;
-  
-  IF admin_uid IS NOT NULL THEN
-    -- Update profile jadi admin
-    UPDATE profiles SET 
-      role = 'admin',
-      plan = 'vip',
-      coins = 99999,
-      xp = 99999,
-      level = 99
-    WHERE id = admin_uid;
-    
-    -- Jika profile belum ada, insert dulu
-    INSERT INTO profiles (id, username, role, plan, coins, xp, level, preferences)
-    VALUES (
-      admin_uid, 'admin', 'admin', 'vip', 99999, 99999, 99,
-      '{"email":"admin@kizai.id","theme":"dark","accent":"blue","language":"id","fontSize":"md"}'
-    )
-    ON CONFLICT (id) DO UPDATE SET
-      role = 'admin', plan = 'vip', coins = 99999, xp = 99999, level = 99;
-    
-    RAISE NOTICE 'Admin account updated! ID: %', admin_uid;
+  SELECT id INTO v_uid FROM auth.users WHERE email = 'admin@kizai.id' LIMIT 1;
+  IF v_uid IS NOT NULL THEN
+    INSERT INTO public.profiles(id, username, role, plan, coins, xp, level, preferences)
+    VALUES(v_uid, 'admin', 'admin', 'vip', 99999, 99999, 99,
+      '{"email":"admin@kizai.id","theme":"dark","accent":"blue","language":"id","fontSize":"md"}')
+    ON CONFLICT (id) DO UPDATE SET role='admin', plan='vip', coins=99999, xp=99999, level=99, updated_at=NOW();
+    RAISE NOTICE '✅ Admin OK: %', v_uid;
   ELSE
-    RAISE NOTICE 'Admin user not found. Please register at /auth with email: admin@kizai.id first, then run this SQL again.';
+    RAISE NOTICE '⚠️  Daftar dulu di /auth pakai admin@kizai.id lalu jalankan SQL ini lagi';
   END IF;
 END $$;
-
--- ATAU: Ganti username tertentu jadi admin:
--- UPDATE profiles SET role='admin', plan='vip' WHERE username='namauser';
