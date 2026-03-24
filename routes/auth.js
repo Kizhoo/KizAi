@@ -4,6 +4,14 @@ const { sb, verifyToken, effectivePlan, accessibleModels, rateLimit } = require(
 
 const router = Router();
 
+// Wrap any promise with a timeout — prevents 524 Cloudflare errors
+function withTimeout(promise, ms = 8000, msg = 'Operasi timeout, coba lagi') {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error(msg)), ms))
+  ]);
+}
+
 router.all('*', async (req, res) => {
   let client;
   try { client = sb(); }
@@ -154,8 +162,11 @@ router.all('*', async (req, res) => {
       if (!p) return res.status(401).json({ error: 'Username tidak ditemukan' });
       email = p.preferences?.email || '';
       if (!email) {
-        // Fallback: cari via admin API
-        const { data: au } = await client.auth.admin.getUserById(p.id).catch(()=>({data:null}));
+        // Fallback: cari via admin API (dengan timeout 5s)
+        const { data: au } = await withTimeout(
+          client.auth.admin.getUserById(p.id),
+          5000, 'admin.getUserById timeout'
+        ).catch(()=>({data:null}));
         email = au?.user?.email || '';
         if (!email) return res.status(401).json({ error: 'Tidak bisa login dengan username ini. Gunakan email.' });
         // Simpan email ke preferences untuk next login
@@ -268,12 +279,20 @@ router.all('*', async (req, res) => {
     const { current_password, new_password } = req.body;
     if (!current_password || !new_password || new_password.length < 6)
       return res.status(400).json({ error: 'Password minimal 6 karakter' });
-    // Get email from auth.users (verifyToken includes it)
     const email = user.email || user.preferences?.email;
     if (!email) return res.status(400).json({ error: 'Email tidak ditemukan, hubungi admin' });
-    const { error: se } = await client.auth.signInWithPassword({ email, password: current_password });
+    // Verifikasi password lama (dengan timeout)
+    const { error: se } = await withTimeout(
+      client.auth.signInWithPassword({ email, password: current_password }),
+      8000, 'Verifikasi timeout'
+    ).catch(e => ({ error: { message: e.message } }));
     if (se) return res.status(400).json({ error: 'Password saat ini salah' });
-    await client.auth.admin.updateUserById(user.id, { password: new_password });
+    // Update password baru (dengan timeout)
+    const { error: ue } = await withTimeout(
+      client.auth.admin.updateUserById(user.id, { password: new_password }),
+      8000, 'Update timeout'
+    ).catch(e => ({ error: { message: e.message } }));
+    if (ue) return res.status(500).json({ error: 'Gagal update password: ' + ue.message });
     return res.json({ ok: true });
   }
 
@@ -343,17 +362,25 @@ router.all('*', async (req, res) => {
   if (req.method === 'DELETE' && action === 'delete_account') {
     const user = await verifyToken(client, req.headers.authorization);
     if (!user) return res.status(401).json({ error: 'Tidak terautentikasi' });
-    // Hapus semua data user
-    const { data: sessions } = await client.from('chat_sessions').select('id').eq('user_id', user.id);
-    for (const s of sessions||[]) {
-      await client.from('chat_messages').delete().eq('session_id', s.id).catch(()=>{});
-    }
-    await client.from('chat_sessions').delete().eq('user_id', user.id).catch(()=>{});
-    await client.from('notifications').delete().eq('user_id', user.id).catch(()=>{});
-    await client.from('activity_log').delete().eq('user_id', user.id).catch(()=>{});
-    await client.from('bookmarks').delete().eq('user_id', user.id).catch(()=>{});
+    // Ambil semua session ID dulu
+    const { data: sessions } = await client.from('chat_sessions').select('id').eq('user_id', user.id).catch(()=>({data:[]}));
+    const sessionIds = (sessions||[]).map(s => s.id);
+    // Hapus semua data secara paralel
+    await Promise.allSettled([
+      sessionIds.length
+        ? client.from('chat_messages').delete().in('session_id', sessionIds)
+        : Promise.resolve(),
+      client.from('chat_sessions').delete().eq('user_id', user.id),
+      client.from('notifications').delete().eq('user_id', user.id),
+      client.from('activity_log').delete().eq('user_id', user.id),
+      client.from('bookmarks').delete().eq('user_id', user.id),
+      client.from('referrals').delete().or(`referrer_id.eq.${user.id},referred_id.eq.${user.id}`),
+    ]);
     await client.from('profiles').delete().eq('id', user.id).catch(()=>{});
-    await client.auth.admin.deleteUser(user.id).catch(()=>{});
+    await withTimeout(
+      client.auth.admin.deleteUser(user.id),
+      8000, 'deleteUser timeout'
+    ).catch(()=>{});
     return res.json({ ok: true });
   }
 
@@ -415,10 +442,13 @@ router.all('*', async (req, res) => {
   if (req.method === 'POST' && action === 'forgot_password') {
     const { email } = req.body;
     if (!email) return res.status(400).json({ error: 'Email wajib diisi' });
-    // Supabase built-in password reset - sends magic link
-    await client.auth.resetPasswordForEmail(email.toLowerCase().trim(), {
-      redirectTo: (process.env.WEB_URL || 'https://kizhoo.my.id') + '/auth#reset'
-    }).catch(()=>{});
+    // Supabase built-in password reset - dengan timeout 8s
+    await withTimeout(
+      client.auth.resetPasswordForEmail(email.toLowerCase().trim(), {
+        redirectTo: (process.env.WEB_URL || 'https://kizhoo.my.id') + '/auth#reset'
+      }),
+      8000, 'reset timeout'
+    ).catch(()=>{});
     // Always return OK (don't leak if email exists)
     return res.json({ ok: true });
   }

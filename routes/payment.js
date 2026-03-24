@@ -12,6 +12,14 @@ const WEB_URL    = process.env.WEB_URL           || 'https://kizai.up.railway.ap
 const BOT_TOKEN  = process.env.BOT_TOKEN         || '';
 const ADMIN_TG   = process.env.ADMIN_TELEGRAM_ID || '';
 
+// Wrap promise dengan timeout untuk cegah 524 Cloudflare
+function withTimeout(promise, ms = 10000, msg = 'Timeout, coba lagi') {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error(msg)), ms))
+  ]);
+}
+
 const { COUPONS_STORE: _CS } = require('../lib/coupons');
 const COUPONS = Object.fromEntries(_CS.filter(c=>c.active).map(c=>[c.code, c.discount]));
 const COINS_BONUS = { premium: 200, vip: 500 };
@@ -132,9 +140,10 @@ router.all('*', async (req, res) => {
         buyerEmail:  (email || '').trim() || 'user@kizai.id',
         buyerPhone:  telegram_id.trim(), paymentMethod: 'qris',
       };
-      const ipRes = await ipaymuPost('/payment', ipBody);
+      // iPaymu call dengan timeout 12 detik
+      const ipRes = await withTimeout(ipaymuPost('/payment', ipBody), 12000, 'iPaymu timeout');
       if (ipRes.Status === 200 && ipRes.Data?.Url) {
-        await client.from('orders').update({ payment_data: { ipaymu_url: ipRes.Data.Url } }).eq('order_id', orderId);
+        await client.from('orders').update({ payment_data: { ipaymu_url: ipRes.Data.Url } }).eq('order_id', orderId).catch(()=>{});
         // Sandbox mode → auto aktifkan tanpa menunggu callback
         if (!IPAYMU_PROD) {
           await autoActivate(client, order);
@@ -142,10 +151,15 @@ router.all('*', async (req, res) => {
         }
         return res.json({ order_id: orderId, payment_url: ipRes.Data.Url, status: 'pending' });
       }
-      // iPaymu gagal → tetap auto aktifkan
+      // iPaymu gagal → tetap auto aktifkan (graceful degradation)
       await autoActivate(client, order);
       return res.json({ order_id: orderId, status: 'approved', message: 'Paket berhasil diaktifkan!' });
-    } catch (e) { return res.status(500).json({ error: 'iPaymu error: ' + e.message }); }
+    } catch (e) {
+      // iPaymu error / timeout → auto aktifkan agar user tidak rugi
+      console.error('iPaymu error:', e.message);
+      await autoActivate(client, order).catch(()=>{});
+      return res.json({ order_id: orderId, status: 'approved', message: 'Paket berhasil diaktifkan!' });
+    }
   }
 
   /* ── CALLBACK ── */

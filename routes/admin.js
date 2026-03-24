@@ -4,6 +4,14 @@ const { sb, verifyToken } = require('../lib/supabase');
 
 const router = Router();
 
+// Wrap promise dengan timeout untuk cegah 524 Cloudflare
+function withTimeout(promise, ms = 8000, msg = 'Timeout, coba lagi') {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error(msg)), ms))
+  ]);
+}
+
 // Kupon store - shared dengan payment.js via lib/coupons.js
 const { COUPONS_STORE } = require('../lib/coupons');
 
@@ -220,7 +228,11 @@ router.all('*', async (req, res) => {
   if (req.method === 'POST' && action === 'reset_password') {
     const { user_id, new_password } = req.body;
     if (!new_password||new_password.length<6) return res.status(400).json({ error: 'Password minimal 6 karakter' });
-    await client.auth.admin.updateUserById(user_id, { password: new_password });
+    const { error: re } = await withTimeout(
+      client.auth.admin.updateUserById(user_id, { password: new_password }),
+      8000, 'Reset password timeout'
+    ).catch(e => ({ error: { message: e.message } }));
+    if (re) return res.status(500).json({ error: 'Gagal reset: ' + re.message });
     return res.json({ ok: true });
   }
 
@@ -261,7 +273,10 @@ router.all('*', async (req, res) => {
     if (req.query.user_id === admin.id)
       return res.status(400).json({ error: 'Tidak bisa hapus akun sendiri' });
     await client.from('profiles').delete().eq('id',req.query.user_id);
-    await client.auth.admin.deleteUser(req.query.user_id).catch(()=>{});
+    await withTimeout(
+      client.auth.admin.deleteUser(req.query.user_id),
+      8000, 'deleteUser timeout'
+    ).catch(()=>{});
     return res.json({ ok: true });
   }
 
