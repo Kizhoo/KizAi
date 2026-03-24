@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark" data-accent="blue" data-fs="md">
+<head>
+<script>(function(){var p=JSON.parse(localStorage.getItem('kizai_prefs')||'{}');document.documentElement.setAttribute('data-theme',p.theme||'dark');document.documentElement.setAttribute('data-accent',p.accent||'blue');document.documentElement.setAttribute('data-fs',p.fontSize||'md');if(p.reducedMotion)document.documentElement.setAttribute('data-reduced','1')}())</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>105+ Tools AI — KizAi</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/shared.css">
+<style>
+/* NAV */
+#main-nav{position:sticky;top:0;z-index:500;height:60px;display:flex;align-items:center;padding:0 4vw;gap:2rem;background:rgba(5,5,16,.95);backdrop-filter:blur(24px);border-bottom:1px solid var(--bd)}
+.nav-links{display:flex;gap:.1rem;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.nav-link{padding:.35rem .6rem;border-radius:var(--r2);font-size:.78rem;font-weight:500;color:var(--gray);white-space:nowrap;flex-shrink:0;transition:all .2s;text-decoration:none}
+.nav-link:hover,.nav-link.active{color:var(--white);background:rgba(255,255,255,.07)}
+.nav-right{display:flex;align-items:center;gap:.4rem;margin-left:auto}
+
+/* HERO */
+.t-hero{padding:.8rem 3vw .8rem;background:linear-gradient(180deg,rgba(var(--accent-rgb),.05),transparent);border-bottom:1px solid var(--bd)}
+.t-hero-inner{max-width:1260px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+.t-hero-title{font-family:var(--ff-display);font-weight:900;font-size:clamp(1.6rem,5vw,3rem);letter-spacing:-.055em;line-height:.95;margin-bottom:.65rem}
+.t-hero-title .hl{background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.t-hero-sub{color:var(--gray);font-size:.9rem;line-height:1.75;margin-bottom:1rem}
+.t-chips{display:flex;gap:.4rem;flex-wrap:wrap}
+.t-chip{padding:.22rem .7rem;border-radius:100px;font-family:var(--ff-mono);font-size:.65rem;font-weight:600;background:var(--accent-dim);color:var(--accent);border:1px solid rgba(var(--accent-rgb),.2)}
+.t-hero-stats{display:flex;gap:1px;background:var(--bd);border:1px solid var(--bd);border-radius:var(--r4);overflow:hidden;flex-shrink:0}
+.t-stat{background:var(--card);padding:.7rem 1rem;text-align:center}
+.t-stat-num{font-family:var(--ff-display);font-weight:800;font-size:1.8rem;letter-spacing:-.06em;color:var(--accent);line-height:1}
+.t-stat-lbl{font-family:var(--ff-mono);font-size:.6rem;color:var(--gray2);text-transform:uppercase;letter-spacing:.1em;margin-top:.2rem}
+
+/* LAYOUT */
+.t-layout{max-width:1260px;margin:0 auto;padding:.75rem 4vw 3rem;display:grid;grid-template-columns:210px 1fr;gap:2.5rem;align-items:start}
+.t-sidebar{position:sticky;top:80px}
+.t-search-wrap{position:relative;margin-bottom:.6rem}
+.t-search-ico{position:absolute;left:.7rem;top:50%;transform:translateY(-50%);font-size:.82rem;color:var(--gray2);pointer-events:none}
+.t-search{width:100%;padding:.58rem 1rem .58rem 2.2rem;background:var(--card);border:1.5px solid var(--bd);border-radius:var(--r3);color:var(--white);font-size:.82rem;font-family:inherit;outline:none;transition:border-color .2s}
+.t-search:focus{border-color:rgba(var(--accent-rgb),.5)}
+.t-search::placeholder{color:var(--gray2)}
+.t-sb-sec{font-family:var(--ff-mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.12em;color:var(--gray2);padding:.6rem .5rem .25rem;font-weight:600}
+.t-cat{display:flex;align-items:center;justify-content:space-between;padding:.46rem .72rem;border-radius:var(--r2);font-size:.82rem;font-weight:500;cursor:pointer;color:var(--gray);border:none;background:none;width:100%;text-align:left;font-family:inherit;transition:all .15s}
+.t-cat:hover{background:var(--card);color:var(--white)}
+.t-cat.active{background:var(--accent-dim);color:var(--accent)}
+.t-cat-n{font-family:var(--ff-mono);font-size:.6rem;color:var(--gray2);background:var(--bg3);padding:.1rem .4rem;border-radius:100px}
+.t-cat.active .t-cat-n{background:rgba(var(--accent-rgb),.15);color:var(--accent)}
+.t-ai-badge{background:linear-gradient(135deg,rgba(var(--accent-rgb),.1),rgba(var(--cyan-rgb),.06));border:1px solid rgba(var(--accent-rgb),.2);border-radius:var(--r4);padding:1rem;margin-top:1.25rem}
+.t-ai-title{font-family:var(--ff-mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:.6rem}
+.t-ai-row{display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:.28rem}
+.t-ai-v{font-family:var(--ff-mono);font-weight:600;color:var(--white)}
+
+/* TOOLS CONTENT */
+.t-content{}
+.t-sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;flex-wrap:wrap;gap:.65rem}
+.t-sec-title{font-family:var(--ff-display);font-weight:700;font-size:.95rem;display:flex;align-items:center;gap:.45rem}
+.t-sec-title em{color:var(--accent);font-style:normal;font-family:var(--ff-mono);font-size:.82rem}
+.t-sort{padding:.4rem .82rem;background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r2);color:var(--gray);font-size:.8rem;font-family:inherit;cursor:pointer;outline:none;transition:border-color .2s}
+.t-sort:focus{border-color:rgba(var(--accent-rgb),.4)}
+
+/* FILTER BAR */
+.t-filter-row{display:flex;gap:.4rem;overflow-x:auto;padding-bottom:.25rem;margin-bottom:.75rem;scrollbar-width:none}
+.t-filter-row::-webkit-scrollbar{display:none}
+.t-pill{padding:.36rem 1rem;border-radius:100px;font-size:.78rem;font-weight:600;cursor:pointer;border:1.5px solid var(--bd);background:none;color:var(--gray);font-family:inherit;transition:all .2s;white-space:nowrap;flex-shrink:0}
+.t-pill:hover{border-color:var(--bd2);color:var(--white)}
+.t-pill.active{background:var(--accent-dim);border-color:rgba(var(--accent-rgb),.4);color:var(--accent)}
+
+/* TOOL GRID */
+.t-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(270px,100%),1fr));gap:.85rem}
+.tcard{background:var(--card);border:1.5px solid var(--bd);border-radius:var(--r4);padding:1.35rem;cursor:pointer;transition:all .28s;position:relative;overflow:hidden}
+.tcard::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(var(--accent-rgb),.05),transparent);opacity:0;transition:opacity .25s}
+.tcard::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2.5px;background:linear-gradient(90deg,var(--accent),var(--cyan));transform:scaleX(0);transition:transform .32s var(--spring);transform-origin:left}
+.tcard:hover{border-color:rgba(var(--accent-rgb),.3);transform:translateY(-3px);box-shadow:0 14px 40px rgba(0,0,0,.45)}
+.tcard:hover::before{opacity:1}
+.tcard:hover::after{transform:scaleX(1)}
+.tcard-head{display:flex;align-items:flex-start;gap:.85rem;margin-bottom:.75rem}
+.tcard-ico{width:44px;height:44px;border-radius:var(--r3);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;background:var(--accent-dim);border:1px solid rgba(var(--accent-rgb),.15);transition:transform .3s var(--spring)}
+.tcard:hover .tcard-ico{transform:scale(1.1) rotate(-5deg)}
+.tcard-meta{flex:1;min-width:0}
+.tcard-name{font-family:var(--ff-display);font-weight:700;font-size:.92rem;letter-spacing:-.02em;margin-bottom:.18rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tcard-cat{font-family:var(--ff-mono);font-size:.62rem;color:var(--gray2);text-transform:uppercase;letter-spacing:.08em}
+.tcard-desc{font-size:.78rem;color:var(--gray);line-height:1.55;margin-bottom:.85rem}
+.tcard-foot{display:flex;align-items:center;justify-content:space-between}
+.tcard-tags{display:flex;gap:.35rem;flex-wrap:wrap}
+.ttag{font-family:var(--ff-mono);font-size:.6rem;padding:.14rem .5rem;border-radius:100px;font-weight:600;border:1px solid}
+.ttag-ai{background:rgba(var(--cyan-rgb),.08);color:var(--cyan);border-color:rgba(var(--cyan-rgb),.2)}
+.ttag-free{background:rgba(var(--green-rgb),.08);color:var(--green);border-color:rgba(var(--green-rgb),.2)}
+.ttag-pro{background:rgba(var(--accent-rgb),.08);color:var(--accent);border-color:rgba(var(--accent-rgb),.2)}
+.ttag-new{background:rgba(var(--hot-rgb),.08);color:var(--hot);border-color:rgba(var(--hot-rgb),.2)}
+.tcard-btn{padding:.3rem .75rem;border-radius:var(--r);background:var(--accent);color:var(--accent-fg);font-size:.7rem;font-weight:700;border:none;cursor:pointer;font-family:var(--ff-body);transition:all .2s;flex-shrink:0}
+.tcard-btn:hover{background:var(--accent2);transform:scale(1.05)}
+.t-no-result{grid-column:1/-1;padding:3.5rem;text-align:center;color:var(--gray)}
+
+/* MODAL */
+.t-modal{position:fixed;inset:0;background:rgba(5,5,16,.96);backdrop-filter:blur(20px);z-index:800;display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:2rem 1rem 3rem}
+.t-modal.open{display:flex}
+.t-modal-box{background:var(--card);border:1px solid var(--bd2);border-radius:var(--r5);width:100%;max-width:620px;overflow:hidden;animation:modal-pop .3s var(--spring)}
+@keyframes modal-pop{from{transform:scale(.94);opacity:0}to{transform:scale(1);opacity:1}}
+.t-mhead{padding:1.4rem 1.5rem 1.1rem;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.t-mhead-left{display:flex;align-items:center;gap:.85rem}
+.t-mhead-ico{width:44px;height:44px;border-radius:var(--r3);background:var(--accent-dim);border:1px solid rgba(var(--accent-rgb),.2);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0}
+.t-mhead-name{font-family:var(--ff-display);font-weight:800;font-size:1.1rem;letter-spacing:-.03em}
+.t-mhead-sub{font-size:.78rem;color:var(--gray);margin-top:.15rem}
+.t-mclose{width:34px;height:34px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--bd);color:var(--gray);cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.t-mclose:hover{background:var(--card2);color:var(--white)}
+.t-mbody{padding:1.35rem 1.5rem}
+.t-mlabel{font-family:var(--ff-mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--gray2);margin-bottom:.4rem;display:block;margin-top:.75rem}
+.t-mlabel:first-child{margin-top:0}
+.t-minput{width:100%;padding:.75rem .9rem;background:var(--bg3);border:1.5px solid var(--bd);border-radius:var(--r2);color:var(--white);font-size:.88rem;font-family:inherit;outline:none;transition:border-color .2s;line-height:1.6;resize:vertical}
+.t-minput:focus{border-color:rgba(var(--accent-rgb),.5)}
+.t-minput::placeholder{color:var(--gray2)}
+.t-mresult{background:var(--bg3);border:1.5px solid var(--bd);border-radius:var(--r2);padding:.9rem 1rem;font-size:.85rem;line-height:1.75;min-height:48px;white-space:pre-wrap;word-break:break-word;cursor:pointer;transition:border-color .2s;margin-top:.9rem;position:relative}
+.t-mresult:hover{border-color:rgba(var(--accent-rgb),.3)}
+.t-mresult-lbl{position:absolute;top:.4rem;right:.6rem;font-family:var(--ff-mono);font-size:.58rem;color:var(--gray2)}
+.t-mresult.ai-result{color:var(--white)}
+.t-mresult.loading::after{content:'';display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);animation:t-pulse 1s infinite}
+@keyframes t-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+.t-mrow{display:grid;grid-template-columns:1fr 1fr;gap:.65rem}
+.t-mactions{display:flex;gap:.5rem;margin-top:.85rem;flex-wrap:wrap}
+.t-preview{width:100%;height:90px;border-radius:var(--r2);border:1px solid var(--bd);background:var(--bg3);object-fit:cover;margin:.6rem 0}
+.color-prev{width:100%;height:56px;border-radius:var(--r2);border:1px solid var(--bd);transition:all .3s;margin:.5rem 0}
+.calc-display{background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r2);padding:.9rem 1rem;font-family:var(--ff-mono);font-size:1.75rem;text-align:right;margin-bottom:.55rem;min-height:58px;word-break:break-all;line-height:1.2}
+.calc-sub{font-family:var(--ff-mono);font-size:.72rem;color:var(--gray2);text-align:right;margin-bottom:.35rem;min-height:1rem}
+.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem}
+.ckey{padding:.72rem;border-radius:var(--r2);font-size:.88rem;font-weight:600;cursor:pointer;border:none;transition:all .15s;font-family:var(--ff-mono)}
+.ckey:hover{filter:brightness(1.2);transform:scale(1.03)}
+.ckey:active{transform:scale(.96)}
+.ckey.num{background:var(--card2);color:var(--white)}
+.ckey.op{background:rgba(var(--accent-rgb),.12);color:var(--accent)}
+.ckey.eq{background:var(--accent);color:var(--accent-fg);grid-column:span 2}
+.ckey.clr{background:rgba(var(--hot-rgb),.12);color:var(--hot)}
+.ckey.sp2{grid-column:span 2}
+.pw-bars{display:flex;gap:3px;margin:.4rem 0}
+.pw-bar{height:5px;flex:1;border-radius:100px;background:var(--bd);transition:background .3s}
+.pw-bar.fill{background:var(--accent)}
+.pw-bar.fill.danger{background:var(--hot)}
+.pw-bar.fill.warn{background:var(--amber)}
+.pw-bar.fill.good{background:var(--green)}
+.palette-row{display:flex;gap:.4rem;margin:.5rem 0}
+.pal-swatch{height:42px;border-radius:var(--r2);flex:1;cursor:pointer;transition:transform .2s;border:1px solid var(--bd)}
+.pal-swatch:hover{transform:scaleY(1.06)}
+.timer-big{font-family:var(--ff-display);font-weight:900;font-size:3.5rem;text-align:center;color:var(--accent);letter-spacing:-.08em;line-height:1;margin:1rem 0}
+.timer-ctrl{display:flex;gap:.5rem;justify-content:center}
+.ai-chat-box{max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:.55rem;margin-bottom:.85rem;padding:.25rem 0}
+.ai-msg{padding:.6rem .85rem;border-radius:var(--r3);font-size:.82rem;line-height:1.65;max-width:85%}
+.ai-msg.bot{background:var(--card2);border:1px solid var(--bd)}
+.ai-msg.usr{background:linear-gradient(135deg,rgba(var(--accent-rgb),.8),rgba(var(--accent-rgb),.6));color:#fff;align-self:flex-end}
+.ai-msg-row{display:flex;gap:.5rem;align-items:flex-end}
+.bmi-result{font-family:var(--ff-display);font-weight:800;font-size:2.5rem;text-align:center;letter-spacing:-.06em;margin:.5rem 0}
+.bmi-cat{font-family:var(--ff-mono);font-size:.8rem;text-align:center;margin-bottom:.75rem}
+.currency-result{font-family:var(--ff-display);font-weight:900;font-size:2.2rem;letter-spacing:-.06em;color:var(--accent);text-align:center;margin:.75rem 0}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .t-layout{grid-template-columns:1fr;gap:0}
+  .t-sidebar{position:static;display:none}
+  .t-sidebar.open{display:block;position:fixed;inset:0;z-index:400;background:var(--bg);padding:1.5rem;overflow-y:auto}
+  .t-hero-stats{display:none}
+}
+@media(max-width:600px){
+  .t-hero{padding:.8rem 3vw .8rem}
+  .t-hero-title{font-size:1.5rem!important}
+  .t-hero-stats{display:none}
+  .t-layout{padding:.5rem 3vw 2rem;grid-template-columns:1fr;gap:0}
+  .t-sidebar{display:none}
+  .tcard{padding:1rem}
+  .t-grid{grid-template-columns:1fr}
+}
+  .t-mrow{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div id="toast-stack"></div>
+<div id="scroll-bar"></div>
+
+<!-- NAV -->
+<header id="main-nav">
+  <a href="/" style="font-family:var(--ff-display);font-weight:900;font-size:1.2rem;letter-spacing:-.04em;text-decoration:none"><span style="color:var(--accent)">Kiz</span>Ai</a>
+  <nav class="nav-links">
+    <a href="/" class="nav-link">Beranda</a>
+    <a href="/chat" class="nav-link">💬 Chat</a>
+    <a href="/tools" class="nav-link active">🔧 Tools</a>
+    <a href="/games" class="nav-link">🎮 Games</a>
+    <a href="/leaderboard" class="nav-link">🏆 Leaderboard</a>
+  </nav>
+  <div class="nav-right">
+    <button class="btn btn-xs btn-ghost" onclick="Theme.toggle()">🌙</button>
+    <a href="/dashboard" class="btn btn-sm btn-secondary" id="nav-user" style="display:none">Dashboard</a>
+    <a href="/auth" class="btn btn-sm btn-primary" id="nav-login">Masuk</a>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="t-hero">
+  <div class="t-hero-inner">
+    <div>
+      <div class="sec-label">// 105+ AI Tools</div>
+      <h1 class="t-hero-title">Tools untuk semua<br><span class="hl">kebutuhanmu.</span></h1>
+      <p class="t-hero-sub">Kalkulator, generator teks, konverter, dan lebih banyak lagi.<br>Powered by AI — gratis untuk semua.</p>
+      <div class="t-chips">
+        <span class="t-chip">🤖 AI-Powered</span>
+        <span class="t-chip">⚡ Instan</span>
+        <span class="t-chip">🔒 Privat</span>
+        <span class="t-chip">♾️ Gratis</span>
+      </div>
+    </div>
+    <div class="t-hero-stats">
+      <div class="t-stat"><div class="t-stat-num">105+</div><div class="t-stat-lbl">Total Tools</div></div>
+      <div class="t-stat" style="border-left:1px solid var(--bd)"><div class="t-stat-num">12</div><div class="t-stat-lbl">Kategori</div></div>
+      <div class="t-stat" style="border-left:1px solid var(--bd)"><div class="t-stat-num">∞</div><div class="t-stat-lbl">Penggunaan</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- LAYOUT -->
+<div class="t-layout">
+  <!-- SIDEBAR -->
+  <aside class="t-sidebar" id="t-sidebar">
+    <div class="t-search-wrap">
+      <span class="t-search-ico">🔍</span>
+      <input class="t-search" id="t-search" placeholder="Cari tools..." oninput="filterTools()">
+    </div>
+    <div class="t-sb-sec">Kategori</div>
+    <div id="t-cats"></div>
+    <div class="t-ai-badge">
+      <div class="t-ai-title">🤖 AI Tools</div>
+      <div class="t-ai-row"><span style="color:var(--gray);font-size:.76rem">Powered by</span><span class="t-ai-v">Cloudflare AI</span></div>
+      <div class="t-ai-row"><span style="color:var(--gray);font-size:.76rem">Model Default</span><span class="t-ai-v">Llama 3.1 8B</span></div>
+      <div class="t-ai-row"><span style="color:var(--gray);font-size:.76rem">Status</span><span class="t-ai-v" style="color:var(--green)">● Online</span></div>
+      <div style="margin-top:.65rem"><a href="/chat" class="btn btn-xs btn-outline w-full" style="justify-content:center">Chat AI Penuh →</a></div>
+    </div>
+  </aside>
+
+  <!-- TOOLS CONTENT -->
+  <div class="t-content">
+    <div class="t-filter-row" id="t-filter-row"></div>
+    <div class="t-sec-header">
+      <div class="t-sec-title">Semua Tools <em id="t-count">105</em></div>
+      <select class="t-sort" onchange="sortTools(this.value)">
+        <option value="default">Default</option>
+        <option value="name">A-Z</option>
+        <option value="popular">Terpopuler</option>
+        <option value="ai">AI First</option>
+      </select>
+    </div>
+    <div class="t-grid" id="t-grid"></div>
+  </div>
+</div>
+
+<!-- TOOL MODAL -->
+<div class="t-modal" id="t-modal">
+  <div class="t-modal-box">
+    <div class="t-mhead">
+      <div class="t-mhead-left">
+        <div class="t-mhead-ico" id="tm-ico">🔧</div>
+        <div><div class="t-mhead-name" id="tm-name">Tool</div><div class="t-mhead-sub" id="tm-sub"></div></div>
+      </div>
+      <button class="t-mclose" onclick="closeTool()">✕</button>
+    </div>
+    <div class="t-mbody" id="tm-body"></div>
+  </div>
+</div>
+
+<script src="/shared.js"></script>
+<script>
+/* ═══════════════════════════════════════
+   TOOLS DATA
+   ═══════════════════════════════════════ */
+const TOOLS = [
+  // 🤖 AI Teks
+  { id:'ai-writer',    name:'AI Penulis',       ico:'✍️',  cat:'AI Teks',    desc:'Buat artikel, esai, atau konten apapun dengan AI',    tags:['ai','free'], popular:9200 },
+  { id:'ai-summary',   name:'AI Ringkasan',     ico:'📄',  cat:'AI Teks',    desc:'Ringkas artikel panjang menjadi poin-poin utama',     tags:['ai','free'], popular:8100 },
+  { id:'ai-translate', name:'AI Terjemahan',    ico:'🌐',  cat:'AI Teks',    desc:'Terjemahkan teks ke 50+ bahasa dengan AI',            tags:['ai','free'], popular:7800 },
+  { id:'ai-grammar',   name:'Perbaiki Teks',    ico:'✅',  cat:'AI Teks',    desc:'Perbaiki tata bahasa dan ejaan secara otomatis',      tags:['ai','free'], popular:6900 },
+  { id:'ai-email',     name:'Generator Email',  ico:'📧',  cat:'AI Teks',    desc:'Buat email profesional dengan satu klik',             tags:['ai','new'],  popular:5400 },
+  { id:'ai-caption',   name:'Caption Generator',ico:'📸',  cat:'AI Teks',    desc:'Buat caption Instagram dan media sosial yang menarik', tags:['ai','free'],popular:6200 },
+  { id:'ai-slogan',    name:'Generator Slogan', ico:'💬',  cat:'AI Teks',    desc:'Buat tagline dan slogan bisnis yang memorable',       tags:['ai','new'],  popular:3800 },
+  { id:'ai-story',     name:'Story Generator',  ico:'📖',  cat:'AI Teks',    desc:'Buat cerita pendek atau plot novel dengan AI',        tags:['ai','free'], popular:4500 },
+  // 🔢 Kalkulator
+  { id:'calc',         name:'Kalkulator',       ico:'🔢',  cat:'Kalkulator', desc:'Kalkulator saintifik dengan history dan memory',      tags:['free'],      popular:15000 },
+  { id:'bmi',          name:'Kalkulator BMI',   ico:'⚖️',  cat:'Kalkulator', desc:'Hitung BMI dan kategori berat badan ideal',          tags:['free'],      popular:8200 },
+  { id:'currency',     name:'Konverter Mata Uang',ico:'💱',cat:'Kalkulator', desc:'Konversi kurs IDR, USD, EUR, JPY, dan lainnya',      tags:['free'],      popular:7400 },
+  { id:'percentage',   name:'Kalkulator %',     ico:'📊',  cat:'Kalkulator', desc:'Hitung persen, diskon, kenaikan, dan selisih',       tags:['free'],      popular:9100 },
+  { id:'age-calc',     name:'Hitung Umur',      ico:'🎂',  cat:'Kalkulator', desc:'Hitung umur tepat dari tanggal lahir',               tags:['free'],      popular:5600 },
+  { id:'loan-calc',    name:'Kalkulator Cicilan',ico:'🏦', cat:'Kalkulator', desc:'Hitung cicilan pinjaman bank dan bunga',             tags:['free'],      popular:6100 },
+  { id:'tip-calc',     name:'Kalkulator Tip',   ico:'🍽️',  cat:'Kalkulator', desc:'Hitung tip restoran dan bagi tagihan',              tags:['free'],      popular:3200 },
+  // 🔒 Password & Keamanan
+  { id:'passgen',      name:'Generator Password',ico:'🔐', cat:'Keamanan',  desc:'Buat password kuat dengan aturan kustom',            tags:['free'],      popular:12000 },
+  { id:'passcheck',    name:'Cek Kekuatan Password',ico:'🛡️',cat:'Keamanan',desc:'Analisis seberapa kuat password kamu',              tags:['free'],      popular:7600 },
+  { id:'hash-gen',     name:'Hash Generator',   ico:'#️⃣',  cat:'Keamanan',  desc:'Generate MD5, SHA1, SHA256 dari teks',              tags:['free','new'],popular:4100 },
+  { id:'uuid-gen',     name:'UUID Generator',   ico:'🆔',  cat:'Keamanan',  desc:'Generate UUID v4 unik untuk ID database',           tags:['free'],      popular:5800 },
+  // 🎨 Desain & Warna
+  { id:'color-picker', name:'Color Picker',     ico:'🎨',  cat:'Desain',    desc:'Pilih warna dan konversi HEX, RGB, HSL',            tags:['free'],      popular:8900 },
+  { id:'palette-gen',  name:'Palette Generator',ico:'🖌️',  cat:'Desain',    desc:'Generate palet warna harmonis dari seed color',     tags:['free','new'],popular:5300 },
+  { id:'gradient-gen', name:'Gradient Generator',ico:'🌈', cat:'Desain',    desc:'Buat gradient CSS yang indah dengan preview',       tags:['free','new'],popular:6100 },
+  { id:'qr-gen',       name:'QR Code Generator',ico:'📱',  cat:'Desain',    desc:'Buat QR Code dari URL, teks, atau kontak',          tags:['free'],      popular:10200 },
+  // ⏱️ Waktu & Produktivitas
+  { id:'timer',        name:'Timer & Stopwatch',ico:'⏱️',  cat:'Produktivitas',desc:'Timer hitung mundur dan stopwatch presisi',      tags:['free'],      popular:9800 },
+  { id:'todo',         name:'To-Do List',       ico:'✅',  cat:'Produktivitas',desc:'Buat dan kelola daftar tugas harianmu',           tags:['free'],      popular:7200 },
+  { id:'note',         name:'Quick Note',       ico:'📝',  cat:'Produktivitas',desc:'Catatan cepat yang tersimpan di browser',         tags:['free'],      popular:6400 },
+  { id:'word-count',   name:'Penghitung Kata',  ico:'📏',  cat:'Produktivitas',desc:'Hitung kata, karakter, kalimat, dan paragraf',   tags:['free'],      popular:5700 },
+  { id:'pomodoro',     name:'Pomodoro Timer',   ico:'🍅',  cat:'Produktivitas',desc:'Timer fokus kerja 25 menit + istirahat',         tags:['free','new'],popular:4100 },
+  // 🔤 Teks & Format
+  { id:'case-convert', name:'Konverter Case',   ico:'🔡',  cat:'Teks',      desc:'Ubah teks ke UPPER, lower, Title, camelCase, dll',  tags:['free'],      popular:8100 },
+  { id:'lorem',        name:'Lorem Ipsum',      ico:'📃',  cat:'Teks',      desc:'Generate teks placeholder dummy untuk desain',      tags:['free'],      popular:6200 },
+  { id:'text-diff',    name:'Text Diff',        ico:'🔍',  cat:'Teks',      desc:'Bandingkan dua teks dan temukan perbedaannya',      tags:['free','new'],popular:3400 },
+  { id:'base64',       name:'Base64 Encoder',   ico:'0️⃣',  cat:'Teks',      desc:'Encode dan decode teks ke format Base64',          tags:['free'],      popular:5100 },
+  { id:'url-encode',   name:'URL Encoder',      ico:'🔗',  cat:'Teks',      desc:'Encode dan decode URL dan query string',           tags:['free'],      popular:4200 },
+  // 🔢 Konverter
+  { id:'unit-convert', name:'Konverter Satuan', ico:'📐',  cat:'Konverter', desc:'Konversi panjang, berat, suhu, volume, dan lainnya', tags:['free'],     popular:7400 },
+  { id:'number-base',  name:'Konverter Bilangan',ico:'🔢', cat:'Konverter', desc:'Konversi desimal, biner, oktal, heksadesimal',      tags:['free'],      popular:4800 },
+  { id:'time-zone',    name:'Konverter Zona Waktu',ico:'🌍',cat:'Konverter',desc:'Konversi waktu antar zona waktu dunia',             tags:['free'],      popular:5600 },
+  { id:'roman',        name:'Angka Romawi',      ico:'I',  cat:'Konverter', desc:'Konversi angka ke dan dari numerasi Romawi',        tags:['free'],      popular:3900 },
+  // 💻 Developer
+  { id:'json-fmt',     name:'JSON Formatter',   ico:'{}',  cat:'Developer', desc:'Format dan validasi JSON dengan syntax highlight',  tags:['free','new'],popular:9200 },
+  { id:'regex-test',   name:'Regex Tester',     ico:'🔎',  cat:'Developer', desc:'Test regex pattern dengan penjelasan langkah',      tags:['free'],      popular:6700 },
+  { id:'color-code',   name:'HTML Color Codes', ico:'🎨',  cat:'Developer', desc:'Referensi lengkap warna HTML dan CSS',             tags:['free'],      popular:4300 },
+  { id:'css-minify',   name:'CSS/JS Minifier',  ico:'⚡',  cat:'Developer', desc:'Kompres CSS dan JavaScript untuk produksi',        tags:['free','new'],popular:5100 },
+];
+
+// Additional real tools
+const MORE_TOOLS = [
+  {id:'markdown',   name:'Markdown Preview', ico:'📝', cat:'Developer', desc:'Edit dan preview Markdown secara real-time', tags:['free','new'], popular:4200},
+  {id:'char-count', name:'Penghitung Karakter', ico:'🔢', cat:'Teks', desc:'Hitung karakter, kata, dan baris dengan detail', tags:['free'], popular:3100},
+  {id:'text-reverse',name:'Balik Teks',      ico:'🔄', cat:'Teks', desc:'Balik urutan karakter atau kata dalam teks', tags:['free','new'], popular:2800},
+  {id:'line-sort',  name:'Sortir Baris',     ico:'↕️', cat:'Teks', desc:'Urutkan baris teks A-Z, Z-A, atau acak', tags:['free'], popular:2600},
+  {id:'text-remove-dup', name:'Hapus Duplikat', ico:'🗑️', cat:'Teks', desc:'Hapus baris yang duplikat dari teks', tags:['free'], popular:2400},
+  {id:'text-extract',name:'Ekstrak Email/URL',ico:'🔍', cat:'Teks', desc:'Ekstrak semua email atau URL dari teks', tags:['free','new'], popular:3300},
+  {id:'symbol-table',name:'Tabel Simbol',    ico:'Ω', cat:'Teks', desc:'Temukan dan salin simbol & karakter khusus', tags:['free'], popular:3800},
+  {id:'readtime',   name:'Estimasi Baca',    ico:'⏱️', cat:'Teks', desc:'Hitung estimasi waktu membaca artikel', tags:['free'], popular:2200},
+  {id:'tax-calc',   name:'Kalkulator Pajak', ico:'🧾', cat:'Kalkulator', desc:'Hitung PPh, PPN, dan pajak penghasilan', tags:['free','new'], popular:4100},
+  {id:'discount',   name:'Kalkulator Diskon',ico:'🏷️', cat:'Kalkulator', desc:'Hitung harga setelah diskon bertingkat', tags:['free'], popular:5200},
+  {id:'investment', name:'Kalkulator Investasi', ico:'📈', cat:'Kalkulator', desc:'Simulasi keuntungan investasi deposito/saham', tags:['free','new'], popular:3700},
+  {id:'calorie',    name:'Kebutuhan Kalori',  ico:'🥗', cat:'Kalkulator', desc:'Hitung kebutuhan kalori harian berdasarkan aktivitas', tags:['free'], popular:4800},
+  {id:'speed-dist', name:'Kalkulator Kecepatan',ico:'🚗', cat:'Kalkulator', desc:'Hitung kecepatan, jarak, dan waktu perjalanan', tags:['free'], popular:3000},
+  {id:'data-convert',name:'Konverter Data',  ico:'💽', cat:'Konverter', desc:'Konversi KB, MB, GB, TB dengan akurat', tags:['free'], popular:4500},
+  {id:'color-convert',name:'Konverter Warna',ico:'🎨', cat:'Konverter', desc:'Konversi HEX ke RGB, HSL, CMYK dan sebaliknya', tags:['free','new'], popular:3900},
+  {id:'img-placeholder',name:'Placeholder Image',ico:'🖼️',cat:'Desain',desc:'Buat URL gambar placeholder untuk mockup', tags:['free'], popular:2700},
+  {id:'css-shadows', name:'CSS Box Shadow',  ico:'🌑', cat:'Desain', desc:'Generator box-shadow CSS dengan preview visual', tags:['free','new'], popular:3200},
+  {id:'css-border',  name:'CSS Border Radius',ico:'⬜',cat:'Desain', desc:'Generator border-radius CSS visual', tags:['free'], popular:2900},
+  {id:'favicon-gen', name:'Favicon Generator',ico:'⭐', cat:'Desain', desc:'Buat favicon emoji untuk website', tags:['free','new'], popular:2500},
+  {id:'ip-info',    name:'Informasi IP',     ico:'🌐', cat:'Developer', desc:'Cek informasi dan lokasi alamat IP', tags:['free'], popular:5800},
+  {id:'jwt-decode', name:'JWT Decoder',      ico:'🔐', cat:'Developer', desc:'Decode dan analisis JWT token', tags:['free','new'], popular:4700},
+  {id:'html-escape',name:'HTML Escape',      ico:'<>', cat:'Developer', desc:'Escape/unescape karakter HTML entities', tags:['free'], popular:3600},
+  {id:'mime-check', name:'MIME Type Checker',ico:'📂', cat:'Developer', desc:'Cek MIME type dari nama file', tags:['free'], popular:2300},
+  {id:'http-status',name:'HTTP Status Codes',ico:'🔌', cat:'Developer', desc:'Referensi kode status HTTP 1xx-5xx', tags:['free'], popular:6100},
+];
+TOOLS.push(...MORE_TOOLS);
+
+const CATS_ORDER = ['AI Teks','Kalkulator','Keamanan','Desain','Produktivitas','Teks','Konverter','Developer','Segera'];
+const TAG_LABELS = [{l:'Semua',v:'all'},{l:'🤖 AI',v:'ai'},{l:'✨ Baru',v:'new'},{l:'♾️ Gratis',v:'free'}];
+
+let activeCat='Semua', activeTag='all', searchQ='';
+
+document.addEventListener('DOMContentLoaded',()=>{
+  const u = Auth.getUser();
+  if(u){
+    document.getElementById('nav-user').style.display='';
+    document.getElementById('nav-user').textContent=u.username;
+    document.getElementById('nav-login').style.display='none';
+  }
+  renderCats(); renderFilters(); renderTools();
+  Scroll.init();
+});
+
+function renderCats(){
+  const cats = ['Semua', ...CATS_ORDER];
+  document.getElementById('t-cats').innerHTML = cats.map(c=>{
+    const n = c==='Semua' ? TOOLS.filter(t=>!t.soon).length : TOOLS.filter(t=>t.cat===c&&!t.soon).length;
+    return `<button class="t-cat${activeCat===c?' active':''}" onclick="setCat('${c}')">${c}<span class="t-cat-n">${n}</span></button>`;
+  }).join('');
+}
+
+function renderFilters(){
+  document.getElementById('t-filter-row').innerHTML = TAG_LABELS.map(t=>
+    `<button class="t-pill${activeTag===t.v?' active':''}" onclick="setTag('${t.v}')">${t.l}</button>`
+  ).join('');
+}
+
+function setCat(c){ activeCat=c; renderCats(); renderTools(); }
+function setTag(v){ activeTag=v; renderFilters(); renderTools(); }
+function filterTools(){ searchQ=document.getElementById('t-search').value.toLowerCase(); renderTools(); }
+function sortTools(v){ renderTools(v); }
+
+function renderTools(sort='default'){
+  let list = [...TOOLS];
+  if(activeCat!=='Semua') list = list.filter(t=>t.cat===activeCat);
+  if(activeTag!=='all') list = list.filter(t=>t.tags.includes(activeTag));
+  if(searchQ) list = list.filter(t=>t.name.toLowerCase().includes(searchQ)||t.desc.toLowerCase().includes(searchQ)||t.cat.toLowerCase().includes(searchQ));
+  if(sort==='name') list.sort((a,b)=>a.name.localeCompare(b.name));
+  else if(sort==='popular') list.sort((a,b)=>b.popular-a.popular);
+  else if(sort==='ai') list.sort((a,b)=>(a.tags.includes('ai')?-1:1));
+
+  document.getElementById('t-count').textContent = list.filter(t=>!t.soon).length;
+  const grid = document.getElementById('t-grid');
+
+  if(!list.length){
+    grid.innerHTML='<div class="t-no-result"><div style="font-size:2.5rem;margin-bottom:.5rem">🔍</div><div style="font-weight:600">Tidak ada tool ditemukan</div></div>';
+    return;
+  }
+
+  const tagHtml = tags => tags.map(t=>{
+    const map={ai:'ttag-ai',free:'ttag-free',pro:'ttag-pro',new:'ttag-new'};
+    const lbl={ai:'🤖 AI',free:'Gratis',pro:'Pro',new:'✨ New'};
+    return map[t]?`<span class="ttag ${map[t]}">${lbl[t]||t}</span>`:'';
+  }).join('');
+
+  grid.innerHTML = list.map(t=>{
+    if(t.soon) return `<div class="tcard" style="opacity:.38;cursor:not-allowed" title="Segera hadir"><div class="tcard-head"><div class="tcard-ico" style="background:var(--bg3);border-color:var(--bd)">${t.ico}</div><div class="tcard-meta"><div class="tcard-name">${t.name}</div><div class="tcard-cat">${t.cat}</div></div></div><div class="tcard-desc">${t.desc}</div><div class="tcard-foot"><div class="tcard-tags"><span class="ttag" style="background:rgba(107,114,128,.08);color:var(--gray2);border-color:rgba(107,114,128,.15)">Segera</span></div></div></div>`;
+    return `<div class="tcard" onclick="openTool('${t.id}')"><div class="tcard-head"><div class="tcard-ico">${t.ico}</div><div class="tcard-meta"><div class="tcard-name">${t.name}</div><div class="tcard-cat">${t.cat}</div></div></div><div class="tcard-desc">${t.desc}</div><div class="tcard-foot"><div class="tcard-tags">${tagHtml(t.tags)}</div><button class="tcard-btn" onclick="event.stopPropagation();openTool('${t.id}')">Buka →</button></div></div>`;
+  }).join('');
+}
+
+/* ═══════════════════════════════════════
+   TOOL MODAL ENGINE
+   ═══════════════════════════════════════ */
+function openTool(id){
+  const t = TOOLS.find(x=>x.id===id);
+  if(!t||t.soon) return;
+  document.getElementById('tm-ico').textContent = t.ico;
+  document.getElementById('tm-name').textContent = t.name;
+  document.getElementById('tm-sub').textContent = t.desc;
+  document.getElementById('t-modal').classList.add('open');
+  document.body.style.overflow='hidden';
+  loadTool(id);
+  // Persist tool usage to DB (background)
+  if (Auth.isLoggedIn()) {
+    const u = Auth.getUser();
+    if (u) {
+      u.tools_used = (u.tools_used||0)+1;
+      Store.set('user', u);
+      API.post('/api/auth?action=update_tool_stats', { tool_id: id }).catch(()=>{});
+    }
+  }
+}
+function closeTool(){
+  document.getElementById('t-modal').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+async function callAI(prompt, body){
+  // Remove previous result
+  const prev = body.querySelector('#ai-result');
+  if (prev) prev.remove();
+  
+  const el = document.createElement('div');
+  el.className = 't-mresult loading';
+  el.id = 'ai-result';
+  el.innerHTML = '<div class="t-mresult-lbl">Klik untuk salin</div><span>⏳ Memproses dengan AI...</span>';
+  body.appendChild(el);
+
+  try {
+    const r = await fetch('/api/chat?action=tools_ai', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...Auth.authHeader() },
+      body: JSON.stringify({ message: prompt, model_id: 'llama-8b' })
+    });
+    const d = await r.json();
+    const text = d.response || d.error || 'Gagal mendapat respons AI';
+    el.textContent = text;
+    el.classList.add('ai-result');
+    el.classList.remove('loading');
+    el.onclick = () => { Clipboard.copy(text); Toast.ok('✅ Disalin ke clipboard!'); };
+    // Add copy hint
+    const hint = document.createElement('div');
+    hint.className = 't-mresult-lbl';
+    hint.textContent = 'Klik untuk salin';
+    el.prepend(hint);
+  } catch(e) {
+    el.innerHTML = '<span style="color:var(--hot)">❌ Error: ' + e.message + '</span>';
+    el.classList.remove('loading');
+  }
+}
+
+function loadTool(id){
+  const b = document.getElementById('tm-body');
+  b.innerHTML = '';
+  const tools = {
+    'calc':calcTool,'bmi':bmiTool,'currency':currencyTool,'percentage':percentTool,
+    'age-calc':ageTool,'loan-calc':loanTool,'tip-calc':tipTool,
+    'passgen':passGenTool,'passcheck':passCheckTool,'uuid-gen':uuidTool,'hash-gen':hashTool,
+    'color-picker':colorPickerTool,'palette-gen':paletteTool,'gradient-gen':gradientTool,'qr-gen':qrTool,
+    'timer':timerTool,'todo':todoTool,'note':noteTool,'word-count':wordCountTool,'pomodoro':pomodoroTool,
+    'case-convert':caseTool,'lorem':loremTool,'text-diff':diffTool,'base64':base64Tool,'url-encode':urlEncodeTool,
+    'unit-convert':unitTool,'number-base':numBaseTool,'time-zone':timeZoneTool,'roman':romanTool,
+    'json-fmt':jsonFmtTool,'regex-test':regexTool,'css-minify':minifyTool,'color-code':colorCodeTool,
+    'ai-writer':aiWriterTool,'ai-summary':aiSummaryTool,'ai-translate':aiTranslateTool,
+    'ai-grammar':aiGrammarTool,'ai-email':aiEmailTool,'ai-caption':aiCaptionTool,
+    'ai-slogan':aiSloganTool,'ai-story':aiStoryTool,
+    // New tools
+    'markdown':markdownTool,'char-count':charCountTool,'text-reverse':textReverseTool,
+    'line-sort':lineSortTool,'text-remove-dup':removeDupTool,'text-extract':textExtractTool,
+    'symbol-table':symbolTableTool,'readtime':readTimeTool,
+    'tax-calc':taxCalcTool,'discount':discountTool,'investment':investmentTool,
+    'calorie':calorieTool,'speed-dist':speedDistTool,
+    'data-convert':dataConvertTool,'color-convert':colorConvertTool,
+    'img-placeholder':imgPlaceholderTool,'css-shadows':cssShadowsTool,
+    'css-border':cssBorderTool,'favicon-gen':faviconTool,
+    'ip-info':ipInfoTool,'jwt-decode':jwtDecodeTool,'html-escape':htmlEscapeTool,
+    'mime-check':mimeCheckTool,'http-status':httpStatusTool,
+  };
+  if(tools[id]) tools[id](b);
+  else b.innerHTML = `<div style="text-align:center;padding:2.5rem"><div style="font-size:3rem;margin-bottom:.75rem">${TOOLS.find(t=>t.id===id)?.ico||'🔧'}</div><div style="font-family:var(--ff-display);font-weight:700;margin-bottom:.4rem">${TOOLS.find(t=>t.id===id)?.name||'Tool'}</div><div style="color:var(--gray);font-size:.84rem;margin-bottom:.75rem">Tool sedang dikembangkan</div><button class="btn btn-sm btn-outline" onclick="closeTool()">← Kembali</button></div>`;
+}
+
+/* ══ KALKULATOR ══ */
+function calcTool(b){
+  let expr='', display='0', history='';
+  const draw=()=>{b.innerHTML=`<div class="calc-sub">${history||'&nbsp;'}</div><div class="calc-display" id="cd">${display}</div><div class="calc-grid">
+    ${['C','±','%','÷','7','8','9','×','4','5','6','−','1','2','3','+','0','.','+'].map((k,i)=>{
+      const cls=i<3?'clr':i===3||i===7||i===11||i===15?'op':i===18?'eq sp2':k==='0'?'num sp2':'num';
+      if(k==='+' && i===18) return `<button class="ckey eq" onclick="cInput('=')">=</button>`;
+      if(k==='0' && i===16) return `<button class="ckey num sp2" onclick="cInput('0')">0</button>`;
+      return `<button class="ckey ${cls}" onclick="cInput('${k}')">${k}</button>`;
+    }).join('')}
+  </div>`;};
+  window.cInput=(k)=>{
+    if(k==='C'){expr='';display='0';history='';}
+    else if(k==='='){try{const r=eval(expr.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-'));history=expr+' =';display=String(parseFloat(r.toFixed(10)));expr=display;}catch{display='Error';expr='';}}
+    else if(k==='±'){expr=expr?String(-parseFloat(expr)):display;display=expr;}
+    else if(k==='%'){try{display=String(parseFloat(eval(expr.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-')))/100);expr=display;}catch{}}
+    else{if(display==='0'&&!'+-×÷−.'.includes(k)){expr=k;}else{expr+=k;}display=expr.slice(-20)||'0';}
+    document.getElementById('cd').textContent=display;
+  };
+  document.addEventListener('keydown',function ck(e){if(!document.getElementById('t-modal').classList.contains('open')){document.removeEventListener('keydown',ck);return;}if(/[0-9+\-*/.%]/.test(e.key)||e.key==='Enter'||e.key==='Escape'){e.preventDefault();cInput(e.key==='Enter'?'=':e.key==='Escape'?'C':e.key==='*'?'×':e.key==='/'?'÷':e.key);}});
+  draw();
+}
+
+/* ══ BMI ══ */
+function bmiTool(b){
+  b.innerHTML=`<div class="t-mrow"><div><label class="t-mlabel">Tinggi (cm)</label><input class="t-minput" id="bmi-h" type="number" placeholder="170" oninput="calcBMI()"></div><div><label class="t-mlabel">Berat (kg)</label><input class="t-minput" id="bmi-w" type="number" placeholder="65" oninput="calcBMI()"></div></div><div class="t-mrow" style="margin-top:.6rem"><div><label class="t-mlabel">Umur</label><input class="t-minput" id="bmi-a" type="number" placeholder="25" oninput="calcBMI()"></div><div><label class="t-mlabel">Jenis Kelamin</label><select class="t-minput" id="bmi-g" onchange="calcBMI()"><option value="m">Laki-laki</option><option value="f">Perempuan</option></select></div></div><div id="bmi-result"></div>`;
+  window.calcBMI=()=>{const h=parseFloat(document.getElementById('bmi-h').value),w=parseFloat(document.getElementById('bmi-w').value);if(!h||!w)return;const bmi=w/((h/100)**2);const cats=[{l:'Kurus Sekali',c:'var(--cyan)',max:16},{l:'Kurus',c:'var(--accent)',max:18.5},{l:'Normal',c:'var(--green)',max:25},{l:'Gemuk',c:'var(--amber)',max:30},{l:'Obesitas',c:'var(--hot)',max:999}];const cat=cats.find(c=>bmi<c.max)||cats[4];document.getElementById('bmi-result').innerHTML=`<div class="bmi-result" style="color:${cat.c}">${bmi.toFixed(1)}</div><div class="bmi-cat" style="color:${cat.c}">${cat.l}</div><div style="background:var(--bg3);border-radius:var(--r2);padding:.75rem;font-size:.8rem;color:var(--gray);line-height:1.65">BMI <strong style="color:var(--white)">${bmi.toFixed(2)}</strong> · Normal: 18.5–25 · Berat ideal: <strong style="color:var(--white)">${((18.5*(h/100)**2)).toFixed(0)}–${((25*(h/100)**2)).toFixed(0)} kg</strong></div>`;};
+}
+
+/* ══ CURRENCY ══ */
+function currencyTool(b){
+  const RATES={USD:1,IDR:15800,EUR:0.92,JPY:149,SGD:1.35,GBP:0.79,AUD:1.53,MYR:4.73,CNY:7.24,KRW:1320,THB:35.2};
+  b.innerHTML=`<div class="t-mrow"><div><label class="t-mlabel">Jumlah</label><input class="t-minput" id="cr-amt" type="number" value="100" oninput="convCur()"></div><div><label class="t-mlabel">Dari</label><select class="t-minput" id="cr-from" onchange="convCur()">${Object.keys(RATES).map(r=>`<option${r==='USD'?' selected':''}>${r}</option>`).join('')}</select></div></div><div><label class="t-mlabel" style="margin-top:.6rem">Ke</label><select class="t-minput" id="cr-to" onchange="convCur()">${Object.keys(RATES).map(r=>`<option${r==='IDR'?' selected':''}>${r}</option>`).join('')}</select></div><div class="currency-result" id="cr-res">—</div><div style="font-family:var(--ff-mono);font-size:.7rem;color:var(--gray2);text-align:center">*Kurs perkiraan, bukan real-time</div>`;
+  window.convCur=()=>{const a=parseFloat(document.getElementById('cr-amt').value)||0,f=document.getElementById('cr-from').value,t=document.getElementById('cr-to').value;const r=a/RATES[f]*RATES[t];document.getElementById('cr-res').textContent=r.toLocaleString('id-ID',{maximumFractionDigits:2})+' '+t;};
+  window.convCur();
+}
+
+/* ══ PERCENTAGE ══ */
+function percentTool(b){
+  b.innerHTML=`<div class="t-mrow"><div><label class="t-mlabel">Angka</label><input class="t-minput" id="pa" type="number" placeholder="100" oninput="calcPct()"></div><div><label class="t-mlabel">Persen (%)</label><input class="t-minput" id="pb" type="number" placeholder="15" oninput="calcPct()"></div></div><div id="pct-result" style="margin-top:.9rem"></div>`;
+  window.calcPct=()=>{const a=parseFloat(document.getElementById('pa').value),p=parseFloat(document.getElementById('pb').value);if(isNaN(a)||isNaN(p))return;const r=a*p/100;document.getElementById('pct-result').innerHTML=`<div style="display:flex;flex-direction:column;gap:.5rem"><div style="background:var(--bg3);border-radius:var(--r2);padding:.75rem;display:flex;justify-content:space-between"><span style="color:var(--gray)">${p}% dari ${a}</span><strong style="color:var(--accent)">${r.toFixed(2)}</strong></div><div style="background:var(--bg3);border-radius:var(--r2);padding:.75rem;display:flex;justify-content:space-between"><span style="color:var(--gray)">${a} + ${p}%</span><strong style="color:var(--green)">${(a+r).toFixed(2)}</strong></div><div style="background:var(--bg3);border-radius:var(--r2);padding:.75rem;display:flex;justify-content:space-between"><span style="color:var(--gray)">${a} − ${p}%</span><strong style="color:var(--hot)">${(a-r).toFixed(2)}</strong></div></div>`;};
+}
+
+/* ══ AGE ══ */
+function ageTool(b){
+  b.innerHTML=`<label class="t-mlabel">Tanggal Lahir</label><input class="t-minput" type="date" id="age-in" onchange="calcAge()"><div id="age-result" style="margin-top:.9rem"></div>`;
+  window.calcAge=()=>{const d=new Date(document.getElementById('age-in').value);if(!d)return;const now=new Date();const y=now.getFullYear()-d.getFullYear(),m=now.getMonth()-d.getMonth(),days=now.getDate()-d.getDate();const ay=y-(m<0||(m===0&&days<0)?1:0);const am=((m+(m<0?12:0))+(days<0?-1:0)+12)%12;const ad=days<0?new Date(now.getFullYear(),now.getMonth(),0).getDate()+days:days;const next=new Date(now.getFullYear()+(now.getMonth()>d.getMonth()||(now.getMonth()===d.getMonth()&&now.getDate()>=d.getDate())?1:0),d.getMonth(),d.getDate());const dLeft=Math.ceil((next-now)/86400000);document.getElementById('age-result').innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem"><div style="background:var(--accent-dim);border:1px solid rgba(var(--accent-rgb),.2);border-radius:var(--r3);padding:.85rem;text-align:center"><div style="font-family:var(--ff-display);font-weight:800;font-size:1.8rem;color:var(--accent)">${ay}</div><div style="font-family:var(--ff-mono);font-size:.62rem;color:var(--gray2);text-transform:uppercase">Tahun</div></div><div style="background:var(--bg3);border-radius:var(--r3);padding:.85rem;text-align:center"><div style="font-family:var(--ff-display);font-weight:800;font-size:1.8rem">${am}bl ${ad}hr</div><div style="font-family:var(--ff-mono);font-size:.62rem;color:var(--gray2);text-transform:uppercase">Sisa Bulan & Hari</div></div></div><div style="margin-top:.5rem;font-family:var(--ff-mono);font-size:.78rem;color:var(--gray);text-align:center">🎂 Ulang tahun berikutnya: <span style="color:var(--accent)">${dLeft} hari lagi</span></div>`;};
+}
+
+/* ══ LOAN ══ */
+function loanTool(b){
+  b.innerHTML=`<div class="t-mrow"><div><label class="t-mlabel">Jumlah Pinjaman (Rp)</label><input class="t-minput" id="ln-p" type="number" placeholder="50000000" oninput="calcLoan()"></div><div><label class="t-mlabel">Bunga/Tahun (%)</label><input class="t-minput" id="ln-r" type="number" placeholder="12" oninput="calcLoan()"></div></div><label class="t-mlabel" style="margin-top:.6rem">Durasi (bulan)</label><input class="t-minput" id="ln-n" type="number" placeholder="36" oninput="calcLoan()"><div id="loan-result" style="margin-top:.9rem"></div>`;
+  window.calcLoan=()=>{const p=parseFloat(document.getElementById('ln-p').value),r=parseFloat(document.getElementById('ln-r').value)/100/12,n=parseInt(document.getElementById('ln-n').value);if(!p||!r||!n)return;const m=p*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1);const total=m*n;document.getElementById('loan-result').innerHTML=`<div style="display:flex;flex-direction:column;gap:.5rem"><div style="background:var(--accent-dim);border:1px solid rgba(var(--accent-rgb),.2);border-radius:var(--r3);padding:1rem;text-align:center"><div style="font-family:var(--ff-mono);font-size:.62rem;color:var(--accent);text-transform:uppercase;margin-bottom:.35rem">Cicilan Per Bulan</div><div style="font-family:var(--ff-display);font-weight:800;font-size:1.75rem;color:var(--accent)">Rp ${Math.round(m).toLocaleString('id')}</div></div><div style="background:var(--bg3);border-radius:var(--r2);padding:.75rem;display:flex;justify-content:space-between"><span style="color:var(--gray);font-size:.82rem">Total Bayar</span><strong>Rp ${Math.round(total).toLocaleString('id')}</strong></div><div style="background:var(--bg3);border-radius:var(--r2);padding:.75rem;display:flex;justify-content:space-between"><span style="color:var(--gray);font-size:.82rem">Total Bunga</span><strong style="color:var(--hot)">Rp ${Math.round(total-p).toLocaleString('id')}</strong></div></div>`;};
+}
+
+/* ══ TIP ══ */
+function tipTool(b){
+  b.innerHTML=`<div class="t-mrow"><div><label class="t-mlabel">Total Tagihan (Rp)</label><input class="t-minput" id="tip-b" type="number" placeholder="150000" oninput="calcTip()"></div><div><label class="t-mlabel">% Tip</label><select class="t-minput" id="tip-p" onchange="calcTip()"><option value="5">5%</option><option value="10" selected>10%</option><option value="15">15%</option><option value="20">20%</option><option value="25">25%</option></select></div></div><label class="t-mlabel" style="margin-top:.6rem">Jumlah Orang</label><input class="t-minput" id="tip-n" type="number" placeholder="4" value="1" oninput="calcTip()"><div id="tip-result" style="margin-top:.9rem"></div>`;
+  window.calcTip=()=>{const b=parseFloat(document.getElementById('tip-b').value)||0,p=parseInt(document.getElementById('tip-p').value)/100,n=parseInt(document.getElementById('tip-n').value)||1;const tip=b*p,total=b+tip,each=total/n;document.getElementById('tip-result').innerHTML=`<div style="display:flex;flex-direction:column;gap:.4rem"><div style="background:var(--bg3);border-radius:var(--r2);padding:.7rem;display:flex;justify-content:space-between"><span style="color:var(--gray);font-size:.82rem">Tip (${p*100}%)</span><strong>Rp ${Math.round(tip).toLocaleString('id')}</strong></div><div style="background:var(--bg3);border-radius:var(--r2);padding:.7rem;display:flex;justify-content:space-between"><span style="color:var(--gray);font-size:.82rem">Total</span><strong>Rp ${Math.round(total).toLocaleString('id')}</strong></div><div style="background:var(--accent-dim);border:1px solid rgba(var(--accent-rgb),.2);border-radius:var(--r2);padding:.7rem;display:flex;justify-content:space-between"><span style="color:var(--accent);font-size:.82rem">Per Orang (${n})</span><strong style="color:var(--accent)">Rp ${Math.round(each).toLocaleString('id')}</strong></div></div>`;};
+}
+
+/* ══ PASSWORD GENERATOR ══ */
+function passGenTool(b){
+  b.innerHTML=`<label class="t-mlabel">Panjang: <span id="pl-lbl">16</span> karakter</label><input type="range" id="pl" min="6" max="64" value="16" style="width:100%;accent-color:var(--accent);margin:.4rem 0" oninput="document.getElementById('pl-lbl').textContent=this.value;genPass()"><div style="display:flex;gap:.75rem;margin:.5rem 0;flex-wrap:wrap">
+  ${['Upper (A-Z)','Lower (a-z)','Angka (0-9)','Simbol (!@#)'].map((l,i)=>`<label style="display:flex;align-items:center;gap:.35rem;font-size:.82rem;cursor:pointer"><input type="checkbox" id="pc-${i}" ${i<3?'checked':''} onchange="genPass()" style="accent-color:var(--accent)">${l}</label>`).join('')}</div>
+  <div class="t-mresult" id="pass-out" onclick="Clipboard.copy(document.getElementById('pass-val').textContent);Toast.ok('Password disalin!')"><div class="t-mresult-lbl">Klik untuk salin</div><span id="pass-val">—</span></div>
+  <div class="pw-bars" id="pw-bars">${Array(4).fill('<div class="pw-bar"></div>').join('')}</div>
+  <div style="font-family:var(--ff-mono);font-size:.72rem;color:var(--gray2);text-align:center" id="pw-str">—</div>
+  <button class="btn btn-primary btn-md" style="margin-top:.85rem;width:100%" onclick="genPass()">🔄 Generate Ulang</button>`;
+  window.genPass=()=>{
+    const len=parseInt(document.getElementById('pl').value);
+    const use=[document.getElementById('pc-0').checked,document.getElementById('pc-1').checked,document.getElementById('pc-2').checked,document.getElementById('pc-3').checked];
+    const pools=['ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz','0123456789','!@#$%^&*()-_=+[]{}|;:,.<>?'];
+    let chars=pools.filter((_,i)=>use[i]).join('');
+    if(!chars)chars=pools[1];
+    let pass='';for(let i=0;i<len;i++)pass+=chars[Math.floor(Math.random()*chars.length)];
+    document.getElementById('pass-val').textContent=pass;
+    const bars=document.getElementById('pw-bars').children;
+    let str=0;if(len>=8)str++;if(len>=12)str++;if(use.filter(Boolean).length>=3)str++;if(len>=20&&use.filter(Boolean).length===4)str++;
+    const cls=['','danger','warn','warn','good'];const lbl=['Sangat Lemah','Lemah','Cukup','Kuat','Sangat Kuat'];
+    Array.from(bars).forEach((bar,i)=>{bar.className='pw-bar'+(i<str?' fill '+cls[str]:'');});
+    document.getElementById('pw-str').textContent=lbl[str]||'';
+  };
+  window.genPass();
+}
+
+/* ══ PASSWORD CHECKER ══ */
+function passCheckTool(b){
+  b.innerHTML=`<label class="t-mlabel">Masukkan Password</label><input class="t-minput" id="pc-inp" type="text" placeholder="Ketik password disini..." oninput="checkPass(this.value)"><div class="pw-bars" id="pch-bars" style="margin:.5rem 0">${Array(4).fill('<div class="pw-bar"></div>').join('')}</div><div id="pc-result"></div>`;
+  window.checkPass=(p)=>{let s=0,tips=[];if(p.length>=8)s++;else tips.push('Tambah panjang hingga 8+ karakter');if(/[A-Z]/.test(p))s++;else tips.push('Tambah huruf kapital (A-Z)');if(/[0-9]/.test(p))s++;else tips.push('Tambah angka (0-9)');if(/[^A-Za-z0-9]/.test(p))s++;else tips.push('Tambah karakter simbol (!@#...)');const cls=['','danger','warn','warn','good'];const lbl=['Sangat Lemah','Lemah','Cukup','Kuat','Sangat Kuat'];Array.from(document.getElementById('pch-bars').children).forEach((bar,i)=>{bar.className='pw-bar'+(i<s?' fill '+cls[s]:'');});document.getElementById('pc-result').innerHTML=`<div style="font-family:var(--ff-mono);font-size:.75rem;margin-bottom:.5rem;color:var(--${s<=1?'hot':s<=2?'amber':'green'})">${lbl[s]}</div>${tips.map(t=>`<div style="font-size:.78rem;color:var(--gray);padding:.25rem 0;display:flex;gap:.4rem">⚠️ ${t}</div>`).join('')}`;};
+}
+
+/* ══ UUID ══ */
+function uuidTool(b){
+  const gen=()=>([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,c=>(c^crypto.getRandomValues(new Uint8Array(1))[0]&15>>c/4).toString(16));
+  b.innerHTML=`<label class="t-mlabel">UUID v4 Generator</label><div id="uuid-list" style="display:flex;flex-direction:column;gap:.4rem"></div><div class="t-mactions"><button class="btn btn-primary btn-md" onclick="genUUIDs()">🔄 Generate 5 UUID</button><button class="btn btn-sm btn-secondary" onclick="genUUIDs(1)">Generate 1</button></div>`;
+  window.genUUIDs=(n=5)=>{const list=document.getElementById('uuid-list');list.innerHTML='';for(let i=0;i<n;i++){const u=gen();const d=document.createElement('div');d.className='t-mresult';d.style.fontFamily='var(--ff-mono)';d.style.fontSize='.82rem';d.style.cursor='pointer';d.textContent=u;d.onclick=()=>{Clipboard.copy(u);Toast.ok('UUID disalin!');};list.appendChild(d);}};
+  window.genUUIDs();
+}
+
+/* ══ HASH ══ */
+function hashTool(b){
+  b.innerHTML=`<label class="t-mlabel">Teks Input</label><textarea class="t-minput" id="hash-in" rows="3" placeholder="Masukkan teks..."></textarea><div class="t-mactions"><button class="btn btn-primary btn-md" onclick="genHash()">⚡ Generate Hash</button></div><div id="hash-out"></div>`;
+  window.genHash=async()=>{const txt=document.getElementById('hash-in').value;if(!txt){Toast.warn('Masukkan teks dulu');return;}const enc=new TextEncoder();const data=enc.encode(txt);const algs=['SHA-1','SHA-256','SHA-512'];const results=await Promise.all(algs.map(async a=>{const buf=await crypto.subtle.digest(a,data);return{a,h:Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('')};}));document.getElementById('hash-out').innerHTML=results.map(r=>`<label class="t-mlabel">${r.a}</label><div class="t-mresult" style="font-family:var(--ff-mono);font-size:.72rem;word-break:break-all;cursor:pointer" onclick="Clipboard.copy('${r.h}');Toast.ok('${r.a} disalin!')">${r.h}<div class="t-mresult-lbl">Klik salin</div></div>`).join('');};
+}
+
+/* ══ COLOR PICKER ══ */
+function colorPickerTool(b){
+  b.innerHTML=`<label class="t-mlabel">Pilih Warna</label><div style="display:flex;gap:.6rem;align-items:center"><input type="color" id="cp-pick" value="#4f7fff" oninput="updateColor(this.value)" style="width:56px;height:42px;border-radius:var(--r2);border:2px solid var(--bd);cursor:pointer;background:none;padding:2px"><input class="t-minput" id="cp-hex" placeholder="#4f7fff" style="flex:1;font-family:var(--ff-mono)" oninput="if(/^#[0-9a-f]{6}$/i.test(this.value))updateColor(this.value)"></div><div class="color-prev" id="cp-prev"></div><div class="t-mrow"><div><label class="t-mlabel">RGB</label><div class="t-mresult" id="cp-rgb" style="font-family:var(--ff-mono);font-size:.82rem;cursor:pointer" onclick="Clipboard.copy(this.textContent);Toast.ok('RGB disalin!')">—</div></div><div><label class="t-mlabel">HSL</label><div class="t-mresult" id="cp-hsl" style="font-family:var(--ff-mono);font-size:.82rem;cursor:pointer" onclick="Clipboard.copy(this.textContent);Toast.ok('HSL disalin!')">—</div></div></div>`;
+  window.updateColor=(hex)=>{document.getElementById('cp-pick').value=hex;document.getElementById('cp-hex').value=hex;document.getElementById('cp-prev').style.background=hex;document.getElementById('cp-prev').style.borderColor=hex+'40';const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),bl=parseInt(hex.slice(5,7),16);document.getElementById('cp-rgb').textContent=`rgb(${r}, ${g}, ${bl})`;const rl=r/255,gl=g/255,bll=bl/255;const max=Math.max(rl,gl,bll),min=Math.min(rl,gl,bll);let h,s,l=(max+min)/2;if(max===min){h=s=0;}else{const d=max-min;s=l>.5?d/(2-max-min):d/(max+min);switch(max){case rl:h=((gl-bll)/d+(gl<bll?6:0))/6;break;case gl:h=((bll-rl)/d+2)/6;break;case bll:h=((rl-gl)/d+4)/6;break;}}document.getElementById('cp-hsl').textContent=`hsl(${Math.round(h*360)}, ${Math.round(s*100)}%, ${Math.round(l*100)}%)`;};
+  window.updateColor('#4f7fff');
+}
+
+/* ══ PALETTE ══ */
+function paletteTool(b){
+  b.innerHTML=`<label class="t-mlabel">Warna Dasar</label><div style="display:flex;gap:.5rem"><input type="color" id="pal-seed" value="#4f7fff" style="width:48px;height:38px;border-radius:var(--r2);border:2px solid var(--bd);cursor:pointer;padding:2px;background:none"><input class="t-minput" id="pal-hex" value="#4f7fff" style="flex:1;font-family:var(--ff-mono)" oninput="genPalette()"><button class="btn btn-primary btn-md" onclick="genPalette()">Generate</button></div><div class="palette-row" id="pal-row"></div><div id="pal-codes" style="display:flex;flex-direction:column;gap:.3rem;margin-top:.5rem"></div>`;
+  window.genPalette=()=>{const hex=document.getElementById('pal-hex').value||document.getElementById('pal-seed').value;document.getElementById('pal-seed').value=hex;if(!/^#[0-9a-f]{6}$/i.test(hex))return;const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),bl=parseInt(hex.slice(5,7),16);const shades=[20,40,60,80,100,120,140,160].map(f=>{const nr=Math.min(255,Math.round(r*f/100));const ng=Math.min(255,Math.round(g*f/100));const nb=Math.min(255,Math.round(bl*f/100));return'#'+[nr,ng,nb].map(x=>x.toString(16).padStart(2,'0')).join('');});document.getElementById('pal-row').innerHTML=shades.map(c=>`<div class="pal-swatch" style="background:${c}" title="${c}" onclick="Clipboard.copy('${c}');Toast.ok('${c} disalin!')"></div>`).join('');document.getElementById('pal-codes').innerHTML=shades.map(c=>`<div style="display:flex;align-items:center;gap:.5rem;font-family:var(--ff-mono);font-size:.72rem;cursor:pointer" onclick="Clipboard.copy('${c}');Toast.ok('Disalin!')"><div style="width:20px;height:20px;border-radius:4px;background:${c};border:1px solid var(--bd);flex-shrink:0"></div>${c}</div>`).join('');};
+  window.genPalette();
+}
+
+/* ══ GRADIENT ══ */
+function gradientTool(b){
+  b.innerHTML=`<div class="t-mrow"><div><label class="t-mlabel">Warna 1</label><div style="display:flex;gap:.4rem"><input type="color" id="gc1" value="#4f7fff" oninput="genGradient()" style="width:42px;height:36px;border-radius:var(--r2);border:2px solid var(--bd);cursor:pointer;padding:2px"><input class="t-minput" id="gh1" value="#4f7fff" style="font-family:var(--ff-mono);font-size:.82rem" oninput="document.getElementById('gc1').value=this.value;genGradient()"></div></div><div><label class="t-mlabel">Warna 2</label><div style="display:flex;gap:.4rem"><input type="color" id="gc2" value="#06b6d4" oninput="genGradient()" style="width:42px;height:36px;border-radius:var(--r2);border:2px solid var(--bd);cursor:pointer;padding:2px"><input class="t-minput" id="gh2" value="#06b6d4" style="font-family:var(--ff-mono);font-size:.82rem" oninput="document.getElementById('gc2').value=this.value;genGradient()"></div></div></div><div class="t-mrow" style="margin-top:.5rem"><div><label class="t-mlabel">Arah</label><select class="t-minput" id="gdir" onchange="genGradient()"><option value="to right">→ Kanan</option><option value="to bottom">↓ Bawah</option><option value="to bottom right">↘ Kanan Bawah</option><option value="135deg">135°</option><option value="to top">↑ Atas</option></select></div><div><label class="t-mlabel">Tipe</label><select class="t-minput" id="gtype" onchange="genGradient()"><option value="linear">Linear</option><option value="radial">Radial</option></select></div></div><div style="width:100%;height:100px;border-radius:var(--r3);margin:.75rem 0;border:1px solid var(--bd);transition:all .3s" id="g-prev"></div><div class="t-mresult" id="g-css" style="font-family:var(--ff-mono);font-size:.78rem;cursor:pointer" onclick="Clipboard.copy(this.textContent);Toast.ok('CSS disalin!')"></div>`;
+  window.genGradient=()=>{const c1=document.getElementById('gc1').value,c2=document.getElementById('gc2').value,dir=document.getElementById('gdir').value,type=document.getElementById('gtype').value;const css=type==='radial'?`radial-gradient(circle, ${c1}, ${c2})`:`linear-gradient(${dir}, ${c1}, ${c2})`;document.getElementById('g-prev').style.background=css;document.getElementById('g-css').textContent=`background: ${css};`;};
+  window.genGradient();
+}
+
+/* ══ QR CODE ══ */
+function qrTool(b){
+  b.innerHTML=`<label class="t-mlabel">Teks atau URL</label><input class="t-minput" id="qr-in" placeholder="https://kizai.id atau teks apapun..."><div class="t-mactions"><button class="btn btn-primary btn-md" onclick="genQR()">📱 Generate QR</button></div><div id="qr-out" style="text-align:center;margin-top:.75rem"></div>`;
+  window.genQR=()=>{const v=document.getElementById('qr-in').value.trim();if(!v){Toast.warn('Masukkan teks atau URL');return;}const url=`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(v)}`;document.getElementById('qr-out').innerHTML=`<img src="${url}" style="border-radius:var(--r3);border:4px solid var(--card2);width:200px;height:200px"><div style="font-family:var(--ff-mono);font-size:.72rem;color:var(--gray2);margin-top:.5rem">Klik kanan → Simpan Gambar</div>`;};
+}
+
+/* ══ TIMER ══ */
+function timerTool(b){
+  let min=0,sec=0,running=false,iv,sw=0,swrun=false,swiv;
+  b.innerHTML=`<div style="display:flex;gap:1rem;justify-content:center;margin-bottom:.75rem"><button class="t-pill${activeTab==='t'?' active':''}" id="tab-t" onclick="timerTab('t')">⏱ Timer</button><button class="t-pill" id="tab-s" onclick="timerTab('s')">⏱ Stopwatch</button></div><div id="timer-body"></div>`;
+  window.timerTab=(t)=>{document.getElementById('tab-t').classList.toggle('active',t==='t');document.getElementById('tab-s').classList.toggle('active',t==='s');if(t==='t')renderTimer();else renderSW();};
+  let activeTab='t';
+  const renderTimer=()=>{activeTab='t';document.getElementById('timer-body').innerHTML=`<div class="t-mrow" style="margin-bottom:.75rem"><div><label class="t-mlabel">Menit</label><input class="t-minput" id="tm-m" type="number" value="5" min="0" max="99" style="text-align:center;font-size:1.2rem"></div><div><label class="t-mlabel">Detik</label><input class="t-minput" id="tm-s" type="number" value="0" min="0" max="59" style="text-align:center;font-size:1.2rem"></div></div><div class="timer-big" id="tm-disp">05:00</div><div class="timer-ctrl"><button class="btn btn-primary btn-md" id="tm-btn" onclick="tmToggle()">▶ Mulai</button><button class="btn btn-sm btn-outline" onclick="tmReset()">↺ Reset</button></div>`;};
+  window.tmToggle=()=>{if(running){clearInterval(iv);running=false;document.getElementById('tm-btn').textContent='▶ Lanjut';}else{if(!running&&sec===0&&min===0){min=parseInt(document.getElementById('tm-m').value)||5;sec=parseInt(document.getElementById('tm-s').value)||0;}running=true;document.getElementById('tm-btn').textContent='⏸ Pause';iv=setInterval(()=>{if(sec>0)sec--;else if(min>0){min--;sec=59;}else{clearInterval(iv);running=false;document.getElementById('tm-btn').textContent='▶ Mulai';Toast.ok('⏰ Timer selesai!');return;}document.getElementById('tm-disp').textContent=String(min).padStart(2,'0')+':'+String(sec).padStart(2,'0');},1000);}};
+  window.tmReset=()=>{clearInterval(iv);running=false;min=parseInt(document.getElementById('tm-m')?.value)||5;sec=parseInt(document.getElementById('tm-s')?.value)||0;document.getElementById('tm-disp').textContent=String(min).padStart(2,'0')+':'+String(sec).padStart(2,'0');document.getElementById('tm-btn').textContent='▶ Mulai';};
+  const renderSW=()=>{activeTab='s';document.getElementById('timer-body').innerHTML=`<div class="timer-big" id="sw-disp">00:00.0</div><div class="timer-ctrl"><button class="btn btn-primary btn-md" id="sw-btn" onclick="swToggle()">▶ Mulai</button><button class="btn btn-sm btn-outline" onclick="swReset()">↺ Reset</button></div><div id="sw-laps" style="max-height:150px;overflow-y:auto;margin-top:.75rem;display:flex;flex-direction:column;gap:.3rem"></div>`;};
+  window.swToggle=()=>{if(swrun){clearInterval(swiv);swrun=false;document.getElementById('sw-btn').textContent='▶ Lanjut';const laps=document.getElementById('sw-laps');const d=document.createElement('div');d.style.cssText='font-family:var(--ff-mono);font-size:.75rem;color:var(--gray);padding:.3rem .6rem;background:var(--bg3);border-radius:4px';d.textContent='Lap: '+document.getElementById('sw-disp').textContent;laps.prepend(d);}else{swrun=true;document.getElementById('sw-btn').textContent='⏸ Stop';swiv=setInterval(()=>{sw+=100;const m=Math.floor(sw/60000),s=Math.floor(sw/1000)%60,ms=Math.floor(sw/100)%10;document.getElementById('sw-disp').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')+'.'+ms;},100);}};
+  window.swReset=()=>{clearInterval(swiv);swrun=false;sw=0;if(document.getElementById('sw-disp'))document.getElementById('sw-disp').textContent='00:00.0';if(document.getElementById('sw-btn'))document.getElementById('sw-btn').textContent='▶ Mulai';};
+  renderTimer();
+}
+
+/* ══ TODO ══ */
+function todoTool(b){
+  // Load todos from Supabase preferences
+  const _u = Auth.getUser();
+  let todos = _u?.preferences?.todos || [];
+  const save=()=>{
+    if(Auth.isLoggedIn()){
+      API.put('/api/auth?action=update_prefs',{todos:todos}).catch(()=>{});
+    }
+  };
+  const draw=()=>{b.innerHTML=`<div style="display:flex;gap:.5rem;margin-bottom:.75rem"><input class="t-minput" id="todo-in" placeholder="Tambah tugas baru..." style="flex:1" onkeydown="if(event.key==='Enter')addTodo()"><button class="btn btn-primary btn-md" onclick="addTodo()">+</button></div><div id="todo-list" style="display:flex;flex-direction:column;gap:.35rem;max-height:280px;overflow-y:auto">${todos.map((t,i)=>`<div style="display:flex;align-items:center;gap:.55rem;padding:.55rem .75rem;background:var(--bg3);border-radius:var(--r2);font-size:.84rem;${t.done?'opacity:.5;text-decoration:line-through':''}"><div onclick="toggleTodo(${i})" style="width:18px;height:18px;border-radius:4px;border:1.5px solid var(--bd2);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:${t.done?'var(--accent)':'none'};border-color:${t.done?'var(--accent)':'var(--bd2)'}">${t.done?'✓':''}</div><span style="flex:1">${t.text}</span><button onclick="delTodo(${i})" style="background:none;border:none;color:var(--gray2);cursor:pointer;font-size:.9rem">✕</button></div>`).join('')}</div><div style="font-family:var(--ff-mono);font-size:.72rem;color:var(--gray2);margin-top:.5rem">${todos.filter(t=>t.done).length}/${todos.length} selesai · <span style="cursor:pointer;color:var(--hot)" onclick="clearDone()">Hapus selesai</span></div>`;};
+  window.addTodo=()=>{const v=document.getElementById('todo-in').value.trim();if(!v)return;todos.push({text:v,done:false});save();draw();};
+  window.toggleTodo=(i)=>{todos[i].done=!todos[i].done;save();draw();};
+  window.delTodo=(i)=>{todos.splice(i,1);save();draw();};
+  window.clearDone=()=>{todos=todos.filter(t=>!t.done);save();draw();};
+  draw();
+}
+
+/* ══ NOTE ══ */
+function noteTool(b){
+  const _nu=Auth.getUser(); const saved=_nu?.preferences?.quicknote||'';
+  b.innerHTML=`<label class="t-mlabel">Catatan Quick (tersimpan otomatis)</label><textarea class="t-minput" id="note-ta" rows="8" placeholder="Ketik catatan kamu disini...">${saved}</textarea><div class="t-mactions"><button class="btn btn-sm btn-primary" onclick="Clipboard.copy(document.getElementById('note-ta').value);Toast.ok('Catatan disalin!')">📋 Salin</button><button class="btn btn-sm btn-outline" onclick="document.getElementById('note-ta').value='';localStorage.removeItem('kizai_quicknote');Toast.ok('Catatan dihapus')">🗑️ Hapus</button></div><div style="font-family:var(--ff-mono);font-size:.65rem;color:var(--gray2);margin-top:.35rem" id="note-info">Karakter: ${saved.length}</div>`;
+  document.getElementById('note-ta').addEventListener('input',function(){
+    document.getElementById('note-info').textContent='Karakter: '+this.value.length+' · Tersimpan ✓';
+    if(Auth.isLoggedIn()){
+      clearTimeout(window._noteSaveTimer);
+      window._noteSaveTimer=setTimeout(()=>{
+        API.put('/api/auth?action=update_prefs',{quicknote:this.value}).catch(()=>{});
+      },1500); // debounce 1.5s
+    }
+  });
+}
+
+/* ══ WORD COUNT ══ */
+function wordCountTool(b){
+  b.innerHTML=`<label class="t-mlabel">Teks Input</label><textarea class="t-minput" id="wc-in" rows="6" placeholder="Paste atau ketik teks disini..." oninput="countWords()"></textarea><div id="wc-out" style="display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-top:.75rem"></div>`;
+  window.countWords=()=>{const t=document.getElementById('wc-in').value;const w=t.trim()?t.trim().split(/\s+/).length:0;const s=t.split(/[.!?]+/).filter(Boolean).length;const p=t.split(/\n\n+/).filter(Boolean).length;const rt=Math.ceil(w/200);document.getElementById('wc-out').innerHTML=[['Kata',w,'var(--accent)'],['Karakter',t.length,'var(--cyan)'],['Karakter (no spasi)',t.replace(/\s/g,'').length,'var(--white)'],['Kalimat',s,'var(--green)'],['Paragraf',p||1,'var(--amber)'],['Waktu Baca',rt+'m','var(--gray)']].map(([l,v,c])=>`<div style="background:var(--bg3);border-radius:var(--r2);padding:.7rem;text-align:center"><div style="font-family:var(--ff-display);font-weight:700;font-size:1.25rem;color:${c}">${v}</div><div style="font-family:var(--ff-mono);font-size:.62rem;color:var(--gray2);text-transform:uppercase;margin-top:.1rem">${l}</div></div>`).join('');};
+}
+
+/* ══ POMODORO ══ */
+function pomodoroTool(b){
+  const sessions=[25,5,25,5,25,5,25,15];const labels=['Fokus','Istirahat','Fokus','Istirahat','Fokus','Istirahat','Fokus','Istirahat Panjang'];
+  let sIdx=0,sec=sessions[0]*60,running=false,iv;
+  const draw=()=>{b.innerHTML=`<div style="font-family:var(--ff-mono);font-size:.72rem;text-align:center;color:var(--accent);margin-bottom:.35rem;text-transform:uppercase;letter-spacing:.12em">${labels[sIdx]} — Sesi ${Math.floor(sIdx/2)+1}/4</div><div class="timer-big" id="pom-disp">${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}</div><div style="width:100%;height:4px;background:var(--bd2);border-radius:100px;margin:.5rem 0"><div style="height:100%;background:var(--accent);border-radius:100px;transition:width 1s;width:${((sessions[sIdx]*60-sec)/(sessions[sIdx]*60)*100)}%"></div></div><div class="timer-ctrl"><button class="btn btn-primary btn-md" id="pom-btn" onclick="pomToggle()">▶ Mulai</button><button class="btn btn-sm btn-outline" onclick="pomSkip()">⏭ Skip</button><button class="btn btn-sm btn-ghost" onclick="pomReset()">↺</button></div>`;};
+  window.pomToggle=()=>{if(running){clearInterval(iv);running=false;document.getElementById('pom-btn').textContent='▶ Lanjut';}else{running=true;document.getElementById('pom-btn').textContent='⏸ Pause';iv=setInterval(()=>{sec--;if(sec<=0){clearInterval(iv);running=false;Toast.ok('🍅 '+labels[sIdx]+' selesai!');sIdx=(sIdx+1)%sessions.length;sec=sessions[sIdx]*60;}draw();},1000);}};
+  window.pomSkip=()=>{clearInterval(iv);running=false;sIdx=(sIdx+1)%sessions.length;sec=sessions[sIdx]*60;draw();};
+  window.pomReset=()=>{clearInterval(iv);running=false;sIdx=0;sec=sessions[0]*60;draw();};
+  draw();
+}
+
+/* ══ CASE CONVERTER ══ */
+function caseTool(b){
+  b.innerHTML=`<label class="t-mlabel">Teks Input</label><textarea class="t-minput" id="case-in" rows="3" placeholder="Masukkan teks..."></textarea><div class="t-mactions">${['UPPER','lower','Title','Sentence','camelCase','snake_case','kebab-case'].map(c=>`<button class="btn btn-sm btn-secondary" onclick="convertCase('${c}')">${c}</button>`).join('')}</div><div id="case-out" style="margin-top:.75rem"></div>`;
+  window.convertCase=(type)=>{const t=document.getElementById('case-in').value;const fns={UPPER:s=>s.toUpperCase(),lower:s=>s.toLowerCase(),Title:s=>s.replace(/\b\w/g,c=>c.toUpperCase()),Sentence:s=>s.charAt(0).toUpperCase()+s.slice(1).toLowerCase(),camelCase:s=>s.replace(/[-_\s]+(.)?/g,(_,c)=>c?c.toUpperCase():''),snake_case:s=>s.replace(/[\s-]+/g,'_').toLowerCase(),'kebab-case':s=>s.replace(/[\s_]+/g,'-').toLowerCase()};const r=fns[type]?fns[type](t):t;document.getElementById('case-out').innerHTML=`<div class="t-mresult" onclick="Clipboard.copy(this.textContent.replace(this.querySelector('.t-mresult-lbl').textContent,''));Toast.ok('Disalin!')">${r}<div class="t-mresult-lbl">Klik salin</div></div>`;};
+}
+
+/* ══ LOREM IPSUM ══ */
+function loremTool(b){
+  const LOREM=['Lorem ipsum dolor sit amet, consectetur adipiscing elit.','Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.','Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.','Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.','Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.'];
+  b.innerHTML=`<div class="t-mrow"><div><label class="t-mlabel">Paragraf</label><input class="t-minput" id="lor-n" type="number" value="2" min="1" max="10"></div><div><label class="t-mlabel">Tipe</label><select class="t-minput" id="lor-t"><option>Paragraf</option><option>Kalimat</option><option>Kata</option></select></div></div><div class="t-mactions"><button class="btn btn-primary btn-md" onclick="genLorem()">Generate</button></div><div id="lor-out" style="margin-top:.75rem"></div>`;
+  window.genLorem=()=>{const n=parseInt(document.getElementById('lor-n').value)||2,t=document.getElementById('lor-t').value;let r='';if(t==='Paragraf'){for(let i=0;i<n;i++)r+=LOREM.join(' ')+'\n\n';}else if(t==='Kalimat'){const all=Array(n).fill(0).map((_,i)=>LOREM[i%LOREM.length]);r=all.join(' ');}else{r=LOREM.join(' ').split(/\s+/).slice(0,n*20).join(' ');}document.getElementById('lor-out').innerHTML=`<div class="t-mresult" style="cursor:pointer;max-height:200px;overflow-y:auto" onclick="Clipboard.copy(this.textContent);Toast.ok('Teks disalin!')">${r.trim()}<div class="t-mresult-lbl">Klik salin</div></div>`;};
+}
+
+/* ══ TEXT DIFF ══ */
+function diffTool(b){
+  b.innerHTML=`<div class="t-mrow"><div><label class="t-mlabel">Teks A</label><textarea class="t-minput" id="diff-a" rows="4" placeholder="Teks asli..."></textarea></div><div><label class="t-mlabel">Teks B</label><textarea class="t-minput" id="diff-b" rows="4" placeholder="Teks baru..."></textarea></div></div><button class="btn btn-primary btn-md" style="margin-top:.65rem" onclick="doDiff()">🔍 Bandingkan</button><div id="diff-out" style="margin-top:.75rem"></div>`;
+  window.doDiff=()=>{const a=document.getElementById('diff-a').value.split('\n'),b_=document.getElementById('diff-b').value.split('\n');const max=Math.max(a.length,b_.length);let html='';for(let i=0;i<max;i++){const la=a[i]??'',lb=b_[i]??'';if(la===lb)html+=`<div style="font-family:var(--ff-mono);font-size:.78rem;padding:.25rem .5rem;border-radius:4px">${la||'&nbsp;'}</div>`;else{if(la)html+=`<div style="background:rgba(239,68,68,.1);border-left:3px solid var(--hot);padding:.25rem .5rem;font-family:var(--ff-mono);font-size:.78rem;color:var(--hot)">− ${la}</div>`;if(lb)html+=`<div style="background:rgba(34,197,94,.1);border-left:3px solid var(--green);padding:.25rem .5rem;font-family:var(--ff-mono);font-size:.78rem;color:var(--green)">+ ${lb}</div>`;}}document.getElementById('diff-out').innerHTML=`<div style="background:var(--bg3);border-radius:var(--r2);padding:.75rem;max-height:250px;overflow-y:auto">${html}</div>`;};
+}
+
+/* ══ BASE64 ══ */
+function base64Tool(b){
+  b.innerHTML=`<label class="t-mlabel">Input</label><textarea class="t-minput" id="b64-in" rows="3" placeholder="Teks atau Base64..."></textarea><div class="t-mactions"><button class="btn btn-primary btn-md" onclick="doB64('enc')">🔒 Encode</button><button class="btn btn-sm btn-secondary" onclick="doB64('dec')">🔓 Decode</button></div><div id="b64-out" style="margin-top:.75rem"></div>`;
+  window.doB64=(m)=>{const v=document.getElementById('b64-in').value;try{const r=m==='enc'?btoa(unescape(encodeURIComponent(v))):decodeURIComponent(escape(atob(v)));document.getElementById('b64-out').innerHTML=`<div class="t-mresult" style="font-family:var(--ff-mono);font-size:.78rem;word-break:break-all;cursor:pointer" onclick="Clipboard.copy(this.textContent);Toast.ok('Disalin!')">${r}<div class="t-mresult-lbl">Klik salin</div></div>`;}catch(e){Toast.err('Format tidak valid');}};
+}
+
+/* ══ URL ENCODE ══ */
+function urlEncodeTool(b){
+  b.innerHTML=`<label class="t-mlabel">Input</label><input class="t-minput" id="url-in" placeholder="URL atau teks..."><div class="t-mactions"><button class="btn btn-primary btn-md" onclick="doUrl('enc')">🔗 Encode</button><button class="btn btn-sm btn-secondary" onclick="doUrl('dec')">🔓 Decode</button></div><div id="url-out" style="margin-top:.75rem"></div>`;
+  window.doUrl=(m)=>{const v=document.getElementById('url-in').value;try{const r=m==='enc'?encodeURIComponent(v):decodeURIComponent(v);document.getElementById('url-out').innerHTML=`<div class="t-mresult" style="font-family:var(--ff-mono);font-size:.82rem;word-break:break-all;cursor:pointer" onclick="Clipboard.copy(this.textContent);Toast.ok('Disalin!')">${r}<div class="t-mresult-lbl">Klik salin</div></div>`;}catch(e){Toast.err('Format tidak valid');}};
+}
+
+/* ══ UNIT CONVERT ══ */
+function unitTool(b){
+  const cats={Panjang:{m:1,km:0.001,cm:100,mm:1000,in:39.37,ft:3.281,yd:1.094,mi:0.000621},Berat:{kg:1,g:1000,mg:1e6,lb:2.205,oz:35.274,ton:0.001},Suhu:'special',Volume:{L:1,mL:1000,m3:0.001,gal:0.264,fl_oz:33.814},Kecepatan:{mps:1,'km/h':3.6,mph:2.237,knot:1.944}};
+  b.innerHTML=`<div class="t-mrow"><div><label class="t-mlabel">Kategori</label><select class="t-minput" id="uc-cat" onchange="renderUC()">${Object.keys(cats).map(c=>`<option>${c}</option>`).join('')}</select></div><div><label class="t-mlabel">Nilai</label><input class="t-minput" id="uc-val" type="number" value="1" oninput="calcUC()"></div></div><div class="t-mrow" style="margin-top:.5rem"><div><label class="t-mlabel">Dari</label><select class="t-minput" id="uc-from" onchange="calcUC()"></select></div><div><label class="t-mlabel">Ke</label><select class="t-minput" id="uc-to" onchange="calcUC()"></select></div></div><div class="t-mresult" id="uc-res" style="font-family:var(--ff-mono);font-size:1.1rem;text-align:center;margin-top:.75rem"></div>`;
+  window.renderUC=()=>{const cat=document.getElementById('uc-cat').value,c=cats[cat];if(c==='special'){document.getElementById('uc-from').innerHTML=['°C','°F','K'].map(u=>`<option>${u}</option>`).join('');document.getElementById('uc-to').innerHTML=['°C','°F','K'].map(u=>`<option>  ${u}</option>`).join('');}else{const units=Object.keys(c);document.getElementById('uc-from').innerHTML=units.map(u=>`<option>${u}</option>`).join('');document.getElementById('uc-to').innerHTML=units.map((u,i)=>`<option${i===1?' selected':''}>${u}</option>`).join('');}calcUC();};
+  window.calcUC=()=>{const cat=document.getElementById('uc-cat').value,v=parseFloat(document.getElementById('uc-val').value)||0,f=document.getElementById('uc-from').value.trim(),t=document.getElementById('uc-to').value.trim(),c=cats[cat];let r;if(c==='special'){if(f==='°C'&&t==='°F')r=v*9/5+32;else if(f==='°F'&&t==='°C')r=(v-32)*5/9;else if(f==='°C'&&t==='K')r=v+273.15;else if(f==='K'&&t==='°C')r=v-273.15;else if(f==='°F'&&t==='K')r=(v-32)*5/9+273.15;else if(f==='K'&&t==='°F')r=(v-273.15)*9/5+32;else r=v;}else r=v/c[f]*c[t];document.getElementById('uc-res').textContent=`${v} ${f} = ${parseFloat(r.toFixed(6))} ${t}`;};
+  window.renderUC();
+}
+
+/* ══ NUMBER BASE ══ */
+function numBaseTool(b){
+  b.innerHTML=`<label class="t-mlabel">Masukkan Angka</label><input class="t-minput" id="nb-in" placeholder="Contoh: 255" oninput="convBase()"><label class="t-mlabel" style="margin-top:.6rem">Basis Input</label><select class="t-minput" id="nb-from" onchange="convBase()"><option value="10">Desimal (10)</option><option value="2">Biner (2)</option><option value="8">Oktal (8)</option><option value="16">Heksadesimal (16)</option></select><div id="nb-out" style="margin-top:.75rem;display:flex;flex-direction:column;gap:.4rem"></div>`;
+  window.convBase=()=>{const v=document.getElementById('nb-in').value.trim(),from=parseInt(document.getElementById('nb-from').value);const n=parseInt(v,from);if(isNaN(n)){document.getElementById('nb-out').innerHTML='<div style="color:var(--hot);font-size:.82rem">Input tidak valid</div>';return;}document.getElementById('nb-out').innerHTML=[['Desimal',n.toString(10),'10'],['Biner',n.toString(2),'2'],['Oktal',n.toString(8),'8'],['Hex',n.toString(16).toUpperCase(),'16']].map(([l,v,base])=>`<div class="t-mresult" style="display:flex;justify-content:space-between;font-family:var(--ff-mono);font-size:.82rem;cursor:pointer" onclick="Clipboard.copy('${v}');Toast.ok('${l} disalin!')"><span style="color:var(--gray)">${l} (${base})</span><span style="color:var(--accent)">${v}</span><div class="t-mresult-lbl">Salin</div></div>`).join('');};
+}
+
+/* ══ TIME ZONE ══ */
+function timeZoneTool(b){
+  const TZ={WIB:'Asia/Jakarta',WITA:'Asia/Makassar',WIT:'Asia/Jayapura','UTC':'UTC',SGT:'Asia/Singapore',JST:'Asia/Tokyo',EST:'America/New_York',PST:'America/Los_Angeles',GMT:'Europe/London',CET:'Europe/Paris'};
+  b.innerHTML=`<label class="t-mlabel">Waktu Lokal</label><input class="t-minput" type="datetime-local" id="tz-in" onchange="convTZ()"><div class="t-mrow" style="margin-top:.5rem"><div><label class="t-mlabel">Dari Zona</label><select class="t-minput" id="tz-from" onchange="convTZ()">${Object.keys(TZ).map(t=>`<option${t==='WIB'?' selected':''}>${t}</option>`).join('')}</select></div><div><label class="t-mlabel">Ke Zona</label><select class="t-minput" id="tz-to" onchange="convTZ()">${Object.keys(TZ).map(t=>`<option${t==='UTC'?' selected':''}>${t}</option>`).join('')}</select></div></div><div id="tz-result" style="margin-top:.75rem"></div>`;
+  // Set current time
+  const now=new Date();document.getElementById('tz-in').value=now.toISOString().slice(0,16);
+  window.convTZ=()=>{const v=document.getElementById('tz-in').value;const f=document.getElementById('tz-from').value,t=document.getElementById('tz-to').value;if(!v)return;try{const d=new Date(v);const r=d.toLocaleString('id-ID',{timeZone:TZ[t],weekday:'long',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'});document.getElementById('tz-result').innerHTML=`<div class="t-mresult" style="font-size:.88rem">${f} → ${t}<br><strong style="color:var(--accent)">${r}</strong></div>`;}catch(e){Toast.err('Format waktu tidak valid');}};
+  window.convTZ();
+}
+
+/* ══ ROMAN ══ */
+function romanTool(b){
+  const toRoman=n=>{const v=[1000,900,500,400,100,90,50,40,10,9,5,4,1];const s=['M','CM','D','CD','C','XC','L','XL','X','IX','V','IV','I'];let r='';v.forEach((val,i)=>{while(n>=val){r+=s[i];n-=val;}});return r;};
+  const fromRoman=s=>{const m={I:1,V:5,X:10,L:50,C:100,D:500,M:1000};let r=0;for(let i=0;i<s.length;i++){const c=m[s[i]],n=m[s[i+1]];if(n&&c<n)r-=c;else r+=c;}return r;};
+  b.innerHTML=`<div class="t-mrow"><div><label class="t-mlabel">Angka → Romawi</label><input class="t-minput" id="ro-num" type="number" placeholder="1-3999" oninput="conv2R()"><div id="ro-r" style="font-family:var(--ff-display);font-weight:800;font-size:1.8rem;text-align:center;color:var(--accent);margin:.5rem 0;min-height:2.5rem"></div></div><div><label class="t-mlabel">Romawi → Angka</label><input class="t-minput" id="ro-rom" placeholder="Contoh: XIV" style="text-transform:uppercase" oninput="this.value=this.value.toUpperCase();conv2N()"><div id="ro-n" style="font-family:var(--ff-display);font-weight:800;font-size:1.8rem;text-align:center;color:var(--cyan);margin:.5rem 0;min-height:2.5rem"></div></div></div>`;
+  window.conv2R=()=>{const n=parseInt(document.getElementById('ro-num').value);document.getElementById('ro-r').textContent=n>0&&n<4000?toRoman(n):'—';};
+  window.conv2N=()=>{const s=document.getElementById('ro-rom').value;document.getElementById('ro-n').textContent=s?fromRoman(s)||'—':'—';};
+}
+
+/* ══ JSON FORMATTER ══ */
+function jsonFmtTool(b){
+  b.innerHTML=`<label class="t-mlabel">JSON Input</label><textarea class="t-minput" id="json-in" rows="5" placeholder='{"key": "value", "num": 42}'></textarea><div class="t-mactions"><button class="btn btn-primary btn-md" onclick="fmtJSON()">✨ Format</button><button class="btn btn-sm btn-secondary" onclick="minJSON()">⚡ Minify</button><button class="btn btn-sm btn-outline" onclick="validateJSON()">✅ Validasi</button></div><div id="json-out" style="margin-top:.75rem"></div>`;
+  window.fmtJSON=()=>{try{const v=JSON.parse(document.getElementById('json-in').value);const r=JSON.stringify(v,null,2);document.getElementById('json-out').innerHTML=`<pre class="t-mresult" style="font-family:var(--ff-mono);font-size:.78rem;overflow-x:auto;max-height:250px;cursor:pointer" onclick="Clipboard.copy(this.textContent);Toast.ok('JSON disalin!')">${r}<div class="t-mresult-lbl">Klik salin</div></pre>`;}catch(e){document.getElementById('json-out').innerHTML=`<div style="color:var(--hot);font-size:.82rem;font-family:var(--ff-mono)">❌ ${e.message}</div>`;}};
+  window.minJSON=()=>{try{const r=JSON.stringify(JSON.parse(document.getElementById('json-in').value));document.getElementById('json-out').innerHTML=`<div class="t-mresult" style="font-family:var(--ff-mono);font-size:.78rem;word-break:break-all;cursor:pointer" onclick="Clipboard.copy(this.textContent);Toast.ok('Disalin!')">${r}<div class="t-mresult-lbl">Klik salin</div></div>`;}catch(e){Toast.err('JSON tidak valid');}};
+  window.validateJSON=()=>{try{JSON.parse(document.getElementById('json-in').value);document.getElementById('json-out').innerHTML=`<div style="color:var(--green);font-family:var(--ff-mono);font-size:.82rem">✅ JSON valid!</div>`;}catch(e){document.getElementById('json-out').innerHTML=`<div style="color:var(--hot);font-family:var(--ff-mono);font-size:.82rem">❌ ${e.message}</div>`;}};
+}
+
+/* ══ REGEX TESTER ══ */
+function regexTool(b){
+  b.innerHTML=`<label class="t-mlabel">Pattern Regex</label><div style="display:flex;gap:.4rem"><span style="font-family:var(--ff-mono);font-size:1rem;color:var(--gray2);align-self:center">/</span><input class="t-minput" id="rx-pat" placeholder="[a-z]+\\.com" style="flex:1;font-family:var(--ff-mono)" oninput="testRegex()"><span style="font-family:var(--ff-mono);font-size:1rem;color:var(--gray2);align-self:center">/</span><input class="t-minput" id="rx-flag" value="gi" style="width:60px;font-family:var(--ff-mono);text-align:center" oninput="testRegex()"></div><label class="t-mlabel" style="margin-top:.6rem">Teks Test</label><textarea class="t-minput" id="rx-txt" rows="4" placeholder="Teks yang ingin ditest..." oninput="testRegex()"></textarea><div id="rx-out" style="margin-top:.75rem"></div>`;
+  window.testRegex=()=>{const pat=document.getElementById('rx-pat').value,flag=document.getElementById('rx-flag').value,txt=document.getElementById('rx-txt').value;if(!pat){document.getElementById('rx-out').innerHTML='';return;}try{const rx=new RegExp(pat,flag);const matches=[...txt.matchAll(rx)];const hl=txt.replace(rx,m=>`<mark style="background:rgba(var(--accent-rgb),.3);color:var(--accent);border-radius:2px">${m}</mark>`);document.getElementById('rx-out').innerHTML=`<div style="font-family:var(--ff-mono);font-size:.72rem;color:var(--green);margin-bottom:.5rem">✅ ${matches.length} match ditemukan</div><div style="background:var(--bg3);border-radius:var(--r2);padding:.75rem;font-size:.82rem;line-height:1.75;word-break:break-word">${hl||'(tidak ada teks)'}</div>`;}catch(e){document.getElementById('rx-out').innerHTML=`<div style="color:var(--hot);font-size:.82rem;font-family:var(--ff-mono)">❌ ${e.message}</div>`;}};
+}
+
+/* ══ MINIFIER ══ */
+function minifyTool(b){
+  b.innerHTML=`<label class="t-mlabel">Tipe</label><select class="t-minput" id="min-type" style="margin-bottom:.6rem"><option>CSS</option><option>JavaScript</option></select><label class="t-mlabel">Input</label><textarea class="t-minput" id="min-in" rows="5" placeholder="Paste CSS atau JS disini..."></textarea><div class="t-mactions"><button class="btn btn-primary btn-md" onclick="doMinify()">⚡ Minify</button></div><div id="min-out" style="margin-top:.75rem"></div>`;
+  window.doMinify=()=>{const v=document.getElementById('min-in').value,type=document.getElementById('min-type').value;let r=v.replace(/\/\*[\s\S]*?\*\//g,'').replace(/\/\/.*/g,'').replace(/\s+/g,' ').replace(/\s*([{}:;,])\s*/g,'$1').replace(/;}/g,'}').trim();document.getElementById('min-out').innerHTML=`<div style="font-family:var(--ff-mono);font-size:.7rem;color:var(--green);margin-bottom:.5rem">✅ ${v.length}→${r.length} karakter (${Math.round((1-r.length/v.length)*100)}% lebih kecil)</div><div class="t-mresult" style="font-family:var(--ff-mono);font-size:.75rem;word-break:break-all;cursor:pointer;max-height:200px;overflow-y:auto" onclick="Clipboard.copy(this.textContent);Toast.ok('Disalin!')">${r}<div class="t-mresult-lbl">Klik salin</div></div>`;};
+}
+
+/* ══ AI TOOLS ══ */
+function aiWriterTool(b){
+  b.innerHTML=`<label class="t-mlabel">Topik atau Judul</label><input class="t-minput" id="aw-topic" placeholder="Contoh: Manfaat olahraga pagi hari"><label class="t-mlabel" style="margin-top:.6rem">Gaya Penulisan</label><select class="t-minput" id="aw-style"><option>Formal dan profesional</option><option>Santai dan friendly</option><option>Persuasif dan menarik</option><option>Edukatif dan informatif</option></select><label class="t-mlabel" style="margin-top:.6rem">Panjang</label><select class="t-minput" id="aw-len"><option>Singkat (1 paragraf)</option><option>Sedang (3-4 paragraf)</option><option>Panjang (5+ paragraf)</option></select><div class="t-mactions"><button class="btn btn-primary btn-md" onclick="runAIWriter()">✍️ Tulis dengan AI</button></div>`;
+  window.runAIWriter=()=>{const t=document.getElementById('aw-topic').value,s=document.getElementById('aw-style').value,l=document.getElementById('aw-len').value;if(!t){Toast.warn('Masukkan topik dulu');return;}callAI(`Tulis artikel tentang "${t}" dengan gaya ${s}, panjang ${l}. Gunakan Bahasa Indonesia yang baik.`,b);};
+}
+
+function aiSummaryTool(b){
+  b.innerHTML=`<label class="t-mlabel">Teks yang Ingin Diringkas</label><textarea class="t-minput" id="sum-in" rows="6" placeholder="Paste artikel atau teks panjang disini..."></textarea><label class="t-mlabel" style="margin-top:.6rem">Format Output</label><select class="t-minput" id="sum-fmt"><option>Poin-poin utama</option><option>Paragraf ringkas</option><option>3 kalimat saja</option></select><div class="t-mactions"><button class="btn btn-primary btn-md" onclick="runSummary()">📄 Ringkas dengan AI</button></div>`;
+  window.runSummary=()=>{const t=document.getElementById('sum-in').value,f=document.getElementById('sum-fmt').value;if(!t){Toast.warn('Masukkan teks dulu');return;}callAI(`Ringkas teks berikut dalam format ${f}: \n\n${t}`,b);};
+}
+
+function aiTranslateTool(b){
+  b.innerHTML=`<label class="t-mlabel">Teks Input</label><textarea class="t-minput" id="tr-in" rows="4" placeholder="Masukkan teks yang ingin diterjemahkan..."></textarea><div class="t-mrow" style="margin-top:.6rem"><div><label class="t-mlabel">Dari</label><select class="t-minput" id="tr-from"><option>Indonesia</option><option>Inggris</option><option>Arab</option><option>Mandarin</option><option>Jepang</option><option>Korea</option><option>Prancis</option><option>Jerman</option><option>Spanyol</option></select></div><div><label class="t-mlabel">Ke</label><select class="t-minput" id="tr-to"><option value="Inggris">Inggris</option><option value="Indonesia">Indonesia</option><option>Arab</option><option>Mandarin</option><option>Jepang</option><option>Korea</option></select></div></div><div class="t-mactions"><button class="btn btn-primary btn-md" onclick="runTranslate()">🌐 Terjemahkan</button></div>`;
+  window.runTranslate=()=>{const t=document.getElementById('tr-in').value,f=document.getElementById('tr-from').value,to=document.getElementById('tr-to').value;if(!t){Toast.warn('Masukkan teks dulu');return;}callAI(`Terjemahkan teks berikut dari bahasa ${f} ke bahasa ${to}. Hanya tampilkan hasil terjemahan, tanpa penjelasan tambahan:\n\n${t}`,b);};
+}
+
+function aiGrammarTool(b){
+  b.innerHTML=`<label class="t-mlabel">Teks yang Ingin Diperbaiki</label><textarea class="t-minput" id="gr-in" rows="5" placeholder="Masukkan teks dengan kesalahan tata bahasa..."></textarea><label class="t-mlabel" style="margin-top:.6rem">Bahasa</label><select class="t-minput" id="gr-lang"><option>Indonesia</option><option>Inggris</option></select><div class="t-mactions"><button class="btn btn-primary btn-md" onclick="runGrammar()">✅ Perbaiki Teks</button></div>`;
+  window.runGrammar=()=>{const t=document.getElementById('gr-in').value,l=document.getElementById('gr-lang').value;if(!t){Toast.warn('Masukkan teks dulu');return;}callAI(`Perbaiki tata bahasa dan ejaan teks ${l} berikut. Tampilkan teks yang sudah diperbaiki saja:\n\n${t}`,b);};
+}
+
+function aiEmailTool(b){
+  b.innerHTML=`<label class="t-mlabel">Tujuan Email</label><input class="t-minput" id="em-to" placeholder="Contoh: Melamar pekerjaan sebagai developer"><label class="t-mlabel" style="margin-top:.6rem">Nada</label><select class="t-minput" id="em-tone"><option>Formal dan profesional</option><option>Ramah dan santai</option><option>Tegas dan singkat</option></select><div class="t-mactions"><button class="btn btn-primary btn-md" onclick="runEmail()">📧 Buat Email</button></div>`;
+  window.runEmail=()=>{const t=document.getElementById('em-to').value,tone=document.getElementById('em-tone').value;if(!t){Toast.warn('Isi tujuan email dulu');return;}callAI(`Buat email dalam Bahasa Indonesia dengan nada ${tone} untuk: ${t}. Sertakan Subject, Salam, Isi, dan Penutup.`,b);};
+}
+
+function aiCaptionTool(b){
+  b.innerHTML=`<label class="t-mlabel">Deskripsi Konten / Foto</label><input class="t-minput" id="cap-desc" placeholder="Contoh: Foto sunset di pantai Bali"><label class="t-mlabel" style="margin-top:.6rem">Platform</label><select class="t-minput" id="cap-plat"><option>Instagram</option><option>TikTok</option><option>Twitter/X</option><option>LinkedIn</option></select><label class="t-mlabel" style="margin-top:.6rem">Jumlah Opsi</label><select class="t-minput" id="cap-n"><option>3 opsi</option><option>5 opsi</option></select><div class="t-mactions"><button class="btn btn-primary btn-md" onclick="runCaption()">📸 Generate Caption</button></div>`;
+  window.runCaption=()=>{const d=document.getElementById('cap-desc').value,p=document.getElementById('cap-plat').value,n=document.getElementById('cap-n').value;if(!d){Toast.warn('Isi deskripsi dulu');return;}callAI(`Buat ${n} caption ${p} dalam Bahasa Indonesia untuk: ${d}. Tambahkan emoji yang relevan dan hashtag yang tepat.`,b);};
+}
+
+function aiSloganTool(b){
+  b.innerHTML=`<label class="t-mlabel">Nama Bisnis / Produk</label><input class="t-minput" id="sl-name" placeholder="Contoh: KizAi, BaksoKang, Warung Kopi Nusantara"><label class="t-mlabel" style="margin-top:.6rem">Deskripsi Singkat</label><input class="t-minput" id="sl-desc" placeholder="Platform AI untuk Indonesia"><div class="t-mactions"><button class="btn btn-primary btn-md" onclick="runSlogan()">💬 Generate Slogan</button></div>`;
+  window.runSlogan=()=>{const n=document.getElementById('sl-name').value,d=document.getElementById('sl-desc').value;if(!n){Toast.warn('Isi nama bisnis dulu');return;}callAI(`Buat 5 slogan/tagline kreatif dan memorable dalam Bahasa Indonesia untuk "${n}" (${d||'bisnis baru'}). Buat yang singkat, menarik, dan mudah diingat.`,b);};
+}
+
+function aiStoryTool(b){
+  b.innerHTML=`<label class="t-mlabel">Genre</label><select class="t-minput" id="st-genre"><option>Petualangan</option><option>Romantis</option><option>Horror</option><option>Komedi</option><option>Sci-Fi</option><option>Fantasi</option></select><label class="t-mlabel" style="margin-top:.6rem">Karakter Utama</label><input class="t-minput" id="st-char" placeholder="Contoh: Seorang mahasiswa bernama Dito"><label class="t-mlabel" style="margin-top:.6rem">Setting</label><input class="t-minput" id="st-set" placeholder="Contoh: Jakarta tahun 2050"><div class="t-mactions"><button class="btn btn-primary btn-md" onclick="runStory()">📖 Generate Cerita</button></div>`;
+  window.runStory=()=>{const g=document.getElementById('st-genre').value,c=document.getElementById('st-char').value,s=document.getElementById('st-set').value;callAI(`Tulis cerita pendek genre ${g} dalam Bahasa Indonesia${c?` dengan karakter utama: ${c}`:''}${s?` berlatar di: ${s}`:''}. Buat cerita yang menarik dengan alur yang jelas.`,b);};
+}
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('t-modal').classList.contains('open'))closeTool();});
+document.getElementById('t-modal').addEventListener('click',e=>{if(e.target===document.getElementById('t-modal'))closeTool();});
+
+/* ═══ TAMBAHAN TOOLS ══════════════════════════════════════════ */
+
+function markdownTool(b){b.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div><div class="t-mlabel">Markdown Input</div><textarea class="t-minput" id="md-in" style="height:200px;font-family:var(--ff-mono);font-size:.8rem" placeholder="# Judul\n\n**Bold**, *italic*, [link](url)\n\n- Item 1\n- Item 2" oninput="mdPrev()"></textarea></div><div><div class="t-mlabel">Preview</div><div id="md-out" style="background:var(--bg2);border:1px solid var(--bd);border-radius:8px;padding:12px;min-height:200px;font-size:.85rem;line-height:1.7"></div></div></div>`;window.mdPrev=()=>{let t=document.getElementById('md-in').value;t=t.replace(/^### (.+)$/gm,'<h3 style="font-family:var(--ff-display);font-weight:700;margin:.5rem 0">$1</h3>').replace(/^## (.+)$/gm,'<h2 style="font-family:var(--ff-display);font-weight:800;margin:.6rem 0">$1</h2>').replace(/^# (.+)$/gm,'<h1 style="font-family:var(--ff-display);font-weight:900;margin:.7rem 0">$1</h1>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>').replace(/`(.+?)`/g,'<code style="background:var(--bg3);padding:1px 6px;border-radius:4px;font-family:var(--ff-mono);font-size:.82em">$1</code>').replace(/\[(.+?)\]\((.+?)\)/g,'<a href="$2" style="color:var(--accent)">$1</a>').replace(/^- (.+)$/gm,'<li style="margin:.2rem 0">$1</li>').replace(/^\d+\. (.+)$/gm,'<li style="margin:.2rem 0">$1</li>').replace(/\n/g,'<br>');document.getElementById('md-out').innerHTML=t;};}
+
+function charCountTool(b){b.innerHTML=`<textarea class="t-minput" id="cc-in" style="height:140px" placeholder="Ketik atau tempel teks di sini..." oninput="ccUpdate()"></textarea><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px" id="cc-stats"><div class="t-mstat"><div class="t-mstat-val">0</div><div class="t-mstat-lbl">Karakter</div></div><div class="t-mstat"><div class="t-mstat-val">0</div><div class="t-mstat-lbl">Kata</div></div><div class="t-mstat"><div class="t-mstat-val">0</div><div class="t-mstat-lbl">Kalimat</div></div><div class="t-mstat"><div class="t-mstat-val">0</div><div class="t-mstat-lbl">Paragraf</div></div></div>`;window.ccUpdate=()=>{const t=document.getElementById('cc-in').value;const stats=document.querySelectorAll('#cc-stats .t-mstat-val');stats[0].textContent=t.length;stats[1].textContent=t.trim()?t.trim().split(/\s+/).length:0;stats[2].textContent=t.trim()?t.split(/[.!?]+/).filter(s=>s.trim()).length:0;stats[3].textContent=t.trim()?t.split(/\n\n+/).filter(s=>s.trim()).length:0;};}
+
+function textReverseTool(b){b.innerHTML=`<textarea class="t-minput" id="trrev-in" style="height:100px" placeholder="Masukkan teks..."></textarea><div style="display:flex;gap:6px;margin:.7rem 0;flex-wrap:wrap"><button class="btn btn-sm btn-primary" onclick="trApply('rev')">↩ Balik Karakter</button><button class="btn btn-sm btn-secondary" onclick="trApply('revword')">↩ Balik Kata</button><button class="btn btn-sm btn-secondary" onclick="trApply('revline')">↩ Balik Baris</button></div><div class="t-mresult" id="tr-out" onclick="Clipboard.copy(document.getElementById('tr-out').textContent);Toast.ok('Disalin!')"></div>`;window.trApply=m=>{let t=document.getElementById('trrev-in').value;if(!t){Toast.warn('Masukkan teks!');return;}let r='';if(m==='rev')r=[...t].reverse().join('');else if(m==='revword')r=t.split(' ').reverse().join(' ');else r=t.split('\n').reverse().join('\n');document.getElementById('tr-out').textContent=r;};}
+
+function lineSortTool(b){b.innerHTML=`<textarea class="t-minput" id="ls-in" style="height:120px" placeholder="Baris 1&#10;Baris 3&#10;Baris 2"></textarea><div style="display:flex;gap:6px;margin:.7rem 0;flex-wrap:wrap"><button class="btn btn-sm btn-primary" onclick="lsApply('az')">A→Z</button><button class="btn btn-sm btn-secondary" onclick="lsApply('za')">Z→A</button><button class="btn btn-sm btn-secondary" onclick="lsApply('len')">Panjang</button><button class="btn btn-sm btn-secondary" onclick="lsApply('rand')">🔀 Acak</button></div><textarea class="t-minput" id="ls-out" style="height:120px" readonly></textarea>`;window.lsApply=m=>{const lines=document.getElementById('ls-in').value.split('\n');let sorted;if(m==='az')sorted=[...lines].sort((a,b)=>a.localeCompare(b));else if(m==='za')sorted=[...lines].sort((a,b)=>b.localeCompare(a));else if(m==='len')sorted=[...lines].sort((a,b)=>a.length-b.length);else sorted=[...lines].sort(()=>Math.random()-.5);document.getElementById('ls-out').value=sorted.join('\n');};}
+
+function removeDupTool(b){b.innerHTML=`<textarea class="t-minput" id="rd-in" style="height:120px" placeholder="Baris 1&#10;Baris 2&#10;Baris 1&#10;Baris 3"></textarea><button class="btn btn-sm btn-primary" style="margin:.7rem 0" onclick="rdApply()">🗑️ Hapus Duplikat</button><div class="t-mlabel" id="rd-info"></div><textarea class="t-minput" id="rd-out" style="height:120px" readonly></textarea>`;window.rdApply=()=>{const lines=document.getElementById('rd-in').value.split('\n');const unique=[...new Set(lines)];document.getElementById('rd-out').value=unique.join('\n');document.getElementById('rd-info').textContent=`Dihapus: ${lines.length-unique.length} duplikat`;};}
+
+function textExtractTool(b){b.innerHTML=`<textarea class="t-minput" id="te-in" style="height:120px" placeholder="Tempel teks yang mengandung email atau URL..."></textarea><div style="display:flex;gap:6px;margin:.7rem 0"><button class="btn btn-sm btn-primary" onclick="teExtract('email')">📧 Ekstrak Email</button><button class="btn btn-sm btn-secondary" onclick="teExtract('url')">🔗 Ekstrak URL</button></div><textarea class="t-minput" id="te-out" style="height:120px" readonly placeholder="Hasil ekstraksi..."></textarea>`;window.teExtract=type=>{const t=document.getElementById('te-in').value;let matches=[];if(type==='email')matches=t.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g)||[];else matches=t.match(/https?:\/\/[^\s<>"]+/g)||[];document.getElementById('te-out').value=matches.length?[...new Set(matches)].join('\n'):'Tidak ada '+type+' ditemukan.';};}
+function symbolTableTool(b){const SYMS=[['←→↑↓','Panah'],['♠♣♥♦','Kartu'],['★☆✓✗','Misc'],['©®™°','Legal'],['½⅓⅔¼','Pecahan'],['αβγδ','Yunani'],['€£¥₹','Mata Uang'],['∞±≠≈','Matematika'],['😀😂❤️🔥','Emoji']];b.innerHTML=`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">${SYMS.map(([s,n])=>`<button class="btn btn-xs btn-secondary" onclick="symShow('${s}','${n}')">${n}</button>`).join('')}</div><div id="sym-grid" style="display:flex;flex-wrap:wrap;gap:6px;padding:12px;background:var(--bg2);border-radius:10px;min-height:60px"></div><div id="sym-copied" style="font-family:var(--ff-mono);font-size:.72rem;color:var(--green);margin-top:6px;min-height:1.2rem"></div>`;window.symShow=(s,n)=>{document.getElementById('sym-grid').innerHTML=[...s].map(c=>`<button style="width:40px;height:40px;font-size:1.2rem;border-radius:8px;border:1px solid var(--bd2);background:var(--card2);cursor:pointer" onclick="symCopy('${c}')">${c}</button>`).join('');};window.symCopy=c=>{Clipboard.copy(c);document.getElementById('sym-copied').textContent='Disalin: '+c;};}
+
+function readTimeTool(b){b.innerHTML=`<textarea class="t-minput" id="rt-in" style="height:140px" placeholder="Tempel artikel di sini..." oninput="rtCalc()"></textarea><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px"><div class="t-mstat"><div class="t-mstat-val" id="rt-words">0</div><div class="t-mstat-lbl">Kata</div></div><div class="t-mstat"><div class="t-mstat-val" id="rt-time">0 menit</div><div class="t-mstat-lbl">Waktu Baca</div></div><div class="t-mstat"><div class="t-mstat-val" id="rt-speak">0 menit</div><div class="t-mstat-lbl">Waktu Bicara</div></div></div>`;window.rtCalc=()=>{const t=document.getElementById('rt-in').value;const w=t.trim()?t.trim().split(/\s+/).length:0;document.getElementById('rt-words').textContent=w;const min=Math.ceil(w/238);const spk=Math.ceil(w/130);document.getElementById('rt-time').textContent=min<1?'<1 menit':`${min} menit`;document.getElementById('rt-speak').textContent=spk<1?'<1 menit':`${spk} menit`;};}
+
+function taxCalcTool(b){b.innerHTML=`<div style="display:grid;gap:10px"><div><div class="t-mlabel">Penghasilan Bruto (Rp)</div><input class="input" id="tax-in" type="number" placeholder="5000000" oninput="taxCalc()"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div class="t-mstat"><div class="t-mstat-val" id="tax-ppn">Rp 0</div><div class="t-mstat-lbl">PPN 11%</div></div><div class="t-mstat"><div class="t-mstat-val" id="tax-net">Rp 0</div><div class="t-mstat-lbl">Setelah PPN</div></div></div></div>`;window.taxCalc=()=>{const v=parseFloat(document.getElementById('tax-in').value)||0;const ppn=v*.11;document.getElementById('tax-ppn').textContent='Rp '+Format.number(Math.round(ppn));document.getElementById('tax-net').textContent='Rp '+Format.number(Math.round(v+ppn));};}
+
+function discountTool(b){b.innerHTML=`<div style="display:grid;gap:10px"><div><div class="t-mlabel">Harga Asli (Rp)</div><input class="input" id="dc-price" type="number" placeholder="100000" oninput="dcCalc()"></div><div><div class="t-mlabel">Diskon (%)</div><input class="input" id="dc-disc" type="number" placeholder="20" min="0" max="100" oninput="dcCalc()"></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px"><div class="t-mstat"><div class="t-mstat-val" id="dc-save">Rp 0</div><div class="t-mstat-lbl">Hemat</div></div><div class="t-mstat"><div class="t-mstat-val" id="dc-final">Rp 0</div><div class="t-mstat-lbl">Bayar</div></div><div class="t-mstat"><div class="t-mstat-val" id="dc-pct">0%</div><div class="t-mstat-lbl">Efektif</div></div></div></div>`;window.dcCalc=()=>{const p=parseFloat(document.getElementById('dc-price').value)||0;const d=parseFloat(document.getElementById('dc-disc').value)||0;const save=p*d/100;const final=p-save;document.getElementById('dc-save').textContent='Rp '+Format.number(Math.round(save));document.getElementById('dc-final').textContent='Rp '+Format.number(Math.round(final));document.getElementById('dc-pct').textContent=d+'%';};}
+
+function investmentTool(b){b.innerHTML=`<div style="display:grid;gap:10px"><div><div class="t-mlabel">Modal Awal (Rp)</div><input class="input" id="inv-modal" type="number" placeholder="10000000" oninput="invCalc()"></div><div><div class="t-mlabel">Bunga Per Tahun (%)</div><input class="input" id="inv-rate" type="number" placeholder="6" step="0.1" oninput="invCalc()"></div><div><div class="t-mlabel">Durasi (Tahun)</div><input class="input" id="inv-years" type="number" placeholder="5" min="1" oninput="invCalc()"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div class="t-mstat"><div class="t-mstat-val" id="inv-result">Rp 0</div><div class="t-mstat-lbl">Total Akhir</div></div><div class="t-mstat"><div class="t-mstat-val" id="inv-profit">Rp 0</div><div class="t-mstat-lbl">Keuntungan</div></div></div></div>`;window.invCalc=()=>{const m=parseFloat(document.getElementById('inv-modal').value)||0;const r=parseFloat(document.getElementById('inv-rate').value)||0;const y=parseInt(document.getElementById('inv-years').value)||1;const total=m*Math.pow(1+r/100,y);document.getElementById('inv-result').textContent='Rp '+Format.number(Math.round(total));document.getElementById('inv-profit').textContent='Rp '+Format.number(Math.round(total-m));};}
+
+function calorieTool(b){b.innerHTML=`<div style="display:grid;gap:10px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div><div class="t-mlabel">Berat (kg)</div><input class="input" id="cal-w" type="number" placeholder="70" oninput="calCalc()"></div><div><div class="t-mlabel">Tinggi (cm)</div><input class="input" id="cal-h" type="number" placeholder="170" oninput="calCalc()"></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div><div class="t-mlabel">Usia (tahun)</div><input class="input" id="cal-a" type="number" placeholder="25" oninput="calCalc()"></div><div><div class="t-mlabel">Jenis Kelamin</div><select class="input" id="cal-g" onchange="calCalc()"><option value="m">Laki-laki</option><option value="f">Perempuan</option></select></div></div><div><div class="t-mlabel">Tingkat Aktivitas</div><select class="input" id="cal-act" onchange="calCalc()"><option value="1.2">Sedentary (Kurang gerak)</option><option value="1.375">Ringan (1-3x/minggu)</option><option value="1.55">Sedang (3-5x/minggu)</option><option value="1.725">Aktif (6-7x/minggu)</option><option value="1.9">Sangat Aktif</option></select></div><div class="t-mstat"><div class="t-mstat-val" id="cal-result">- kkal</div><div class="t-mstat-lbl">Kebutuhan Kalori Harian</div></div></div>`;window.calCalc=()=>{const w=parseFloat(document.getElementById('cal-w').value)||0;const h=parseFloat(document.getElementById('cal-h').value)||0;const a=parseInt(document.getElementById('cal-a').value)||0;const g=document.getElementById('cal-g').value;const act=parseFloat(document.getElementById('cal-act').value)||1.2;if(!w||!h||!a)return;const bmr=g==='m'?88.362+(13.397*w)+(4.799*h)-(5.677*a):447.593+(9.247*w)+(3.098*h)-(4.330*a);const tdee=bmr*act;document.getElementById('cal-result').textContent=Math.round(tdee)+' kkal';};}
+
+function speedDistTool(b){b.innerHTML=`<div style="display:grid;gap:10px"><div><div class="t-mlabel">Jarak (km)</div><input class="input" id="sd-dist" type="number" placeholder="100" oninput="sdCalc()"></div><div><div class="t-mlabel">Waktu (jam)</div><input class="input" id="sd-time" type="number" placeholder="2" step="0.5" oninput="sdCalc()"></div><div class="t-mstat"><div class="t-mstat-val" id="sd-speed">0 km/j</div><div class="t-mstat-lbl">Kecepatan Rata-rata</div></div></div>`;window.sdCalc=()=>{const d=parseFloat(document.getElementById('sd-dist').value)||0;const t=parseFloat(document.getElementById('sd-time').value)||0;if(t>0)document.getElementById('sd-speed').textContent=(d/t).toFixed(1)+' km/j';};}
+
+function dataConvertTool(b){b.innerHTML=`<div style="display:grid;gap:10px"><div style="display:grid;grid-template-columns:1fr auto;gap:8px"><input class="input" id="dc-val" type="number" placeholder="1024" oninput="dcConv()"><select class="input" id="dc-from" onchange="dcConv()"><option>B</option><option>KB</option><option selected>MB</option><option>GB</option><option>TB</option></select></div><div style="display:grid;gap:6px" id="dc-results"></div></div>`;const UNITS=['B','KB','MB','GB','TB'];window.dcConv=()=>{const v=parseFloat(document.getElementById('dc-val').value)||0;const f=UNITS.indexOf(document.getElementById('dc-from').value);const bytes=v*Math.pow(1024,f);document.getElementById('dc-results').innerHTML=UNITS.map((u,i)=>{const val=bytes/Math.pow(1024,i);return`<div class="t-mstat" style="display:flex;justify-content:space-between;padding:8px 12px;text-align:left"><span style="color:var(--gray)">${u}</span><span style="font-weight:700;color:var(--accent)">${val<0.01?val.toExponential(2):Number(val.toPrecision(6)).toString()}</span></div>`;}).join('');};}
+
+function colorConvertTool(b){b.innerHTML=`<div style="display:grid;gap:10px"><div><div class="t-mlabel">Pilih Warna</div><div style="display:flex;gap:8px"><input class="input" type="color" id="ccv-picker" value="#4f7fff" style="width:50px;padding:2px;cursor:pointer" oninput="ccvConvert(this.value)"><input class="input" id="ccv-hex" placeholder="#4f7fff" oninput="ccvConvert(this.value)" style="flex:1"></div></div><div style="display:grid;gap:6px" id="ccv-out"></div></div>`;window.ccvConvert=v=>{if(!v.match(/^#[0-9a-fA-F]{6}$/)){return;}document.getElementById('ccv-hex').value=v;document.getElementById('ccv-picker').value=v;const r=parseInt(v.slice(1,3),16),g=parseInt(v.slice(3,5),16),bl=parseInt(v.slice(5,7),16);const rn=r/255,gn=g/255,bn=bl/255;const max=Math.max(rn,gn,bn),min=Math.min(rn,gn,bn);const l=(max+min)/2;const s=max===min?0:(l<.5?(max-min)/(max+min):(max-min)/(2-max-min));let h=0;if(max!==min){if(max===rn)h=(gn-bn)/(max-min)+(gn<bn?6:0);else if(max===gn)h=(bn-rn)/(max-min)+2;else h=(rn-gn)/(max-min)+4;h/=6;}const ck=1-Math.max(rn,gn,bn);const cc=ck===1?0:(1-rn-ck)/(1-ck);const cm=(1-gn-ck)/(1-ck);const cy=(1-bn-ck)/(1-ck);document.getElementById('ccv-out').innerHTML=[`HEX: ${v}`,`RGB: rgb(${r}, ${g}, ${bl})`,`HSL: hsl(${Math.round(h*360)}, ${Math.round(s*100)}%, ${Math.round(l*100)}%)`,`CMYK: cmyk(${Math.round(cc*100)}%, ${Math.round(cm*100)}%, ${Math.round(cy*100)}%, ${Math.round(ck*100)}%)`].map(t=>`<div class="t-mresult" onclick="Clipboard.copy(this.textContent.split(': ')[1]);Toast.ok('Disalin!')" style="cursor:pointer;font-family:var(--ff-mono);font-size:.82rem">${t}</div>`).join('');}; window.ccvConvert('#4f7fff');}
+
+function imgPlaceholderTool(b){b.innerHTML=`<div style="display:grid;gap:10px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div><div class="t-mlabel">Lebar (px)</div><input class="input" id="ip-w" value="400" oninput="ipGen()"></div><div><div class="t-mlabel">Tinggi (px)</div><input class="input" id="ip-h" value="300" oninput="ipGen()"></div></div><div><div class="t-mlabel">Teks</div><input class="input" id="ip-txt" placeholder="400x300" oninput="ipGen()"></div><img id="ip-prev" style="max-width:100%;border-radius:8px;border:1px solid var(--bd);margin:.5rem 0"><div class="t-mresult" id="ip-url" onclick="Clipboard.copy(this.textContent);Toast.ok('URL disalin!')" style="font-family:var(--ff-mono);font-size:.72rem;cursor:pointer"></div></div>`;window.ipGen=()=>{const w=document.getElementById('ip-w').value||400;const h=document.getElementById('ip-h').value||300;const t=document.getElementById('ip-txt').value||w+'x'+h;const url=`https://placehold.co/${w}x${h}/0e0e24/4f7fff?text=${encodeURIComponent(t)}`;document.getElementById('ip-prev').src=url;document.getElementById('ip-url').textContent=url;};window.ipGen();}
+
+function cssShadowsTool(b){b.innerHTML=`<div style="display:grid;gap:8px"><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px"><div><div class="t-mlabel">X Offset</div><input class="input" type="range" id="sh-x" min="-50" max="50" value="4" oninput="shUpdate()"></div><div><div class="t-mlabel">Y Offset</div><input class="input" type="range" id="sh-y" min="-50" max="50" value="4" oninput="shUpdate()"></div><div><div class="t-mlabel">Blur</div><input class="input" type="range" id="sh-b" min="0" max="100" value="20" oninput="shUpdate()"></div><div><div class="t-mlabel">Spread</div><input class="input" type="range" id="sh-s" min="-20" max="50" value="0" oninput="shUpdate()"></div></div><input type="color" id="sh-c" value="#000000" oninput="shUpdate()" style="width:50px;height:36px;cursor:pointer"><div id="sh-prev" style="width:100%;height:80px;background:var(--card2);border-radius:12px;margin:.5rem 0;transition:box-shadow .2s"></div><div class="t-mresult" id="sh-code" onclick="Clipboard.copy(this.textContent);Toast.ok('CSS disalin!')" style="font-family:var(--ff-mono);font-size:.78rem;cursor:pointer"></div></div>`;window.shUpdate=()=>{const x=document.getElementById('sh-x').value;const y=document.getElementById('sh-y').value;const bl=document.getElementById('sh-b').value;const sp=document.getElementById('sh-s').value;const c=document.getElementById('sh-c').value;const css=`box-shadow: ${x}px ${y}px ${bl}px ${sp}px ${c}`;document.getElementById('sh-prev').style.boxShadow=`${x}px ${y}px ${bl}px ${sp}px ${c}`;document.getElementById('sh-code').textContent=css;}; window.shUpdate();}
+
+function cssBorderTool(b){b.innerHTML=`<div style="display:grid;gap:8px"><div class="t-mlabel">Border Radius (px)</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">${['TL','TR','BR','BL'].map((c,i)=>`<div><div class="t-mlabel">${c}</div><input class="input" type="number" id="br-${i}" value="12" min="0" max="200" oninput="brUpdate()"></div>`).join('')}</div><div id="br-prev" style="width:120px;height:80px;background:linear-gradient(135deg,var(--accent),var(--cyan));margin:.75rem auto;transition:border-radius .3s"></div><div class="t-mresult" id="br-code" onclick="Clipboard.copy(this.textContent);Toast.ok('CSS disalin!')" style="font-family:var(--ff-mono);font-size:.78rem;cursor:pointer"></div></div>`;window.brUpdate=()=>{const vals=[0,1,2,3].map(i=>document.getElementById('br-'+i).value+'px');const css=`border-radius: ${vals[0]} ${vals[1]} ${vals[2]} ${vals[3]}`;document.getElementById('br-prev').style.borderRadius=vals.join(' ');document.getElementById('br-code').textContent=css;}; window.brUpdate();}
+
+function faviconTool(b){b.innerHTML=`<div style="display:grid;gap:10px;text-align:center"><div class="t-mlabel">Pilih Emoji untuk Favicon</div><input class="input" id="fv-emoji" type="text" value="⚡" maxlength="2" style="text-align:center;font-size:2rem;padding:.5rem" oninput="fvGen()"><div id="fv-prev" style="width:64px;height:64px;margin:0 auto;font-size:48px;line-height:64px;border:1px solid var(--bd);border-radius:8px;background:var(--bg3)">⚡</div><div class="t-mresult" id="fv-code" onclick="Clipboard.copy(this.textContent);Toast.ok('HTML disalin!')" style="font-family:var(--ff-mono);font-size:.72rem;cursor:pointer;text-align:left"><link rel="icon" href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'&gt;&lt;text y='.9em' font-size='90'&gt;⚡&lt;/text&gt;&lt;/svg&gt;"></div></div>`;window.fvGen=()=>{const e=document.getElementById('fv-emoji').value||'⭐';document.getElementById('fv-prev').textContent=e;const html=`<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>${e}</text></svg>">`;document.getElementById('fv-code').textContent=html;};}
+
+function ipInfoTool(b){b.innerHTML=`<button class="btn btn-primary btn-md" onclick="ipFetch()" style="margin-bottom:12px">🌐 Cek IP Saya</button><div id="ip-res" style="display:grid;gap:6px"></div>`;window.ipFetch=async()=>{const res=document.getElementById('ip-res');res.innerHTML='<div style="color:var(--gray)">⏳ Mengambil info...</div>';try{const d=await(await fetch('https://ipapi.co/json/')).json();res.innerHTML=[['IP',d.ip],['Kota',d.city],['Negara',d.country_name],['ISP',d.org],['Zona Waktu',d.timezone],['Koordinat',`${d.latitude}, ${d.longitude}`]].map(([l,v])=>`<div class="t-mresult" style="display:flex;justify-content:space-between"><span style="color:var(--gray)">${l}</span><span style="font-weight:600">${v||'-'}</span></div>`).join('');}catch{res.innerHTML='<div style="color:var(--hot)">❌ Gagal mengambil info IP</div>';};};}
+
+function jwtDecodeTool(b){b.innerHTML=`<textarea class="t-minput" id="jwt-in" style="height:80px;font-family:var(--ff-mono);font-size:.72rem" placeholder="Tempel JWT token di sini..." oninput="jwtDecode()"></textarea><div id="jwt-out" style="display:grid;gap:6px;margin-top:8px"></div>`;window.jwtDecode=()=>{const t=document.getElementById('jwt-in').value.trim();const parts=t.split('.');if(parts.length!==3){document.getElementById('jwt-out').innerHTML='<div style="color:var(--gray)">Format JWT: header.payload.signature</div>';return;}try{const dec=p=>{try{return JSON.parse(atob(p.replace(/-/g,'+').replace(/_/g,'/')));}catch{return null;}};const h=dec(parts[0]);const p=dec(parts[1]);document.getElementById('jwt-out').innerHTML=[['Header',h],['Payload',p]].map(([l,d])=>`<div><div class="t-mlabel">${l}</div><pre class="t-mresult" style="font-family:var(--ff-mono);font-size:.72rem;white-space:pre-wrap;cursor:pointer" onclick="Clipboard.copy(this.textContent);Toast.ok('Disalin!')">${JSON.stringify(d,null,2)}</pre></div>`).join('');}catch{document.getElementById('jwt-out').innerHTML='<div style="color:var(--hot)">❌ Token tidak valid</div>';};};}
+
+function htmlEscapeTool(b){b.innerHTML=`<textarea class="t-minput" id="he-in" style="height:100px" placeholder="<div class='hello'>World & more</div>"></textarea><div style="display:flex;gap:6px;margin:.7rem 0"><button class="btn btn-sm btn-primary" onclick="heFn('esc')">Escape HTML</button><button class="btn btn-sm btn-secondary" onclick="heFn('unesc')">Unescape HTML</button></div><div class="t-mresult" id="he-out" onclick="Clipboard.copy(this.textContent);Toast.ok('Disalin!')" style="cursor:pointer;font-family:var(--ff-mono);font-size:.8rem"></div>`;window.heFn=m=>{const t=document.getElementById('he-in').value;let r='';if(m==='esc')r=t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');else r=t.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'");document.getElementById('he-out').textContent=r;};}
+
+function mimeCheckTool(b){const MIMES={'html':'text/html','css':'text/css','js':'application/javascript','json':'application/json','xml':'application/xml','pdf':'application/pdf','png':'image/png','jpg':'image/jpeg','jpeg':'image/jpeg','gif':'image/gif','svg':'image/svg+xml','mp4':'video/mp4','mp3':'audio/mpeg','wav':'audio/wav','zip':'application/zip','docx':'application/vnd.openxmlformats-officedocument.wordprocessingml.document','xlsx':'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','csv':'text/csv','txt':'text/plain','webp':'image/webp','ico':'image/x-icon','woff':'font/woff','woff2':'font/woff2','ts':'application/typescript','py':'text/x-python'};b.innerHTML=`<div><div class="t-mlabel">Nama File atau Ekstensi</div><input class="input" id="mc-in" placeholder="contoh: photo.jpg atau .mp4" oninput="mcCheck()"></div><div class="t-mresult" id="mc-out" style="margin-top:10px;font-family:var(--ff-mono);min-height:40px"></div>`;window.mcCheck=()=>{const v=document.getElementById('mc-in').value.trim().toLowerCase().replace(/^\.*/,'');const ext=v.includes('.')?v.split('.').pop():v;const mime=MIMES[ext]||'unknown/'+ext;document.getElementById('mc-out').textContent=ext?`.${ext} → ${mime}`:'Masukkan nama file...';};}
+
+function httpStatusTool(b){const CODES=[['1xx Informational',[['100','Continue'],['101','Switching Protocols']]],['2xx Success',[['200','OK'],['201','Created'],['204','No Content'],['206','Partial Content']]],['3xx Redirection',[['301','Moved Permanently'],['302','Found'],['304','Not Modified'],['307','Temporary Redirect'],['308','Permanent Redirect']]],['4xx Client Error',[['400','Bad Request'],['401','Unauthorized'],['403','Forbidden'],['404','Not Found'],['405','Method Not Allowed'],['408','Request Timeout'],['409','Conflict'],['422','Unprocessable Entity'],['429','Too Many Requests']]],['5xx Server Error',[['500','Internal Server Error'],['502','Bad Gateway'],['503','Service Unavailable'],['504','Gateway Timeout']]]];b.innerHTML=`<input class="input" id="hs-search" placeholder="Cari kode atau nama..." oninput="hsFilter()" style="margin-bottom:10px"><div id="hs-list">${CODES.map(([g,codes])=>`<div style="margin-bottom:12px"><div class="t-mlabel" style="margin-bottom:6px">${g}</div>${codes.map(([code,name])=>`<div class="t-mresult" style="display:flex;justify-content:space-between;margin-bottom:4px;cursor:pointer" onclick="Clipboard.copy('${code}');Toast.ok('Kode ${code} disalin!')"><span style="font-family:var(--ff-mono);color:var(--accent);font-weight:700">${code}</span><span>${name}</span></div>`).join('')}</div>`).join('')}</div>`;window.hsFilter=()=>{const q=document.getElementById('hs-search').value.toLowerCase();const all=document.querySelectorAll('#hs-list .t-mresult');all.forEach(el=>{const txt=el.textContent.toLowerCase();el.style.display=txt.includes(q)?'':'none';});};}
+
+function colorCodeTool(b){const COLORS=[['Merah',['#FF0000','#DC143C','#B22222','#FF6347','#FF4500','#8B0000']],['Hijau',[' #00FF00','#32CD32','#228B22','#90EE90','#006400','#7CFC00']],['Biru',['#0000FF','#1E90FF','#4169E1','#87CEEB','#00008B','#6495ED']],['Kuning',['#FFFF00','#FFD700','#FFA500','#F0E68C','#DAA520','#BDB76B']],['Ungu',['#800080','#8B008B','#9370DB','#DDA0DD','#4B0082','#EE82EE']],['Pink',['#FF69B4','#FF1493','#FFB6C1','#DB7093','#FF007F','#C71585']]];b.innerHTML=`<div style="display:grid;gap:12px">${COLORS.map(([n,cs])=>`<div><div class="t-mlabel">${n}</div><div style="display:flex;flex-wrap:wrap;gap:4px">${cs.map(c=>`<div style="display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer" onclick="Clipboard.copy('${c.trim()}');Toast.ok('${c.trim()} disalin!')"><div style="width:36px;height:36px;border-radius:6px;background:${c};border:1px solid rgba(255,255,255,.1)"></div><span style="font-family:var(--ff-mono);font-size:.52rem;color:var(--gray2)">${c.trim()}</span></div>`).join('')}</div></div>`).join('')}</div>`;}
+
+/* ═══ STAT COMPONENT CSS ═══════════════════════════════════════ */
+const statStyle = document.createElement('style');
+statStyle.textContent = `.t-mstat{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:12px;text-align:center}.t-mstat-val{font-family:var(--ff-display);font-weight:800;font-size:1.2rem;color:var(--accent);letter-spacing:-.04em;line-height:1.2}.t-mstat-lbl{font-family:var(--ff-mono);font-size:.6rem;color:var(--gray2);text-transform:uppercase;letter-spacing:.07em;margin-top:3px}`;
+document.head.appendChild(statStyle);
+</script>
+</body>
+</html>

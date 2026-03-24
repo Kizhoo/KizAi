@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+<script>(function(){var p=JSON.parse(localStorage.getItem('kizai_prefs')||'{}');document.documentElement.setAttribute('data-theme',p.theme||'dark')}())</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin — KizAi</title>
+<link rel="stylesheet" href="/shared.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--ff-body);background:var(--bg);color:var(--white);min-height:100vh}
+.adm-layout{display:flex;min-height:100vh}
+.adm-sidebar{width:230px;background:var(--card);border-right:1px solid var(--bd);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0;z-index:100}
+.adm-brand{padding:1rem 1.1rem;border-bottom:1px solid var(--bd);font-family:var(--ff-display);font-weight:800;font-size:1.05rem;display:flex;align-items:center;gap:.4rem}
+.adm-brand .accent{color:var(--accent)}
+.adm-section-label{padding:.7rem 1.1rem .2rem;font-family:var(--ff-mono);font-size:.58rem;color:var(--gray2);text-transform:uppercase;letter-spacing:.12em}
+.adm-nav-item{display:flex;align-items:center;gap:.55rem;padding:.48rem 1.1rem;font-size:.82rem;color:var(--gray);cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:background .12s,color .12s}
+.adm-nav-item:hover{color:var(--white);background:rgba(255,255,255,.04)}
+.adm-nav-item.active{color:var(--accent);background:rgba(var(--accent-rgb),.08);font-weight:600;border-right:2px solid var(--accent)}
+.adm-nav-item .ico{width:18px;text-align:center;font-size:.9rem}
+.adm-footer{padding:.85rem 1.1rem;border-top:1px solid var(--bd);margin-top:auto}
+/* Main area */
+.adm-main{flex:1;display:flex;flex-direction:column;min-width:0}
+.adm-topbar{height:54px;background:var(--bg);border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 1.5rem;gap:.75rem;position:sticky;top:0;z-index:50}
+.adm-topbar-title{font-family:var(--ff-display);font-weight:700;font-size:1rem;flex:1}
+.adm-content{padding:1.5rem;flex:1}
+.adm-panel{display:none}
+.adm-panel.active{display:block}
+/* Stat cards */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:.85rem;margin-bottom:1.5rem}
+.stat-card{background:var(--card);border:1px solid var(--bd);border-radius:var(--r3);padding:1rem 1.1rem;cursor:default}
+.stat-card:hover{border-color:var(--bd2)}
+.stat-v{font-family:var(--ff-display);font-weight:800;font-size:1.9rem;letter-spacing:-.05em;line-height:1.1;margin-bottom:.2rem}
+.stat-l{font-family:var(--ff-mono);font-size:.58rem;color:var(--gray2);text-transform:uppercase;letter-spacing:.08em}
+/* Table */
+.adm-table-wrap{overflow-x:auto;background:var(--card);border:1px solid var(--bd);border-radius:var(--r3)}
+.adm-table{width:100%;border-collapse:collapse;font-size:.8rem}
+.adm-table th{padding:.55rem .85rem;text-align:left;font-family:var(--ff-mono);font-size:.58rem;color:var(--gray2);text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--bd);background:var(--bg3);white-space:nowrap}
+.adm-table td{padding:.6rem .85rem;border-bottom:1px solid var(--bd2);vertical-align:middle}
+.adm-table tr:last-child td{border-bottom:none}
+.adm-table tr:hover td{background:rgba(255,255,255,.015)}
+/* Badges */
+.bp{display:inline-flex;align-items:center;padding:.12rem .45rem;border-radius:100px;font-family:var(--ff-mono);font-size:.58rem;font-weight:700}
+.bp-free{background:rgba(107,114,128,.12);color:var(--gray)}
+.bp-premium{background:rgba(245,158,11,.12);color:var(--amber)}
+.bp-vip{background:rgba(var(--accent-rgb),.12);color:var(--accent)}
+.bp-admin{background:rgba(239,68,68,.12);color:var(--hot)}
+.bp-banned{background:rgba(239,68,68,.15);color:var(--hot)}
+.bp-ok{background:rgba(34,197,94,.12);color:var(--green)}
+.bp-warn{background:rgba(245,158,11,.12);color:var(--amber)}
+.bp-err{background:rgba(239,68,68,.12);color:var(--hot)}
+/* Section header */
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem}
+.sec-hd h2{font-family:var(--ff-display);font-weight:700;font-size:1.05rem}
+/* Cards */
+.info-card{background:var(--card);border:1px solid var(--bd);border-radius:var(--r3);padding:1.1rem}
+.info-card+.info-card{margin-top:.85rem}
+/* Health grid */
+.health-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.75rem}
+.health-item{background:var(--card);border:1px solid var(--bd);border-radius:var(--r3);padding:.85rem 1rem;display:flex;align-items:center;gap:.65rem}
+.health-ico{font-size:1.3rem}
+.health-info{flex:1;min-width:0}
+.health-label{font-family:var(--ff-mono);font-size:.6rem;color:var(--gray2);text-transform:uppercase}
+.health-val{font-weight:600;font-size:.88rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* Forms */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.75rem}
+.form-row.full{grid-template-columns:1fr}
+.form-label{font-family:var(--ff-mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--gray2);display:block;margin-bottom:.35rem}
+/* Chart bars */
+.chart-wrap{display:flex;align-items:flex-end;gap:3px;height:80px;margin-top:.5rem}
+.chart-bar{min-width:8px;border-radius:2px 2px 0 0;transition:height .3s;cursor:default}
+.chart-bar:hover{opacity:.8}
+/* Action row */
+.act-row{display:flex;gap:.3rem;flex-wrap:wrap}
+/* Modal */
+.adm-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;align-items:center;justify-content:center}
+.adm-modal-bg.open{display:flex}
+.adm-modal{background:var(--card);border:1px solid var(--bd);border-radius:var(--r4);padding:1.5rem;width:min(480px,94vw);max-height:85vh;overflow-y:auto}
+.adm-modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.adm-modal-title{font-family:var(--ff-display);font-weight:700;font-size:1.05rem}
+/* Overlay */
+.adm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:99}
+.adm-overlay.show{display:block}
+/* Hamburger */
+.adm-hamburger{display:none;background:none;border:none;color:var(--white);font-size:1.4rem;cursor:pointer}
+/* Tabs */
+.adm-tabs{display:flex;gap:.35rem;margin-bottom:1rem;flex-wrap:wrap}
+.adm-tab{padding:.35rem .85rem;border-radius:100px;font-size:.78rem;font-weight:600;cursor:pointer;border:1.5px solid var(--bd);color:var(--gray);background:none;transition:all .15s}
+.adm-tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+/* Danger zone */
+.danger-zone{border:1px solid rgba(239,68,68,.3);border-radius:var(--r3);padding:1rem;margin-top:1rem;background:rgba(239,68,68,.04)}
+.danger-zone h3{color:var(--hot);font-size:.88rem;margin-bottom:.75rem}
+/* System log */
+.sys-log{background:var(--bg);border:1px solid var(--bd);border-radius:var(--r2);padding:.85rem;font-family:var(--ff-mono);font-size:.72rem;line-height:1.9;max-height:380px;overflow-y:auto}
+@media(max-width:768px){
+  .adm-sidebar{position:fixed;left:-230px;top:0;height:100vh;transition:left .2s;z-index:200}
+  .adm-sidebar.open{left:0}
+  .adm-hamburger{display:block}
+  .adm-overlay.show{display:block}
+  .adm-content{padding:1rem}
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+  .form-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div id="toast-stack"></div>
+<div class="adm-overlay" id="adm-overlay" onclick="closeSidebar()"></div>
+
+<!-- USER DETAIL MODAL -->
+<div class="adm-modal-bg" id="user-modal">
+  <div class="adm-modal">
+    <div class="adm-modal-head">
+      <span class="adm-modal-title" id="modal-uname">User Detail</span>
+      <button class="btn btn-xs btn-ghost" onclick="closeModal('user-modal')">✕</button>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<div class="adm-layout">
+  <!-- SIDEBAR -->
+  <aside class="adm-sidebar" id="adm-sidebar">
+    <div class="adm-brand"><span class="accent">Kiz</span>Ai <small style="font-size:.6rem;color:var(--gray);font-weight:400">Admin v4</small></div>
+    
+    <div class="adm-section-label">📊 Dashboard</div>
+    <button class="adm-nav-item active" onclick="showPanel('overview')" id="nav-overview"><span class="ico">🏠</span> Overview</button>
+    <button class="adm-nav-item" onclick="showPanel('analytics')" id="nav-analytics"><span class="ico">📈</span> Analytics</button>
+    <button class="adm-nav-item" onclick="showPanel('health')" id="nav-health"><span class="ico">🩺</span> System Health</button>
+
+    <div class="adm-section-label">👥 Users</div>
+    <button class="adm-nav-item" onclick="showPanel('users')" id="nav-users"><span class="ico">👥</span> Semua User</button>
+    <button class="adm-nav-item" onclick="showPanel('top-users')" id="nav-top-users"><span class="ico">🏆</span> Top Users</button>
+    <button class="adm-nav-item" onclick="showPanel('inactive')" id="nav-inactive"><span class="ico">😴</span> User Inactive</button>
+    <button class="adm-nav-item" onclick="showPanel('expiring')" id="nav-expiring"><span class="ico">⏰</span> Plan Expiring</button>
+
+    <div class="adm-section-label">💳 Orders</div>
+    <button class="adm-nav-item" onclick="showPanel('orders')" id="nav-orders"><span class="ico">📋</span> Semua Order</button>
+    <button class="adm-nav-item" onclick="showPanel('revenue')" id="nav-revenue"><span class="ico">💰</span> Revenue</button>
+
+    <div class="adm-section-label">📢 Komunikasi</div>
+    <button class="adm-nav-item" onclick="showPanel('broadcast')" id="nav-broadcast"><span class="ico">📢</span> Broadcast</button>
+    <button class="adm-nav-item" onclick="showPanel('notif-log')" id="nav-notif-log"><span class="ico">🔔</span> Log Notifikasi</button>
+
+    <div class="adm-section-label">🎟️ Kupon</div>
+    <button class="adm-nav-item" onclick="showPanel('coupons')" id="nav-coupons"><span class="ico">🎟️</span> Manajemen Kupon</button>
+
+    <div class="adm-section-label">⚙️ System</div>
+    <button class="adm-nav-item" onclick="showPanel('leaderboard')" id="nav-leaderboard"><span class="ico">🥇</span> Leaderboard</button>
+    <button class="adm-nav-item" onclick="showPanel('logs')" id="nav-logs"><span class="ico">📋</span> System Logs</button>
+    <button class="adm-nav-item" onclick="showPanel('settings')" id="nav-settings"><span class="ico">⚙️</span> Pengaturan</button>
+
+    <div class="adm-footer">
+      <div style="font-size:.72rem;color:var(--gray);margin-bottom:.5rem" id="admin-badge">—</div>
+      <div style="display:flex;gap:.35rem">
+        <a href="/" class="btn btn-xs btn-ghost">🏠</a>
+        <button class="btn btn-xs btn-ghost" onclick="refreshAll()">🔄</button>
+        <button class="btn btn-xs btn-danger" onclick="Auth.logout()">Keluar</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="adm-main">
+    <div class="adm-topbar">
+      <button class="adm-hamburger" onclick="openSidebar()">☰</button>
+      <div class="adm-topbar-title" id="panel-title">Overview</div>
+      <div style="display:flex;gap:.4rem;margin-left:auto;align-items:center">
+        <div id="maintenance-badge" style="display:none"><span class="bp bp-err">🔧 Maintenance</span></div>
+        <button class="btn btn-xs btn-ghost" onclick="refreshAll()" title="Refresh">🔄</button>
+        <button class="btn btn-xs btn-ghost" onclick="Theme.toggle()">🌙</button>
+      </div>
+    </div>
+
+    <div class="adm-content">
+
+      <!-- ═══ OVERVIEW ═══ -->
+      <div class="adm-panel active" id="panel-overview">
+        <div class="stat-grid" id="stat-grid">
+          <div class="stat-card"><div class="stat-v" style="color:var(--accent)" id="sv-users">—</div><div class="stat-l">Total User</div></div>
+          <div class="stat-card"><div class="stat-v" style="color:var(--amber)" id="sv-premium">—</div><div class="stat-l">Premium</div></div>
+          <div class="stat-card"><div class="stat-v" style="color:var(--accent)" id="sv-vip">—</div><div class="stat-l">VIP</div></div>
+          <div class="stat-card"><div class="stat-v" style="color:var(--green)" id="sv-orders">—</div><div class="stat-l">Order Aktif</div></div>
+          <div class="stat-card"><div class="stat-v" style="color:var(--cyan)" id="sv-revenue">—</div><div class="stat-l">Total Revenue</div></div>
+          <div class="stat-card"><div class="stat-v" style="color:var(--violet)" id="sv-chats">—</div><div class="stat-l">Total Pesan</div></div>
+          <div class="stat-card"><div class="stat-v" style="color:var(--hot)" id="sv-banned">—</div><div class="stat-l">User Banned</div></div>
+          <div class="stat-card"><div class="stat-v" style="color:var(--green)" id="sv-active24h">—</div><div class="stat-l">Aktif 24jam</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+          <div>
+            <div class="sec-hd"><h2>User Terbaru</h2><button class="btn btn-xs btn-outline" onclick="showPanel('users')">Lihat semua →</button></div>
+            <div class="adm-table-wrap"><table class="adm-table"><thead><tr><th>User</th><th>Plan</th><th>Bergabung</th></tr></thead><tbody id="recent-users-tb"></tbody></table></div>
+          </div>
+          <div>
+            <div class="sec-hd"><h2>Pending Orders</h2><button class="btn btn-xs btn-outline" onclick="showPanel('orders')">Lihat semua →</button></div>
+            <div class="adm-table-wrap"><table class="adm-table"><thead><tr><th>Order</th><th>Paket</th><th>Aksi</th></tr></thead><tbody id="pending-orders-tb"></tbody></table></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ ANALYTICS ═══ -->
+      <div class="adm-panel" id="panel-analytics">
+        <div class="sec-hd">
+          <h2>Analytics</h2>
+          <div class="adm-tabs">
+            <button class="adm-tab active" onclick="loadAnalytics(7);setActiveTab(this)">7 Hari</button>
+            <button class="adm-tab" onclick="loadAnalytics(30);setActiveTab(this)">30 Hari</button>
+            <button class="adm-tab" onclick="loadAnalytics(90);setActiveTab(this)">90 Hari</button>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;margin-bottom:1.5rem">
+          <div class="info-card"><div class="stat-l" style="margin-bottom:.5rem">👤 Registrasi Baru</div><div class="stat-v" id="an-newusers" style="color:var(--accent)">—</div><div class="chart-wrap" id="chart-users" style="height:60px"></div></div>
+          <div class="info-card"><div class="stat-l" style="margin-bottom:.5rem">💰 Revenue Periode</div><div class="stat-v" id="an-revenue" style="color:var(--green)">—</div><div class="chart-wrap" id="chart-revenue" style="height:60px"></div></div>
+          <div class="info-card"><div class="stat-l" style="margin-bottom:.5rem">✅ User Aktif</div><div class="stat-v" id="an-active" style="color:var(--cyan)">—</div></div>
+        </div>
+        <div class="sec-hd"><h2>Penggunaan Model AI</h2></div>
+        <div class="adm-table-wrap"><table class="adm-table"><thead><tr><th>Model</th><th>Jumlah Dipakai</th><th>%</th></tr></thead><tbody id="model-usage-tb"></tbody></table></div>
+        <div class="sec-hd" style="margin-top:1.5rem"><h2>Metode Pembayaran</h2></div>
+        <div class="adm-table-wrap"><table class="adm-table"><thead><tr><th>Metode</th><th>Jumlah</th></tr></thead><tbody id="payment-methods-tb"></tbody></table></div>
+      </div>
+
+      <!-- ═══ SYSTEM HEALTH ═══ -->
+      <div class="adm-panel" id="panel-health">
+        <div class="sec-hd"><h2>System Health</h2><button class="btn btn-sm btn-outline" onclick="loadHealth()">🔄 Refresh</button></div>
+        <div class="health-grid" id="health-grid"></div>
+        <div class="sec-hd" style="margin-top:1.5rem"><h2>Chat Stats (7 hari)</h2></div>
+        <div class="info-card">
+          <div class="stat-l" style="margin-bottom:.5rem">Pesan dikirim</div>
+          <div class="stat-v" id="chat-total" style="color:var(--cyan)">—</div>
+          <div class="chart-wrap" id="chart-chat" style="height:60px;margin-top:.5rem"></div>
+        </div>
+        <div class="sec-hd" style="margin-top:1.5rem"><h2>Referral Stats</h2></div>
+        <div class="adm-table-wrap"><table class="adm-table"><thead><tr><th>Referrer ID</th><th>Total Referral</th><th>Koin Dibagi</th></tr></thead><tbody id="referral-tb"></tbody></table></div>
+      </div>
+
+      <!-- ═══ USERS ═══ -->
+      <div class="adm-panel" id="panel-users">
+        <div class="sec-hd">
+          <h2>Semua User <span id="user-count" style="color:var(--gray);font-size:.82rem;font-weight:400"></span></h2>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+            <input class="input" style="width:180px;font-size:.8rem;padding:.38rem .75rem" placeholder="🔍 Cari..." id="user-q" oninput="filterUsers()">
+            <select class="input" style="font-size:.8rem;padding:.38rem .75rem" id="plan-filter" onchange="filterUsers()">
+              <option value="">Semua Plan</option><option value="free">Free</option><option value="premium">Premium</option><option value="vip">VIP</option>
+            </select>
+            <select class="input" style="font-size:.8rem;padding:.38rem .75rem" id="status-filter" onchange="filterUsers()">
+              <option value="">Semua Status</option><option value="active">Aktif</option><option value="banned">Banned</option>
+            </select>
+            <button class="btn btn-sm btn-outline" onclick="exportUsers()">📥 Export CSV</button>
+          </div>
+        </div>
+        <div class="adm-table-wrap">
+          <table class="adm-table">
+            <thead><tr><th>#</th><th>Username</th><th>Plan</th><th>Role</th><th>XP</th><th>Koin</th><th>Game</th><th>Chat</th><th>Streak</th><th>Last Seen</th><th>Aksi</th></tr></thead>
+            <tbody id="users-tb"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══ TOP USERS ═══ -->
+      <div class="adm-panel" id="panel-top-users">
+        <div class="sec-hd">
+          <h2>Top Users</h2>
+          <div class="adm-tabs">
+            <button class="adm-tab active" onclick="loadTopUsers('xp');setActiveTab(this)">XP</button>
+            <button class="adm-tab" onclick="loadTopUsers('coins');setActiveTab(this)">Koin</button>
+            <button class="adm-tab" onclick="loadTopUsers('games');setActiveTab(this)">Games</button>
+            <button class="adm-tab" onclick="loadTopUsers('messages');setActiveTab(this)">Chat</button>
+            <button class="adm-tab" onclick="loadTopUsers('tools');setActiveTab(this)">Tools</button>
+          </div>
+        </div>
+        <div class="adm-table-wrap">
+          <table class="adm-table">
+            <thead><tr><th>Rank</th><th>User</th><th>Plan</th><th>Level</th><th>XP</th><th>Koin</th><th>Games</th><th>Chat</th><th>Aksi</th></tr></thead>
+            <tbody id="top-users-tb"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══ INACTIVE ═══ -->
+      <div class="adm-panel" id="panel-inactive">
+        <div class="sec-hd">
+          <h2>User Tidak Aktif (>30 hari)</h2>
+          <button class="btn btn-sm btn-primary" onclick="sendReminderAll()">💌 Kirim Reminder Semua</button>
+        </div>
+        <div class="adm-table-wrap">
+          <table class="adm-table">
+            <thead><tr><th>Username</th><th>Plan</th><th>Last Seen</th><th>Bergabung</th><th>Aksi</th></tr></thead>
+            <tbody id="inactive-tb"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══ EXPIRING ═══ -->
+      <div class="adm-panel" id="panel-expiring">
+        <div class="sec-hd"><h2>Plan Expired dalam 7 Hari</h2></div>
+        <div class="adm-table-wrap">
+          <table class="adm-table">
+            <thead><tr><th>Username</th><th>Plan</th><th>Telegram</th><th>Expires</th><th>Aksi</th></tr></thead>
+            <tbody id="expiring-tb"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══ ORDERS ═══ -->
+      <div class="adm-panel" id="panel-orders">
+        <div class="sec-hd">
+          <h2>Semua Order</h2>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+            <select class="input" style="font-size:.8rem;padding:.38rem .75rem" id="order-filter" onchange="filterOrders()">
+              <option value="">Semua Status</option><option value="pending">Pending</option><option value="approved">Approved</option><option value="rejected">Rejected</option>
+            </select>
+            <button class="btn btn-sm btn-success" onclick="bulkApprove()">✓ Approve Semua Pending</button>
+            <button class="btn btn-sm btn-outline" onclick="exportOrders()">📥 Export CSV</button>
+          </div>
+        </div>
+        <div class="adm-table-wrap">
+          <table class="adm-table">
+            <thead><tr><th>Order ID</th><th>Customer</th><th>Paket</th><th>Harga</th><th>Metode</th><th>Status</th><th>Tanggal</th><th>Aksi</th></tr></thead>
+            <tbody id="orders-tb"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══ REVENUE ═══ -->
+      <div class="adm-panel" id="panel-revenue">
+        <div class="sec-hd"><h2>Revenue Dashboard</h2></div>
+        <div class="stat-grid">
+          <div class="stat-card"><div class="stat-v" style="color:var(--green)" id="rv-total">—</div><div class="stat-l">Total Revenue</div></div>
+          <div class="stat-card"><div class="stat-v" style="color:var(--amber)" id="rv-month">—</div><div class="stat-l">Bulan Ini</div></div>
+          <div class="stat-card"><div class="stat-v" style="color:var(--cyan)" id="rv-count">—</div><div class="stat-l">Total Order</div></div>
+          <div class="stat-card"><div class="stat-v" style="color:var(--violet)" id="rv-avg">—</div><div class="stat-l">Avg per Order</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem">
+          <div class="info-card"><h3 style="font-size:.85rem;margin-bottom:.75rem">Revenue per Paket</h3><div id="rev-by-plan"></div></div>
+          <div class="info-card"><h3 style="font-size:.85rem;margin-bottom:.75rem">Order per Paket</h3><div id="orders-by-plan"></div></div>
+        </div>
+      </div>
+
+      <!-- ═══ BROADCAST ═══ -->
+      <div class="adm-panel" id="panel-broadcast">
+        <div class="sec-hd"><h2>Broadcast Notifikasi</h2></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+          <div class="info-card">
+            <h3 style="font-size:.88rem;margin-bottom:.85rem">📢 Kirim Broadcast</h3>
+            <div class="form-row full"><label class="form-label">Judul</label><input class="input" id="bc-title" placeholder="Judul notifikasi..." maxlength="80"></div>
+            <div class="form-row full"><label class="form-label">Pesan</label><textarea class="input" id="bc-msg" rows="3" style="resize:vertical" placeholder="Isi pesan..."></textarea></div>
+            <div class="form-row">
+              <div><label class="form-label">Target</label><select class="input" id="bc-target"><option value="all">Semua User</option><option value="free">Free</option><option value="premium">Premium</option><option value="vip">VIP</option></select></div>
+              <div><label class="form-label">Tipe</label><select class="input" id="bc-type"><option value="info">Info</option><option value="success">Success</option><option value="warning">Warning</option><option value="achievement">Achievement</option></select></div>
+            </div>
+            <div class="form-row">
+              <div><label class="form-label">Icon</label><input class="input" id="bc-icon" value="📢" maxlength="4"></div>
+              <div><label class="form-label">URL Aksi (opsional)</label><input class="input" id="bc-url" placeholder="https://..."></div>
+            </div>
+            <button class="btn btn-primary btn-md w-full" style="margin-top:.5rem" onclick="sendBroadcast()">📢 Kirim Broadcast</button>
+          </div>
+          <div class="info-card">
+            <h3 style="font-size:.88rem;margin-bottom:.85rem">👤 Kirim ke User Spesifik</h3>
+            <div class="form-row full"><label class="form-label">Cari User</label><input class="input" id="notif-user-q" placeholder="Ketik username..." oninput="searchUserForNotif()"><div id="notif-user-results" style="margin-top:.35rem"></div></div>
+            <div id="selected-user-badge" style="display:none;margin-bottom:.5rem"></div>
+            <div class="form-row full"><label class="form-label">Judul</label><input class="input" id="nu-title" placeholder="Judul..."></div>
+            <div class="form-row full"><label class="form-label">Pesan</label><textarea class="input" id="nu-msg" rows="2" placeholder="Pesan..."></textarea></div>
+            <button class="btn btn-outline btn-md w-full" style="margin-top:.5rem" onclick="sendNotifUser()">🔔 Kirim Notifikasi</button>
+            <div style="border-top:1px solid var(--bd);margin-top:1rem;padding-top:1rem">
+              <h3 style="font-size:.85rem;margin-bottom:.6rem">🔔 Announcement Sitewide</h3>
+              <input class="input" id="ann-text" placeholder="Teks pengumuman (kosongkan untuk hapus)..." style="margin-bottom:.5rem">
+              <button class="btn btn-outline btn-sm w-full" onclick="setAnnouncement()">Simpan Announcement</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ NOTIF LOG ═══ -->
+      <div class="adm-panel" id="panel-notif-log">
+        <div class="sec-hd">
+          <h2>Log Notifikasi</h2>
+          <button class="btn btn-sm btn-danger" onclick="clearOldNotifs()">🗑️ Hapus Notif >30 hari</button>
+        </div>
+        <div class="adm-table-wrap">
+          <table class="adm-table">
+            <thead><tr><th>User ID</th><th>Tipe</th><th>Judul</th><th>Waktu</th></tr></thead>
+            <tbody id="notif-log-tb"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══ COUPONS ═══ -->
+      <div class="adm-panel" id="panel-coupons">
+        <div class="sec-hd"><h2>Manajemen Kupon</h2></div>
+        <div style="display:grid;grid-template-columns:1fr 300px;gap:1rem">
+          <div class="adm-table-wrap">
+            <table class="adm-table">
+              <thead><tr><th>Kode</th><th>Diskon</th><th>Status</th><th>Aksi</th></tr></thead>
+              <tbody id="coupons-tb"></tbody>
+            </table>
+          </div>
+          <div class="info-card">
+            <h3 style="font-size:.88rem;margin-bottom:.85rem">➕ Buat Kupon Baru</h3>
+            <div style="margin-bottom:.65rem"><label class="form-label">Kode</label><input class="input" id="new-coupon-code" placeholder="PROMO20" style="text-transform:uppercase" oninput="this.value=this.value.toUpperCase()"></div>
+            <div style="margin-bottom:.65rem"><label class="form-label">Diskon (%)</label><input class="input" type="number" id="new-coupon-disc" placeholder="20" min="1" max="100"></div>
+            <button class="btn btn-primary btn-sm w-full" onclick="createCoupon()">➕ Buat Kupon</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ LEADERBOARD ═══ -->
+      <div class="adm-panel" id="panel-leaderboard">
+        <div class="sec-hd">
+          <h2>Leaderboard Admin</h2>
+          <div class="adm-tabs">
+            <button class="adm-tab active" onclick="loadLeaderboard('xp');setActiveTab(this)">XP</button>
+            <button class="adm-tab" onclick="loadLeaderboard('coins');setActiveTab(this)">Koin</button>
+            <button class="adm-tab" onclick="loadLeaderboard('games');setActiveTab(this)">Games</button>
+            <button class="adm-tab" onclick="loadLeaderboard('messages');setActiveTab(this)">Chat</button>
+          </div>
+        </div>
+        <div class="adm-table-wrap">
+          <table class="adm-table">
+            <thead><tr><th>Rank</th><th>User</th><th>Plan</th><th>Level</th><th>XP</th><th>Koin</th><th>Games</th><th>Chat</th><th>Aksi</th></tr></thead>
+            <tbody id="lb-admin-tb"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══ LOGS ═══ -->
+      <div class="adm-panel" id="panel-logs">
+        <div class="sec-hd"><h2>System Logs</h2><button class="btn btn-sm btn-danger" onclick="clearLogs()">🗑️ Clear</button></div>
+        <div class="sys-log" id="sys-log-el">
+          <div style="color:var(--green)">[INIT] KizAi Admin Panel v4 loaded</div>
+        </div>
+      </div>
+
+      <!-- ═══ SETTINGS ═══ -->
+      <div class="adm-panel" id="panel-settings">
+        <div class="sec-hd"><h2>Pengaturan Sistem</h2></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+          <div class="info-card">
+            <h3 style="font-size:.88rem;margin-bottom:.85rem">🔧 Maintenance Mode</h3>
+            <p style="font-size:.82rem;color:var(--gray);margin-bottom:.75rem">Aktifkan untuk blokir semua akses user sementara</p>
+            <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem">
+              <input type="checkbox" id="maintenance-toggle" style="width:16px;height:16px;accent-color:var(--hot)">
+              <label for="maintenance-toggle" style="font-size:.85rem">Aktifkan Maintenance Mode</label>
+            </div>
+            <input class="input" id="maintenance-msg" placeholder="Pesan maintenance..." style="margin-bottom:.5rem">
+            <button class="btn btn-danger btn-sm w-full" onclick="toggleMaintenance()">Simpan</button>
+          </div>
+          <div class="info-card">
+            <h3 style="font-size:.88rem;margin-bottom:.85rem">📊 Data Management</h3>
+            <div style="display:flex;flex-direction:column;gap:.5rem">
+              <button class="btn btn-sm btn-outline w-full" onclick="exportUsers()">📥 Export Users CSV</button>
+              <button class="btn btn-sm btn-outline w-full" onclick="exportOrders()">📥 Export Orders CSV</button>
+              <button class="btn btn-sm btn-outline w-full" onclick="clearActivityLog()">🗑️ Clear Activity Log >30hr</button>
+              <button class="btn btn-sm btn-outline w-full" onclick="clearOldNotifs()">🗑️ Clear Notifikasi Lama</button>
+            </div>
+          </div>
+        </div>
+        <div class="danger-zone" style="margin-top:1rem">
+          <h3>⚠️ Danger Zone</h3>
+          <p style="font-size:.8rem;color:var(--gray);margin-bottom:.75rem">Operasi ini tidak bisa dibatalkan!</p>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+            <button class="btn btn-sm btn-danger" onclick="bulkApprove()">✓ Approve Semua Pending</button>
+            <button class="btn btn-sm btn-danger" onclick="sendReminderAll()">💌 Kirim Reminder Ke Semua Inactive</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /adm-content -->
+  </main>
+</div>
+
+<script src="/shared.js"></script>
+<script>
+let allUsers = [], allOrders = [], selectedNotifUserId = null;
+
+/* ═══════ INIT ═══════ */
+document.addEventListener('DOMContentLoaded', async () => {
+  addLog('INFO', 'Loading admin dashboard...');
+  const { data, ok } = await API.get('/api/admin?action=verify');
+  if (!ok) { Toast.err('Bukan admin atau sesi habis'); setTimeout(() => location.href = '/admin-login', 1500); return; }
+  document.getElementById('admin-badge').textContent = '👤 ' + (data.username||'admin');
+  addLog('OK', `Login sebagai ${data.username}`);
+  await refreshAll();
+});
+
+/* ═══════ NAVIGATION ═══════ */
+function showPanel(name) {
+  document.querySelectorAll('.adm-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.adm-nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-'+name)?.classList.add('active');
+  document.getElementById('nav-'+name)?.classList.add('active');
+  const titles = { overview:'Overview', analytics:'Analytics', health:'System Health', users:'Semua User', 'top-users':'Top Users', inactive:'User Inactive', expiring:'Plan Expiring', orders:'Semua Order', revenue:'Revenue', broadcast:'Broadcast', 'notif-log':'Log Notifikasi', coupons:'Kupon', leaderboard:'Leaderboard', logs:'System Logs', settings:'Pengaturan' };
+  document.getElementById('panel-title').textContent = titles[name]||name;
+  if (window.innerWidth < 768) closeSidebar();
+  // Lazy load panel data
+  if (name === 'analytics') loadAnalytics(7);
+  if (name === 'health') loadHealth();
+  if (name === 'inactive') loadInactive();
+  if (name === 'expiring') loadExpiring();
+  if (name === 'revenue') loadRevenue();
+  if (name === 'top-users') loadTopUsers('xp');
+  if (name === 'coupons') loadCoupons();
+  if (name === 'notif-log') loadNotifLog();
+  if (name === 'leaderboard') loadLeaderboard('xp');
+}
+function openSidebar() { document.getElementById('adm-sidebar').classList.add('open'); document.getElementById('adm-overlay').classList.add('show'); }
+function closeSidebar() { document.getElementById('adm-sidebar').classList.remove('open'); document.getElementById('adm-overlay').classList.remove('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function setActiveTab(btn) { btn.closest('.adm-panel, .adm-content').querySelectorAll('.adm-tab').forEach(t => t.classList.remove('active')); btn.classList.add('active'); }
+
+/* ═══════ REFRESH ALL ═══════ */
+async function refreshAll() {
+  await Promise.all([loadStats(), loadActiveUsers(), loadUsers(), loadOrders()]);
+  addLog('OK', 'Data refreshed');
+}
+
+function addLog(level, msg) {
+  const el = document.getElementById('sys-log-el');
+  if (!el) return;
+  const c = { INFO:'var(--cyan)', OK:'var(--green)', WARN:'var(--amber)', ERROR:'var(--hot)' };
+  const t = new Date().toLocaleTimeString('id');
+  el.innerHTML += `<div style="color:${c[level]||'var(--gray)'}">[${t}] [${level}] ${msg}</div>`;
+  el.scrollTop = el.scrollHeight;
+}
+function clearLogs() { document.getElementById('sys-log-el').innerHTML = '<div style="color:var(--green)">[INFO] Logs cleared</div>'; }
+
+/* ═══════ STATS ═══════ */
+async function loadStats() {
+  const { data, ok } = await API.get('/api/admin?action=stats');
+  if (!ok) { addLog('ERROR', 'Failed to load stats'); return; }
+  document.getElementById('sv-users').textContent    = Format.number(data.totalUsers||0);
+  document.getElementById('sv-premium').textContent  = Format.number(data.premiumUsers||0);
+  document.getElementById('sv-vip').textContent      = Format.number(data.vipUsers||0);
+  document.getElementById('sv-orders').textContent   = Format.number(data.activeOrders||0);
+  document.getElementById('sv-revenue').textContent  = 'Rp'+Format.number(data.totalRevenue||0);
+  document.getElementById('sv-chats').textContent    = Format.number(data.totalMessages||0);
+  document.getElementById('sv-banned').textContent   = Format.number(data.bannedUsers||0);
+  addLog('OK', `Stats: ${data.totalUsers} users, Rp${Format.number(data.totalRevenue||0)} revenue`);
+}
+
+async function loadActiveUsers() {
+  const { data, ok } = await API.get('/api/admin?action=active_users');
+  if (ok) document.getElementById('sv-active24h').textContent = Format.number(data.last24h||0);
+}
+
+/* ═══════ USERS ═══════ */
+async function loadUsers() {
+  const { data, ok } = await API.get('/api/admin?action=users');
+  if (!ok) { addLog('ERROR', 'Failed to load users'); return; }
+  allUsers = data.users||[];
+  document.getElementById('user-count').textContent = `(${allUsers.length})`;
+  renderUsers(allUsers);
+  renderRecentUsers();
+  addLog('OK', `${allUsers.length} users loaded`);
+}
+
+function renderUsers(list) {
+  const tb = document.getElementById('users-tb');
+  if (!list.length) { tb.innerHTML = `<tr><td colspan="11" style="text-align:center;color:var(--gray);padding:2rem">Tidak ada user</td></tr>`; return; }
+  tb.innerHTML = list.map((u,i) => `
+    <tr>
+      <td style="color:var(--gray2)">${i+1}</td>
+      <td><strong>${u.username}</strong>${u.telegram_id?`<div style="font-size:.68rem;color:var(--gray2)">📱${u.telegram_id}</div>`:''}</td>
+      <td><span class="bp bp-${u.plan}">${u.plan}</span></td>
+      <td><span class="bp bp-${u.role==='admin'?'admin':'free'}">${u.role}</span></td>
+      <td>${Format.number(u.xp||0)}</td>
+      <td>${Format.number(u.coins||0)}</td>
+      <td>${u.games_played||0}</td>
+      <td>${u.chat_messages||0}</td>
+      <td>${u.streak||0}🔥</td>
+      <td style="color:var(--gray2);font-size:.72rem">${Format.relativeTime(u.last_seen)}</td>
+      <td><div class="act-row">
+        <button class="btn btn-xs btn-ghost" onclick="openUserModal('${u.id}')">👁</button>
+        <button class="btn btn-xs btn-outline" onclick="quickGrantPlan('${u.id}','${u.username}')">🎁</button>
+        <button class="btn btn-xs btn-outline" onclick="quickEdit('${u.id}','${u.username}','${u.plan}',${u.coins||0},${u.xp||0})">✏️</button>
+        <button class="btn btn-xs ${u.is_banned?'btn-ghost':'btn-danger'}" onclick="toggleBan('${u.id}','${u.username}',${!u.is_banned})">${u.is_banned?'✓Unban':'🚫'}</button>
+      </div></td>
+    </tr>`).join('');
+}
+
+function renderRecentUsers() {
+  const tb = document.getElementById('recent-users-tb');
+  tb.innerHTML = allUsers.slice(0,6).map(u=>`
+    <tr><td><strong>${u.username}</strong></td><td><span class="bp bp-${u.plan}">${u.plan}</span></td><td style="color:var(--gray2);font-size:.72rem">${Format.relativeTime(u.created_at)}</td></tr>`).join('')||'<tr><td colspan="3" style="color:var(--gray);padding:.75rem;text-align:center">Belum ada user</td></tr>';
+}
+
+function filterUsers() {
+  const q = document.getElementById('user-q').value.toLowerCase();
+  const plan = document.getElementById('plan-filter').value;
+  const status = document.getElementById('status-filter').value;
+  let list = allUsers;
+  if (q) list = list.filter(u => u.username.toLowerCase().includes(q) || (u.telegram_id||'').includes(q));
+  if (plan) list = list.filter(u => u.plan === plan);
+  if (status === 'active') list = list.filter(u => !u.is_banned);
+  if (status === 'banned') list = list.filter(u => u.is_banned);
+  renderUsers(list);
+}
+
+/* ═══════ USER MODAL ═══════ */
+async function openUserModal(userId) {
+  document.getElementById('user-modal').classList.add('open');
+  document.getElementById('modal-body').innerHTML = '<div style="text-align:center;padding:1rem;color:var(--gray)">Memuat...</div>';
+  const { data, ok } = await API.get(`/api/admin?action=user_detail&user_id=${userId}`);
+  if (!ok) { document.getElementById('modal-body').innerHTML = '<div style="color:var(--hot)">Gagal memuat data</div>'; return; }
+  const p = data.profile;
+  document.getElementById('modal-uname').textContent = `👤 ${p.username}`;
+  document.getElementById('modal-body').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-bottom:1rem">
+      ${[['Plan',`<span class="bp bp-${p.plan}">${p.plan}</span>`],['Role',`<span class="bp bp-${p.role==='admin'?'admin':'free'}">${p.role}</span>`],['XP',Format.number(p.xp||0)],['Koin',Format.number(p.coins||0)],['Level',p.level||1],['Games',p.games_played||0],['Chat',p.chat_messages||0],['Streak',`${p.streak||0}🔥`],['Telegram',p.telegram_id||'-'],['Bergabung',Format.relativeTime(p.created_at)],['Last Seen',Format.relativeTime(p.last_seen)],['Plan Expires',p.plan_expires?Format.relativeTime(p.plan_expires):'-']].map(([l,v])=>`<div><div class="stat-l">${l}</div><div style="font-size:.85rem">${v}</div></div>`).join('')}
+    </div>
+    <div style="border-top:1px solid var(--bd);padding-top:.85rem;margin-bottom:.65rem"><strong style="font-size:.82rem">Order Terakhir (${data.orders.length})</strong></div>
+    ${data.orders.slice(0,3).map(o=>`<div style="font-size:.78rem;padding:.35rem 0;border-bottom:1px solid var(--bd2);display:flex;justify-content:space-between"><span>${o.order_id}</span><span class="bp bp-${o.status==='approved'?'ok':o.status==='pending'?'warn':'err'}">${o.status}</span><span>Rp${Format.number(o.price)}</span></div>`).join('')||'<div style="color:var(--gray);font-size:.8rem">Belum ada order</div>'}
+    <div style="border-top:1px solid var(--bd);padding-top:.85rem;margin-top:.5rem">
+      <strong style="font-size:.82rem;display:block;margin-bottom:.5rem">Aksi Cepat</strong>
+      <div class="act-row">
+        <button class="btn btn-xs btn-outline" onclick="quickGrantPlan('${p.id}','${p.username}');closeModal('user-modal')">🎁 Grant Plan</button>
+        <button class="btn btn-xs btn-outline" onclick="extendPlan('${p.id}','${p.username}')">➕ Extend Plan</button>
+        <button class="btn btn-xs btn-outline" onclick="resetUserStats('${p.id}','${p.username}')">🔄 Reset Stats</button>
+        <button class="btn btn-xs btn-outline" onclick="deleteUserSessions('${p.id}','${p.username}')">💬 Hapus Chat</button>
+        <button class="btn btn-xs btn-danger" onclick="confirmDeleteUser('${p.id}','${p.username}')">🗑️ Hapus User</button>
+      </div>
+    </div>`;
+}
+
+/* ═══════ USER ACTIONS ═══════ */
+function quickEdit(id, username, plan, coins, xp) {
+  const newPlan = prompt(`Plan untuk ${username}:`, plan);
+  if (!newPlan || !['free','premium','vip'].includes(newPlan)) return;
+  API.post('/api/admin?action=edit_user', { user_id:id, plan:newPlan }).then(({ok})=>{ if(ok){ Toast.ok('Plan diubah!'); loadUsers(); } else Toast.err('Gagal'); });
+}
+
+function quickGrantPlan(id, username) {
+  const plan = prompt(`Plan untuk ${username} (premium/vip):`, 'premium');
+  if (!plan || !['premium','vip'].includes(plan)) return;
+  const days = parseInt(prompt('Berapa hari?', '30'));
+  if (!days||days<1) return;
+  API.post('/api/admin?action=grant_plan', { user_id:id, plan, days }).then(({ok})=>{ if(ok){ Toast.ok(`${plan} ${days}hr → ${username}`); addLog('OK',`Grant ${plan} ${days}hr → ${username}`); loadUsers(); } else Toast.err('Gagal'); });
+}
+
+function extendPlan(id, username) {
+  const days = parseInt(prompt(`Perpanjang plan ${username} berapa hari?`, '30'));
+  if (!days||days<1) return;
+  API.post('/api/admin?action=extend_plan', { user_id:id, days }).then(({ok,data})=>{ if(ok){ Toast.ok(`Plan diperpanjang ${days} hari`); loadUsers(); } else Toast.err('Gagal'); });
+}
+
+function toggleBan(id, username, ban) {
+  if (!confirm(`${ban?'Ban':'Unban'} ${username}?`)) return;
+  API.post('/api/admin?action=ban_user', { user_id:id, banned:ban }).then(({ok})=>{ if(ok){ Toast.ok(`${username} ${ban?'dibanned':'di-unban'}`); addLog('WARN',`${ban?'BAN':'UNBAN'}: ${username}`); loadUsers(); } else Toast.err('Gagal'); });
+}
+
+function resetUserStats(id, username) {
+  if (!confirm(`Reset semua stats ${username}? XP, koin, level, games, chat akan di-reset!`)) return;
+  API.post('/api/admin?action=reset_user_stats', { user_id:id }).then(({ok})=>{ if(ok){ Toast.ok('Stats di-reset'); loadUsers(); } else Toast.err('Gagal'); });
+}
+
+function deleteUserSessions(id, username) {
+  if (!confirm(`Hapus semua chat ${username}?`)) return;
+  API.post('/api/admin?action=delete_sessions', { user_id:id }).then(({ok,data})=>{ if(ok){ Toast.ok(`${data?.deleted||0} sesi dihapus`); } else Toast.err('Gagal'); });
+}
+
+function confirmDeleteUser(id, username) {
+  if (!confirm(`HAPUS USER ${username}? Semua data akan hilang PERMANEN!`)) return;
+  if (!confirm(`Konfirmasi: benar-benar hapus ${username}?`)) return;
+  API.del(`/api/admin?action=delete_user&user_id=${id}`).then(({ok})=>{ if(ok){ Toast.ok(`${username} dihapus`); addLog('WARN',`DELETE USER: ${username}`); closeModal('user-modal'); loadUsers(); } else Toast.err('Gagal'); });
+}
+
+/* ═══════ ORDERS ═══════ */
+async function loadOrders() {
+  const { data, ok } = await API.get('/api/admin?action=orders');
+  if (!ok) return;
+  allOrders = data.orders||[];
+  renderOrders(allOrders);
+  renderPendingOrders();
+  addLog('OK', `${allOrders.length} orders loaded`);
+}
+
+function renderOrders(list) {
+  const tb = document.getElementById('orders-tb');
+  if (!list.length) { tb.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--gray);padding:2rem">Tidak ada order</td></tr>`; return; }
+  const sc = { pending:'var(--amber)', approved:'var(--green)', rejected:'var(--hot)', expired:'var(--gray)', refunded:'var(--violet)' };
+  tb.innerHTML = list.map(o => `
+    <tr>
+      <td style="font-family:var(--ff-mono);font-size:.68rem;color:var(--gray2)">${o.order_id}</td>
+      <td><div style="font-weight:600">${o.customer_name}</div><div style="font-size:.68rem;color:var(--gray2)">${o.telegram_id||''}</div></td>
+      <td><span class="bp bp-${o.plan}">${o.plan} ${o.duration}hr</span></td>
+      <td style="font-weight:600">Rp${Format.number(o.price||0)}</td>
+      <td style="font-size:.72rem;color:var(--gray2)">${o.payment_method||'qris'}</td>
+      <td><span style="color:${sc[o.status]||'var(--gray)'};font-weight:700;font-size:.75rem">${o.status}</span></td>
+      <td style="color:var(--gray2);font-size:.7rem">${Format.relativeTime(o.created_at)}</td>
+      <td><div class="act-row">
+        ${o.status==='pending'?`<button class="btn btn-xs btn-success" onclick="approveOrder('${o.order_id}')">✓</button><button class="btn btn-xs btn-danger" onclick="rejectOrder('${o.order_id}')">✗</button>`:''}
+        ${o.status==='approved'?`<button class="btn btn-xs btn-outline" onclick="refundOrder('${o.order_id}','${o.user_id||''}')">↩ Refund</button>`:''}
+        <button class="btn btn-xs btn-ghost" onclick="viewOrderDetail('${o.order_id}')">👁</button>
+      </div></td>
+    </tr>`).join('');
+}
+
+function renderPendingOrders() {
+  const tb = document.getElementById('pending-orders-tb');
+  const pending = allOrders.filter(o=>o.status==='pending');
+  tb.innerHTML = pending.slice(0,5).map(o=>`
+    <tr><td style="font-family:var(--ff-mono);font-size:.68rem">${o.order_id.slice(-8)}</td><td><span class="bp bp-${o.plan}">${o.plan}</span></td><td><div class="act-row"><button class="btn btn-xs btn-success" onclick="approveOrder('${o.order_id}')">✓</button><button class="btn btn-xs btn-danger" onclick="rejectOrder('${o.order_id}')">✗</button></div></td></tr>`).join('')||'<tr><td colspan="3" style="color:var(--green);padding:.75rem;text-align:center">✓ Tidak ada pending</td></tr>';
+}
+
+function filterOrders() {
+  const s = document.getElementById('order-filter').value;
+  renderOrders(s ? allOrders.filter(o=>o.status===s) : allOrders);
+}
+
+async function approveOrder(id) {
+  if (!confirm(`Approve ${id}?`)) return;
+  const {ok} = await API.post('/api/admin?action=approve_order', { order_id:id });
+  if (ok) { Toast.ok('Approved!'); addLog('OK',`Approve: ${id}`); loadOrders(); loadStats(); } else Toast.err('Gagal');
+}
+
+async function rejectOrder(id) {
+  if (!confirm(`Reject ${id}?`)) return;
+  const {ok} = await API.post('/api/admin?action=reject_order', { order_id:id });
+  if (ok) { Toast.ok('Rejected'); addLog('WARN',`Reject: ${id}`); loadOrders(); } else Toast.err('Gagal');
+}
+
+async function bulkApprove() {
+  const pending = allOrders.filter(o=>o.status==='pending').length;
+  if (!pending) { Toast.info('Tidak ada pending order'); return; }
+  if (!confirm(`Approve ${pending} order pending?`)) return;
+  const {ok,data} = await API.post('/api/admin?action=bulk_approve', {});
+  if (ok) { Toast.ok(`${data?.approved||pending} order approved!`); addLog('OK',`Bulk approve: ${data?.approved} orders`); loadOrders(); loadStats(); } else Toast.err('Gagal');
+}
+
+function viewOrderDetail(id) {
+  const o = allOrders.find(x=>x.order_id===id);
+  if (!o) return;
+  const sc = { pending:'var(--amber)', approved:'var(--green)', rejected:'var(--hot)', expired:'var(--gray)', refunded:'var(--violet)' };
+  Modal.confirm(
+    `Detail Order: ${o.order_id.slice(-10)}`,
+    `<div style="display:flex;flex-direction:column;gap:.5rem;font-size:.83rem">
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--gray)">Customer</span><strong>${Format.escape(o.customer_name)}</strong></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--gray)">Telegram</span><span style="font-family:var(--ff-mono)">${o.telegram_id||'-'}</span></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--gray)">Email</span><span>${o.email||'-'}</span></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--gray)">Paket</span><span>${o.plan?.toUpperCase()} ${o.duration} hari</span></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--gray)">Harga</span><strong>Rp ${Format.number(o.price)}</strong></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--gray)">Diskon</span><span>Rp ${Format.number(o.discount||0)} ${o.coupon?'('+o.coupon+')':''}</span></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--gray)">Status</span><span style="color:${sc[o.status]||'var(--gray)'};font-weight:700">${o.status}</span></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--gray)">Metode</span><span style="text-transform:uppercase">${o.payment_method||'qris'}</span></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--gray)">Dibuat</span><span>${Format.datetime(o.created_at)}</span></div>
+      ${o.note?`<div style="display:flex;justify-content:space-between"><span style="color:var(--gray)">Catatan</span><span>${Format.escape(o.note)}</span></div>`:''}
+    </div>`,
+    () => {},
+    'primary'
+  );
+  // Update confirm button to just Close
+  const allModals = document.querySelectorAll('.modal-overlay');
+  const lastModal = allModals[allModals.length - 1];
+  if (lastModal) {
+    const confirmBtn = lastModal.querySelector('[id$="-confirm"]');
+    if (confirmBtn) confirmBtn.textContent = '✕ Tutup';
+  }
+}
+
+async function refundOrder(id, userId) {
+  Modal.confirm(
+    '↩ Refund Order',
+    `Refund order <b>${id.slice(-10)}</b>?<br><br>Status akan diubah ke <b>refunded</b>. Centang jika ingin mencabut akses plan juga.<br><br><label style="display:flex;align-items:center;gap:.5rem;font-size:.83rem;cursor:pointer"><input type="checkbox" id="refund-revoke" style="accent-color:var(--accent)"> Cabut plan user sekaligus</label>`,
+    async () => {
+      const revoke = document.getElementById('refund-revoke')?.checked || false;
+      const { ok } = await API.post('/api/admin?action=refund_order', { order_id: id, revoke_plan: revoke, user_id: userId });
+      if (ok) { Toast.ok('Order di-refund'); addLog('WARN', \`Refund: \${id}\`); loadOrders(); }
+      else Toast.err('Gagal refund');
+    },
+    'danger'
+  );
+}
+
+/* ═══════ ANALYTICS ═══════ */
+async function loadAnalytics(days) {
+  const { data, ok } = await API.get(`/api/admin?action=analytics&days=${days}`);
+  if (!ok) return;
+  const userEntries = Object.entries(data.usersByDay||{}).sort(([a],[b])=>a.localeCompare(b));
+  const revEntries  = Object.entries(data.revByDay||{}).sort(([a],[b])=>a.localeCompare(b));
+  const totalUsers  = userEntries.reduce((s,[,v])=>s+v,0);
+  const totalRev    = revEntries.reduce((s,[,v])=>s+v,0);
+  document.getElementById('an-newusers').textContent = Format.number(totalUsers);
+  document.getElementById('an-revenue').textContent  = 'Rp' + Format.number(totalRev);
+  document.getElementById('an-active').textContent   = Format.number(data.activeCount||0);
+  renderMiniChart('chart-users', userEntries.map(([,v])=>v), 'var(--accent)');
+  renderMiniChart('chart-revenue', revEntries.map(([,v])=>v), 'var(--green)');
+  // Model usage
+  const { data: mu } = await API.get('/api/admin?action=model_usage');
+  const tb = document.getElementById('model-usage-tb');
+  const total = (mu?.models||[]).reduce((s,m)=>s+m.count,0);
+  tb.innerHTML = (mu?.models||[]).slice(0,8).map(m=>`<tr><td style="font-family:var(--ff-mono)">${m.model}</td><td>${Format.number(m.count)}</td><td style="color:var(--gray2)">${total>0?Math.round(m.count/total*100):0}%</td></tr>`).join('') || '<tr><td colspan="3" style="color:var(--gray);padding:1rem;text-align:center">Belum ada data</td></tr>';
+  // Payment methods
+  const { data: pm } = await API.get('/api/admin?action=payment_methods');
+  const tb2 = document.getElementById('payment-methods-tb');
+  tb2.innerHTML = (pm?.methods||[]).map(m=>`<tr><td style="text-transform:uppercase;font-family:var(--ff-mono)">${m.method}</td><td>${m.count}</td></tr>`).join('') || '<tr><td colspan="2" style="color:var(--gray);padding:1rem;text-align:center">Belum ada data</td></tr>';
+  addLog('OK', `Analytics ${days} hari loaded`);
+}
+
+function renderMiniChart(elId, values, color) {
+  const el = document.getElementById(elId);
+  if (!el||!values.length) return;
+  const max = Math.max(...values, 1);
+  el.innerHTML = values.map(v => `<div class="chart-bar" style="height:${Math.max(4,Math.round(v/max*100))}%;background:${color};flex:1;opacity:${.5+v/max*.5}" title="${v}"></div>`).join('');
+}
+
+/* ═══════ HEALTH ═══════ */
+async function loadHealth() {
+  const { data, ok } = await API.get('/api/admin?action=system_health');
+  if (!ok) { addLog('ERROR','Failed to load health'); return; }
+  const items = [
+    { ico:'🗄️', label:'Database', val:data.db==='ok'?'✅ Connected':'❌ Error', color: data.db==='ok'?'var(--green)':'var(--hot)' },
+    { ico:'⏱️', label:'Uptime', val:data.uptimeHuman },
+    { ico:'💾', label:'Memory', val:`${data.memory?.used} / ${data.memory?.total}` },
+    { ico:'🔧', label:'Node.js', val:data.node },
+    { ico:'🏗️', label:'Supabase', val:data.supabaseUrl },
+    { ico:'🤖', label:'Cloudflare AI', val:data.cfAI },
+    { ico:'💳', label:'iPaymu', val:data.ipaymu },
+    { ico:'📱', label:'Telegram Bot', val:data.botToken },
+    { ico:'🔧', label:'Maintenance', val:data.maintenance?'AKTIF':'Nonaktif', color: data.maintenance?'var(--hot)':'var(--green)' },
+  ];
+  document.getElementById('health-grid').innerHTML = items.map(i=>`
+    <div class="health-item">
+      <div class="health-ico">${i.ico}</div>
+      <div class="health-info">
+        <div class="health-label">${i.label}</div>
+        <div class="health-val" style="color:${i.color||'var(--white)'}">${i.val}</div>
+      </div>
+    </div>`).join('');
+  // Chat stats
+  const { data: cs } = await API.get('/api/admin?action=chat_stats');
+  document.getElementById('chat-total').textContent = Format.number(cs?.total||0);
+  const chartData = Object.entries(cs?.byDay||{}).sort(([a],[b])=>a.localeCompare(b)).map(([,v])=>v);
+  renderMiniChart('chart-chat', chartData, 'var(--cyan)');
+  // Referral stats
+  const { data: rs } = await API.get('/api/admin?action=referral_stats');
+  const rtb = document.getElementById('referral-tb');
+  const grouped = {};
+  (rs?.referrals||[]).forEach(r=>{ grouped[r.referrer_id]=(grouped[r.referrer_id]||{count:0,coins:0}); grouped[r.referrer_id].count++; grouped[r.referrer_id].coins+=(r.coins_given||0); });
+  rtb.innerHTML = Object.entries(grouped).slice(0,10).map(([id,g])=>`<tr><td style="font-family:var(--ff-mono);font-size:.7rem">${id.slice(0,8)}...</td><td>${g.count}</td><td>${Format.number(g.coins)}</td></tr>`).join('')||'<tr><td colspan="3" style="color:var(--gray);padding:1rem;text-align:center">Belum ada referral</td></tr>';
+  addLog('OK', `Health loaded. Uptime: ${data.uptimeHuman}`);
+}
+
+/* ═══════ TOP USERS ═══════ */
+async function loadTopUsers(by) {
+  const { data, ok } = await API.get(`/api/admin?action=top_users&by=${by}&limit=20`);
+  if (!ok) return;
+  const tb = document.getElementById('top-users-tb');
+  tb.innerHTML = (data.users||[]).map((u,i)=>`
+    <tr>
+      <td><strong style="color:${i===0?'var(--amber)':i===1?'var(--gray)':i===2?'var(--orange)':'var(--gray2)'}">#${i+1}</strong></td>
+      <td><strong>${u.username}</strong></td>
+      <td><span class="bp bp-${u.plan}">${u.plan}</span></td>
+      <td>Lv.${u.level||1}</td>
+      <td>${Format.number(u.xp||0)}</td>
+      <td>${Format.number(u.coins||0)}</td>
+      <td>${u.games_played||0}</td>
+      <td>${u.chat_messages||0}</td>
+      <td><button class="btn btn-xs btn-ghost" onclick="openUserModal('${u.id}')">👁</button></td>
+    </tr>`).join('');
+}
+
+/* ═══════ INACTIVE & EXPIRING ═══════ */
+async function loadInactive() {
+  const { data, ok } = await API.get('/api/admin?action=inactive_users');
+  if (!ok) return;
+  const tb = document.getElementById('inactive-tb');
+  tb.innerHTML = (data.users||[]).map(u=>`
+    <tr>
+      <td><strong>${u.username}</strong></td>
+      <td><span class="bp bp-${u.plan}">${u.plan}</span></td>
+      <td style="color:var(--hot);font-size:.78rem">${Format.relativeTime(u.last_seen)}</td>
+      <td style="color:var(--gray2);font-size:.72rem">${Format.relativeTime(u.created_at)}</td>
+      <td><div class="act-row"><button class="btn btn-xs btn-outline" onclick="sendNotifToUser('${u.id}','${u.username}')">💌</button><button class="btn btn-xs btn-ghost" onclick="openUserModal('${u.id}')">👁</button></div></td>
+    </tr>`).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--green);padding:2rem">✓ Semua user aktif!</td></tr>';
+  addLog('OK', `${data.users?.length||0} inactive users`);
+}
+
+async function loadExpiring() {
+  const { data, ok } = await API.get('/api/admin?action=expiring_plans');
+  if (!ok) return;
+  const tb = document.getElementById('expiring-tb');
+  tb.innerHTML = (data.users||[]).map(u=>`
+    <tr>
+      <td><strong>${u.username}</strong></td>
+      <td><span class="bp bp-${u.plan}">${u.plan}</span></td>
+      <td style="font-size:.75rem;color:var(--gray2)">${u.telegram_id||'-'}</td>
+      <td style="color:var(--amber);font-size:.78rem">${Format.relativeTime(u.plan_expires)}</td>
+      <td><div class="act-row"><button class="btn btn-xs btn-outline" onclick="extendPlan('${u.id}','${u.username}')">➕ Extend</button><button class="btn btn-xs btn-ghost" onclick="sendNotifToUser('${u.id}','${u.username}')">🔔</button></div></td>
+    </tr>`).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--green);padding:2rem">✓ Tidak ada plan yang akan expired</td></tr>';
+  addLog('OK', `${data.users?.length||0} expiring plans`);
+}
+
+/* ═══════ REVENUE ═══════ */
+async function loadRevenue() {
+  const { data, ok } = await API.get('/api/admin?action=revenue_stats');
+  if (!ok) return;
+  document.getElementById('rv-total').textContent = 'Rp'+Format.number(data.total||0);
+  document.getElementById('rv-month').textContent = 'Rp'+Format.number(data.thisMonth||0);
+  document.getElementById('rv-count').textContent = Format.number(data.count||0);
+  document.getElementById('rv-avg').textContent   = 'Rp'+Format.number(Math.round(data.avgPerOrder||0));
+  const plans = ['premium','vip'];
+  document.getElementById('rev-by-plan').innerHTML = plans.map(p=>`<div style="display:flex;justify-content:space-between;padding:.35rem 0;border-bottom:1px solid var(--bd2)"><span class="bp bp-${p}">${p}</span><strong>Rp${Format.number((data.revByPlan||{})[p]||0)}</strong></div>`).join('');
+  document.getElementById('orders-by-plan').innerHTML = plans.map(p=>`<div style="display:flex;justify-content:space-between;padding:.35rem 0;border-bottom:1px solid var(--bd2)"><span class="bp bp-${p}">${p}</span><strong>${(data.byPlan||{})[p]||0} order</strong></div>`).join('');
+  addLog('OK', `Revenue: Rp${Format.number(data.total||0)}`);
+}
+
+/* ═══════ BROADCAST ═══════ */
+async function sendBroadcast() {
+  const title  = document.getElementById('bc-title').value.trim();
+  const msg    = document.getElementById('bc-msg').value.trim();
+  const target = document.getElementById('bc-target').value;
+  const type   = document.getElementById('bc-type').value;
+  const icon   = document.getElementById('bc-icon').value||'📢';
+  const action_url = document.getElementById('bc-url').value.trim();
+  if (!title||!msg) { Toast.warn('Judul dan pesan wajib'); return; }
+  if (!confirm(`Kirim broadcast ke ${target==='all'?'SEMUA user':target}?`)) return;
+  const {data,ok} = await API.post('/api/admin?action=broadcast', { title, message:msg, target, type, icon, action_url });
+  if (ok) { Toast.ok(`Broadcast terkirim ke ${data.sent} user!`); addLog('OK',`Broadcast: "${title}" → ${data.sent} users`); document.getElementById('bc-title').value=''; document.getElementById('bc-msg').value=''; }
+  else Toast.err('Gagal kirim');
+}
+
+async function searchUserForNotif() {
+  const q = document.getElementById('notif-user-q').value.trim();
+  if (q.length < 2) { document.getElementById('notif-user-results').innerHTML=''; return; }
+  const {data,ok} = await API.get(`/api/admin?action=search_user&q=${encodeURIComponent(q)}`);
+  if (!ok) return;
+  document.getElementById('notif-user-results').innerHTML = (data.users||[]).slice(0,4).map(u=>`<div style="padding:.35rem .65rem;background:var(--bg3);border-radius:var(--r2);cursor:pointer;font-size:.8rem;margin-top:.2rem" onclick="selectNotifUser('${u.id}','${u.username}')"><strong>${u.username}</strong> <span class="bp bp-${u.plan}">${u.plan}</span></div>`).join('');
+}
+
+function selectNotifUser(id, username) {
+  selectedNotifUserId = id;
+  document.getElementById('notif-user-results').innerHTML='';
+  document.getElementById('notif-user-q').value='';
+  document.getElementById('selected-user-badge').style.display='block';
+  document.getElementById('selected-user-badge').innerHTML=`<span class="bp bp-ok">✓ ${username}</span> <button style="background:none;border:none;color:var(--hot);cursor:pointer;font-size:.72rem" onclick="selectedNotifUserId=null;document.getElementById('selected-user-badge').style.display='none'">✕</button>`;
+}
+
+function sendNotifToUser(id, username) {
+  selectNotifUser(id, username);
+  showPanel('broadcast');
+}
+
+async function sendNotifUser() {
+  if (!selectedNotifUserId) { Toast.warn('Pilih user terlebih dahulu'); return; }
+  const title = document.getElementById('nu-title').value.trim();
+  const msg   = document.getElementById('nu-msg').value.trim();
+  if (!title||!msg) { Toast.warn('Judul dan pesan wajib'); return; }
+  const {ok} = await API.post('/api/admin?action=send_notif_user', { user_id:selectedNotifUserId, title, message:msg });
+  if (ok) { Toast.ok('Notifikasi terkirim!'); document.getElementById('nu-title').value=''; document.getElementById('nu-msg').value=''; }
+  else Toast.err('Gagal');
+}
+
+async function setAnnouncement() {
+  const msg = document.getElementById('ann-text').value.trim();
+  const {ok} = await API.post('/api/admin?action=set_announcement', { message:msg });
+  if (ok) Toast.ok(msg?'Announcement disimpan!':'Announcement dihapus'); else Toast.err('Gagal');
+}
+
+async function sendReminderAll() {
+  if (!confirm('Kirim reminder ke semua user inactive >30 hari?')) return;
+  const {data,ok} = await API.post('/api/admin?action=send_reminder', {});
+  if (ok) { Toast.ok(`Reminder terkirim ke ${data.sent} user!`); addLog('OK',`Send reminder → ${data.sent} users`); }
+  else Toast.err('Gagal');
+}
+
+/* ═══════ NOTIF LOG ═══════ */
+async function loadNotifLog() {
+  const {data,ok} = await API.get('/api/admin?action=notif_log');
+  const tb = document.getElementById('notif-log-tb');
+  tb.innerHTML = (data?.notifications||[]).map(n=>`
+    <tr>
+      <td style="font-family:var(--ff-mono);font-size:.68rem;color:var(--gray2)">${n.user_id.slice(0,8)}...</td>
+      <td><span class="bp bp-${n.type==='success'?'ok':n.type==='warning'?'warn':'free'}">${n.type}</span></td>
+      <td><strong style="font-size:.78rem">${n.title}</strong><div style="font-size:.7rem;color:var(--gray2)">${n.message?.slice(0,50)||''}</div></td>
+      <td style="color:var(--gray2);font-size:.7rem">${Format.relativeTime(n.created_at)}</td>
+    </tr>`).join('')||'<tr><td colspan="4" style="color:var(--gray);padding:2rem;text-align:center">Belum ada notifikasi</td></tr>';
+}
+
+async function clearOldNotifs() {
+  if (!confirm('Hapus semua notifikasi sudah dibaca dan >30 hari?')) return;
+  const {ok} = await API.del('/api/admin?action=clear_old_notifs');
+  if (ok) { Toast.ok('Notifikasi lama dihapus'); loadNotifLog(); } else Toast.err('Gagal');
+}
+
+/* ═══════ COUPONS ═══════ */
+async function loadCoupons() {
+  const {data,ok} = await API.get('/api/admin?action=list_coupons');
+  const tb = document.getElementById('coupons-tb');
+  tb.innerHTML = (data?.coupons||[]).map(c=>`
+    <tr>
+      <td><strong style="font-family:var(--ff-mono)">${c.code}</strong></td>
+      <td><strong style="color:var(--green)">${Math.round(c.discount*100)}%</strong></td>
+      <td><span class="bp ${c.active?'bp-ok':'bp-err'}">${c.active?'Aktif':'Nonaktif'}</span></td>
+      <td><div class="act-row">
+        <button class="btn btn-xs btn-outline" onclick="toggleCoupon('${c.code}')">${c.active?'Nonaktifkan':'Aktifkan'}</button>
+        <button class="btn btn-xs btn-danger" onclick="deleteCoupon('${c.code}')">🗑️</button>
+      </div></td>
+    </tr>`).join('')||'<tr><td colspan="4" style="color:var(--gray);padding:1rem;text-align:center">Belum ada kupon</td></tr>';
+}
+
+async function createCoupon() {
+  const code = document.getElementById('new-coupon-code').value.trim().toUpperCase();
+  const disc = parseInt(document.getElementById('new-coupon-disc').value);
+  if (!code||!disc) { Toast.warn('Isi kode dan diskon'); return; }
+  const {ok,error} = await API.post('/api/admin?action=create_coupon', { code, discount: disc/100 });
+  if (ok) { Toast.ok(`Kupon ${code} dibuat!`); loadCoupons(); document.getElementById('new-coupon-code').value=''; document.getElementById('new-coupon-disc').value=''; }
+  else Toast.err(error||'Gagal');
+}
+
+async function deleteCoupon(code) {
+  if (!confirm(`Hapus kupon ${code}?`)) return;
+  const {ok} = await API.del(`/api/admin?action=delete_coupon&code=${code}`);
+  if (ok) { Toast.ok(`Kupon ${code} dihapus`); loadCoupons(); } else Toast.err('Gagal');
+}
+
+async function toggleCoupon(code) {
+  const {ok,data} = await API.post('/api/admin?action=toggle_coupon', { code });
+  if (ok) { Toast.ok(`Kupon ${code} ${data.active?'diaktifkan':'dinonaktifkan'}`); loadCoupons(); } else Toast.err('Gagal');
+}
+
+/* ═══════ LEADERBOARD ═══════ */
+async function loadLeaderboard(by) {
+  const {data,ok} = await API.get(`/api/admin?action=leaderboard_admin&by=${by}`);
+  if (!ok) return;
+  const tb = document.getElementById('lb-admin-tb');
+  tb.innerHTML = (data.users||[]).map(u=>`
+    <tr>
+      <td><strong style="color:${u.rank<=3?'var(--amber)':'var(--gray2)'}">#${u.rank}</strong></td>
+      <td><strong>${u.username}</strong></td>
+      <td><span class="bp bp-${u.plan}">${u.plan}</span></td>
+      <td>Lv.${u.level||1}</td>
+      <td>${Format.number(u.xp||0)}</td>
+      <td>${Format.number(u.coins||0)}</td>
+      <td>${u.games_played||0}</td>
+      <td>${u.chat_messages||0}</td>
+      <td><button class="btn btn-xs btn-ghost" onclick="openUserModal('${u.id}')">👁</button></td>
+    </tr>`).join('');
+}
+
+/* ═══════ SETTINGS ═══════ */
+async function toggleMaintenance() {
+  const enabled = document.getElementById('maintenance-toggle').checked;
+  const msg = document.getElementById('maintenance-msg').value.trim();
+  const {ok} = await API.post('/api/admin?action=maintenance_toggle', { enabled, message:msg });
+  if (ok) { Toast.ok(enabled?'Maintenance AKTIF':'Maintenance dimatikan'); document.getElementById('maintenance-badge').style.display=enabled?'block':'none'; addLog('WARN',`Maintenance: ${enabled?'ON':'OFF'}`); }
+  else Toast.err('Gagal');
+}
+
+async function clearActivityLog() {
+  if (!confirm('Hapus activity log >30 hari?')) return;
+  const {ok} = await API.post('/api/admin?action=clear_activity_log', {});
+  if (ok) Toast.ok('Activity log dibersihkan'); else Toast.err('Gagal');
+}
+
+/* ═══════ EXPORT ═══════ */
+function exportToCSV(data, filename, headers, rows) {
+  const csv = [headers.join(','), ...data.map(rows)].join('\n');
+  const blob = new Blob([csv], { type:'text/csv' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; a.click();
+  Toast.ok(`${filename} didownload!`);
+}
+
+async function exportUsers() {
+  const {data,ok} = await API.get('/api/admin?action=export_users');
+  if (!ok) { Toast.err('Gagal export'); return; }
+  exportToCSV(data.users||[], 'kizai-users.csv',
+    ['Username','Plan','Role','XP','Coins','Level','Games','Chat','Banned','Created'],
+    u=>`${u.username},${u.plan},${u.role},${u.xp||0},${u.coins||0},${u.level||1},${u.games_played||0},${u.chat_messages||0},${u.is_banned},${u.created_at}`);
+}
+
+async function exportOrders() {
+  const {data,ok} = await API.get('/api/admin?action=export_orders');
+  if (!ok) { Toast.err('Gagal export'); return; }
+  exportToCSV(data.orders||[], 'kizai-orders.csv',
+    ['OrderID','Customer','Plan','Duration','Price','Status','Method','Created'],
+    o=>`${o.order_id},${o.customer_name},${o.plan},${o.duration},${o.price||0},${o.status},${o.payment_method||'qris'},${o.created_at}`);
+}
+</script>
+</body>
+</html>
