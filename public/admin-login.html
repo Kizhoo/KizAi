@@ -76,6 +76,11 @@ async function doAdminLogin() {
   }
   Store.set('token', data.access_token);
   Store.set('user', data.user);
+  if (data.refresh_token) Store.set('refresh_token', data.refresh_token);
+  if (data.user?.preferences) {
+    const p = data.user.preferences;
+    Store.set('prefs', { theme: p.theme||'dark', accent: p.accent||'blue', fontSize: p.fontSize||'md' });
+  }
   Toast.ok('Login admin berhasil!');
   setTimeout(() => location.href = '/admin', 800);
 }

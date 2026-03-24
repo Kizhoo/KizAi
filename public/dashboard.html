@@ -226,8 +226,8 @@
       <div style="margin-left:auto;display:flex;gap:.5rem">
         <button class="btn btn-xs btn-ghost" onclick="Theme.toggle()" data-tip="Toggle tema">🌙</button>
         <a href="/" class="btn btn-xs btn-ghost" data-tip="Beranda">🏠</a>
-        <a id="admin-btn-link" href="/admin" class="btn btn-xs btn-primary" style="display:none" data-tip="Admin Panel">⚙️ Admin</a>
-        <button class="btn btn-xs btn-danger" onclick="Auth.logout()">Keluar</button>
+        <a id="admin-btn-link" href="/admin" class="btn btn-xs btn-danger" style="display:none" data-tip="Admin Panel">⚡ Admin</a>
+        <button class="btn btn-xs btn-ghost" onclick="Auth.logout()">Keluar</button>
       </div>
     </div>
 
@@ -520,11 +520,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function loadUserData() {
   const local = Auth.getUser();
   document.getElementById('overview-greeting').textContent = `Halo, ${local?.username || 'User'}! 👋`;
-  // Show admin button if user is admin
-  if (local?.role === 'admin') {
+
+  // Tampilkan tombol admin (dari cache lokal dulu, update setelah API)
+  function showAdminBtn(user) {
     const adminBtn = document.getElementById('admin-btn-link');
-    if (adminBtn) adminBtn.style.display = '';
+    if (adminBtn) adminBtn.style.display = (user?.role === 'admin') ? '' : 'none';
   }
+  showAdminBtn(local);
+
   document.getElementById('ds-uname').textContent = local?.username || 'User';
   renderUserBasic(local);
 
@@ -532,6 +535,7 @@ async function loadUserData() {
   if (ok && data?.user) {
     userData = data.user;
     Store.set('user', userData);
+    showAdminBtn(userData); // update setelah dapat data fresh dari server
     renderAll();
   } else {
     userData = local;
